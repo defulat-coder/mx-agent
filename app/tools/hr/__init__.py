@@ -1,4 +1,4 @@
-"""HR Tools — 统一导出查询、办理、主管、管理者工具"""
+"""HR Tools — 统一导出查询、办理、主管、管理者、人才发展工具"""
 
 from app.tools.hr.action import apply_leave, apply_overtime, apply_reimbursement
 from app.tools.hr.admin_action import (
@@ -19,6 +19,21 @@ from app.tools.hr.admin_query import (
     admin_get_salary_summary,
 )
 from app.tools.hr.manager_action import approve_leave_request, approve_overtime_request
+from app.tools.hr.talent_dev_query import (
+    td_get_employee_attendance,
+    td_get_employee_history,
+    td_get_employee_idp,
+    td_get_employee_performance,
+    td_get_employee_profile,
+    td_get_employee_talent_review,
+    td_get_employee_training,
+    td_idp_summary,
+    td_nine_grid_distribution,
+    td_performance_distribution,
+    td_promotion_stats,
+    td_training_summary,
+    td_turnover_analysis,
+)
 from app.tools.hr.manager_query import (
     get_employee_profile,
     get_team_attendance,
@@ -92,4 +107,20 @@ admin_action_tools = [
 
 admin_tools = admin_query_tools + admin_action_tools
 
-all_tools = employee_tools + manager_tools + admin_tools
+talent_dev_tools = [
+    td_get_employee_profile,
+    td_get_employee_training,
+    td_get_employee_talent_review,
+    td_get_employee_idp,
+    td_get_employee_performance,
+    td_get_employee_history,
+    td_get_employee_attendance,
+    td_training_summary,
+    td_nine_grid_distribution,
+    td_performance_distribution,
+    td_turnover_analysis,
+    td_promotion_stats,
+    td_idp_summary,
+]
+
+all_tools = employee_tools + manager_tools + admin_tools + talent_dev_tools

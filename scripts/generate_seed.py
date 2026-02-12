@@ -23,6 +23,7 @@ sql("BEGIN;\n")
 
 # ── 清空旧数据 ──────────────────────────────────────────────
 for t in [
+    "development_plans", "talent_reviews", "trainings",
     "employment_histories", "performance_reviews",
     "overtime_records", "leave_requests", "leave_balances",
     "attendance_records", "social_insurance_records", "salary_records",
@@ -395,6 +396,194 @@ for eid, sd, ed, dept, pos, lv, ct, remark in hist_data:
     )
 sql("")
 
+# ── 11. trainings（培训记录/计划） ─────────────────────────────
+sql("-- trainings")
+
+training_courses = [
+    # (course_name, category, hours, provider, has_exam)
+    ("Python 高级编程", "专业技能", 16, "内训-张三", True),
+    ("微服务架构实践", "专业技能", 24, "极客时间", True),
+    ("React 前端开发", "专业技能", 20, "内训-谢强", True),
+    ("大模型应用开发", "专业技能", 32, "智谱AI学院", True),
+    ("测试自动化框架", "专业技能", 16, "内训-高峰", True),
+    ("产品需求分析", "专业技能", 12, "产品学院", False),
+    ("沟通与协作", "通用素质", 8, "内训-孙八", False),
+    ("时间管理", "通用素质", 4, "得到APP", False),
+    ("职业规划与发展", "通用素质", 6, "内训-孙八", False),
+    ("高效演讲技巧", "通用素质", 8, "外训-演讲力", False),
+    ("团队管理基础", "管理能力", 16, "混沌学园", True),
+    ("OKR 目标管理", "管理能力", 8, "内训-郑晓明", False),
+    ("技术团队领导力", "管理能力", 12, "外训-领导力学院", False),
+    ("信息安全意识", "合规必修", 4, "内训-安全组", True),
+    ("数据隐私保护", "合规必修", 4, "内训-法务部", True),
+    ("反舞弊合规培训", "合规必修", 2, "内训-法务部", True),
+    ("消防安全培训", "合规必修", 2, "行政部", False),
+]
+
+training_statuses = ["已完成", "已完成", "已完成", "进行中", "待开始", "未通过"]
+training_records: list[tuple] = []
+
+for eid, name, _, did, pos, lv, hd, st, _, _ in employees_raw:
+    # 每人 3-6 条培训记录
+    n_courses = random.randint(3, 6)
+    selected = random.sample(training_courses, min(n_courses, len(training_courses)))
+    for course_name, category, hours, provider, has_exam in selected:
+        status = random.choice(training_statuses)
+        score = None
+        completed_dt = None
+        deadline_dt = None
+        # 指派人：合规必修由 HR 指派，其他随机
+        assigned = "孙八" if category == "合规必修" else ("" if random.random() > 0.4 else reviewers_by_dept.get(did, "郑晓明"))
+
+        if status == "已完成":
+            completed_dt = date(2025, random.randint(1, 12), random.randint(1, 28)).isoformat()
+            deadline_dt = completed_dt
+            if has_exam:
+                score = random.randint(60, 100)
+        elif status == "未通过":
+            completed_dt = date(2025, random.randint(6, 12), random.randint(1, 28)).isoformat()
+            deadline_dt = completed_dt
+            if has_exam:
+                score = random.randint(30, 59)
+        elif status == "进行中":
+            deadline_dt = date(2026, random.randint(3, 6), random.randint(1, 28)).isoformat()
+        else:  # 待开始
+            deadline_dt = date(2026, random.randint(4, 9), random.randint(1, 28)).isoformat()
+
+        training_records.append((eid, course_name, category, hours, score, status, provider, assigned, deadline_dt, completed_dt))
+
+for eid, cn, cat, hrs, sc, st, prov, ab, dl, cd in training_records:
+    sc_val = str(sc) if sc is not None else "NULL"
+    dl_val = q(dl) if dl else "NULL"
+    cd_val = q(cd) if cd else "NULL"
+    sql(
+        f"INSERT INTO trainings (employee_id, course_name, category, hours, score, status, provider, assigned_by, deadline, completed_date) "
+        f"VALUES ({eid}, {q(cn)}, {q(cat)}, {hrs}, {sc_val}, {q(st)}, {q(prov)}, {q(ab)}, {dl_val}, {cd_val});"
+    )
+sql("")
+
+# ── 12. talent_reviews（人才盘点九宫格） ──────────────────────
+sql("-- talent_reviews")
+
+# 绩效评级 → 绩效维度映射
+perf_rating_to_dim = {"A": "高", "B+": "高", "B": "中", "C": "低", "D": "低"}
+
+# 九宫格位置映射
+nine_grid_map = {
+    ("高", "高"): "明星", ("高", "中"): "骨干", ("高", "低"): "专家",
+    ("中", "高"): "潜力股", ("中", "中"): "中坚", ("中", "低"): "守成者",
+    ("低", "高"): "待雕琢", ("低", "中"): "待观察", ("低", "低"): "淘汰区",
+}
+
+# 收集每人最近一次绩效评级
+latest_perf: dict[int, str] = {}
+for eid, yr, half, rating, score, reviewer, comment in perf_data:
+    key = (yr, 0 if half == "上半年" else 1)
+    if eid not in latest_perf or key > latest_perf.get(f"{eid}_key", (0, 0)):  # type: ignore
+        latest_perf[eid] = rating
+        latest_perf[f"{eid}_key"] = key  # type: ignore
+
+talent_review_records: list[tuple] = []
+for eid, name, _, did, pos, lv, hd, st, _, _ in employees_raw:
+    hire = date.fromisoformat(hd)
+    if hire.year > 2025:
+        continue  # 太新的员工不参与盘点
+
+    rating = latest_perf.get(eid, "B")
+    performance = perf_rating_to_dim.get(rating, "中")
+    # 潜力根据职级和随机因素
+    if lv in ("P7", "P8", "P9"):
+        potential = random.choice(["高", "高", "中"])
+    elif lv in ("P5", "P6"):
+        potential = random.choice(["高", "中", "中", "低"])
+    else:
+        potential = random.choice(["中", "低", "低"])
+
+    nine_grid = nine_grid_map[(performance, potential)]
+
+    # 标签
+    if nine_grid == "明星":
+        tag = random.choice(["高潜", "继任候选"])
+    elif nine_grid in ("骨干", "潜力股"):
+        tag = random.choice(["高潜", "关键岗位", "普通"])
+    elif nine_grid == "专家":
+        tag = "关键岗位"
+    else:
+        tag = "普通"
+
+    reviewer = reviewers_by_dept.get(did, "郑晓明")
+    if name == reviewer:
+        reviewer = "郑晓明" if name != "郑晓明" else "张三"
+
+    comments_map = {
+        "明星": "综合表现优秀，建议重点培养",
+        "骨干": "业务能力扎实，是团队核心",
+        "潜力股": "有较大成长空间，建议加强历练",
+        "中坚": "表现稳定，完成本职工作",
+        "专家": "专业能力突出，建议拓展管理能力",
+        "守成者": "完成基本工作，建议激发活力",
+        "待雕琢": "潜力不错但绩效待提升，需辅导",
+        "待观察": "表现一般，需要关注",
+        "淘汰区": "绩效和潜力均需改善，考虑转岗",
+    }
+
+    for review_year in [2024, 2025]:
+        talent_review_records.append((
+            eid, review_year, performance, potential, nine_grid, tag,
+            reviewer, comments_map.get(nine_grid, ""),
+        ))
+
+for eid, ry, perf, pot, ng, tag, rev, cmt in talent_review_records:
+    sql(
+        f"INSERT INTO talent_reviews (employee_id, review_year, performance, potential, nine_grid_pos, tag, reviewer, comment) "
+        f"VALUES ({eid}, {ry}, {q(perf)}, {q(pot)}, {q(ng)}, {q(tag)}, {q(rev)}, {q(cmt)});"
+    )
+sql("")
+
+# ── 13. development_plans（个人发展计划 IDP） ─────────────────
+sql("-- development_plans")
+
+idp_goals = [
+    ("掌握 Kubernetes 容器编排", "技术深耕", "完成 CKA 认证课程；在项目中实践 K8s 部署"),
+    ("系统学习分布式架构", "技术深耕", "阅读《DDIA》；完成微服务改造项目一个"),
+    ("提升大模型应用能力", "技术深耕", "完成 RAG 项目实战；掌握 Agent 框架"),
+    ("转型技术管理", "管理转型", "参加管理培训；带领小团队完成一个项目"),
+    ("从后端拓展全栈能力", "跨领域拓展", "学习 React/Vue；独立完成一个前端项目"),
+    ("掌握产品数据分析", "跨领域拓展", "学习 SQL + 数据分析；完成数据看板项目"),
+    ("考取 PMP 证书", "专业认证", "报名 PMP 培训班；每周刷题 5 小时"),
+    ("考取 CPA 证书", "专业认证", "参加 CPA 辅导班；完成模考 3 次"),
+    ("提升英语商务沟通", "跨领域拓展", "报名商务英语课程；每周英语角 1 次"),
+    ("深入学习 NLP 技术", "技术深耕", "阅读 3 篇顶会论文；复现一个开源模型"),
+]
+
+idp_statuses = ["进行中", "进行中", "进行中", "已完成", "已放弃"]
+idp_records: list[tuple] = []
+
+for eid, name, _, did, pos, lv, hd, st, _, _ in employees_raw:
+    hire = date.fromisoformat(hd)
+    if hire.year > 2025:
+        continue
+    # 每人 1-2 个 IDP
+    n_plans = random.randint(1, 2)
+    selected_goals = random.sample(idp_goals, n_plans)
+    for goal, category, actions in selected_goals:
+        status = random.choice(idp_statuses)
+        if status == "已完成":
+            progress = 100
+        elif status == "已放弃":
+            progress = random.randint(10, 40)
+        else:
+            progress = random.randint(20, 85)
+        dl = date(2026, random.randint(6, 12), random.randint(1, 28))
+        idp_records.append((eid, 2026, goal, category, actions, status, progress, dl.isoformat()))
+
+for eid, py, goal, cat, acts, st, prog, dl in idp_records:
+    sql(
+        f"INSERT INTO development_plans (employee_id, plan_year, goal, category, actions, status, progress, deadline) "
+        f"VALUES ({eid}, {py}, {q(goal)}, {q(cat)}, {q(acts)}, {q(st)}, {prog}, {q(dl)});"
+    )
+sql("")
+
 sql("\nCOMMIT;")
 
 # ── 输出 ────────────────────────────────────────────────────
@@ -417,3 +606,6 @@ print(f"  leave_requests:           {len(leave_data)}")
 print(f"  overtime_records:         {len(overtime_data)}")
 print(f"  performance_reviews:      {len(perf_data)}")
 print(f"  employment_histories:     {len(hist_data)}")
+print(f"  trainings:                {len(training_records)}")
+print(f"  talent_reviews:           {len(talent_review_records)}")
+print(f"  development_plans:        {len(idp_records)}")

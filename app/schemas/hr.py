@@ -252,3 +252,110 @@ class LeaveSummaryResponse(BaseModel):
     leave_type: str = Field(description="假期类型")
     total_days_used: Decimal = Field(description="已使用总天数")
     pending_count: int = Field(description="待审批申请数")
+
+
+# ── 人才发展基础 Schema ──────────────────────────────────────
+
+
+class TrainingResponse(BaseModel):
+    """培训记录"""
+
+    course_name: str = Field(description="课程名称")
+    category: str = Field(description="培训分类")
+    hours: Decimal = Field(description="学时")
+    score: int | None = Field(default=None, description="考试分数")
+    status: str = Field(description="状态")
+    provider: str = Field(description="培训机构/讲师")
+    assigned_by: str = Field(description="指派人")
+    deadline: dt.date | None = Field(default=None, description="截止日期")
+    completed_date: dt.date | None = Field(default=None, description="完成日期")
+
+
+class TalentReviewResponse(BaseModel):
+    """人才盘点记录"""
+
+    review_year: int = Field(description="盘点年度")
+    performance: str = Field(description="绩效维度（高/中/低）")
+    potential: str = Field(description="潜力维度（高/中/低）")
+    nine_grid_pos: str = Field(description="九宫格位置")
+    tag: str = Field(description="人才标签")
+    reviewer: str = Field(description="盘点人")
+    comment: str = Field(description="盘点评语")
+
+
+class DevelopmentPlanResponse(BaseModel):
+    """个人发展计划 (IDP)"""
+
+    plan_year: int = Field(description="计划年度")
+    goal: str = Field(description="发展目标")
+    category: str = Field(description="目标分类")
+    actions: str = Field(description="行动计划")
+    status: str = Field(description="状态")
+    progress: int = Field(description="完成进度百分比")
+    deadline: dt.date = Field(description="截止日期")
+
+
+# ── 人才发展报表 Schema ──────────────────────────────────────
+
+
+class TrainingSummaryResponse(BaseModel):
+    """部门培训统计"""
+
+    department_id: int = Field(description="部门 ID")
+    department_name: str = Field(description="部门名称")
+    total_employees: int = Field(description="总员工数")
+    completed_count: int = Field(description="已完成培训人次")
+    completion_rate: float = Field(description="培训完成率")
+    total_hours: float = Field(description="总学时")
+    avg_hours: float = Field(description="人均学时")
+    mandatory_completion_rate: float = Field(description="合规必修完成率")
+
+
+class NineGridDistributionResponse(BaseModel):
+    """九宫格分布"""
+
+    distribution: dict[str, int] = Field(description="各九宫格位置人数")
+    high_potential_employees: list[dict] = Field(description="高潜人才清单")
+
+
+class PerformanceDistributionResponse(BaseModel):
+    """部门绩效分布"""
+
+    department_id: int = Field(description="部门 ID")
+    department_name: str = Field(description="部门名称")
+    ratings: dict[str, int] = Field(description="各评级人数")
+    percentages: dict[str, float] = Field(description="各评级占比")
+
+
+class TurnoverAnalysisResponse(BaseModel):
+    """部门人员流动分析"""
+
+    department_id: int = Field(description="部门 ID")
+    department_name: str = Field(description="部门名称")
+    total_count: int = Field(description="总人数（含离职）")
+    active_count: int = Field(description="在职人数")
+    resigned_count: int = Field(description="离职人数")
+    turnover_rate: float = Field(description="离职率")
+    probation_conversion_rate: float = Field(description="试用期转正率")
+    avg_tenure_years: float = Field(description="平均司龄（年）")
+
+
+class PromotionStatsResponse(BaseModel):
+    """部门晋升统计"""
+
+    department_id: int = Field(description="部门 ID")
+    department_name: str = Field(description="部门名称")
+    promotion_count: int = Field(description="晋升人数")
+    transfer_in_count: int = Field(description="调入人数")
+    transfer_out_count: int = Field(description="调出人数")
+    promotion_rate: float = Field(description="晋升率")
+
+
+class IdpSummaryResponse(BaseModel):
+    """IDP 汇总统计"""
+
+    total_plans: int = Field(description="总计划数")
+    completed_count: int = Field(description="已完成数")
+    completion_rate: float = Field(description="完成率")
+    avg_progress: float = Field(description="平均进度")
+    category_distribution: dict[str, int] = Field(description="各类目标分布")

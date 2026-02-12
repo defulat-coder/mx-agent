@@ -12,6 +12,7 @@ _MOCK_EMPLOYEES = [
     {"employee_id": 9, "roles": ["manager", "admin"], "department_id": 2, "_name": "郑晓明（技术总监/管理者）"},
     {"employee_id": 5, "roles": [], "department_id": 3, "_name": "钱七（产品经理）"},
     {"employee_id": 4, "roles": ["manager"], "department_id": 9, "_name": "赵六（AI 组长）"},
+    {"employee_id": 6, "roles": ["talent_dev"], "department_id": 4, "_name": "孙八（HRBP/人才发展）"},
 ]
 
 
@@ -79,4 +80,21 @@ def get_admin_id(run_context: RunContext) -> int:
     roles: list[str] = state.get("roles", [])  # type: ignore[union-attr]
     if "admin" not in roles:
         raise ValueError("该功能仅限管理者使用")
+    return employee_id
+
+
+def get_talent_dev_id(run_context: RunContext) -> int:
+    """从 session_state 提取人才发展角色身份并校验。
+
+    Returns:
+        员工 ID
+
+    Raises:
+        ValueError: 非人才发展角色
+    """
+    employee_id = get_employee_id(run_context)
+    state = run_context.session_state
+    roles: list[str] = state.get("roles", [])  # type: ignore[union-attr]
+    if "talent_dev" not in roles:
+        raise ValueError("该功能仅限人才发展角色使用")
     return employee_id

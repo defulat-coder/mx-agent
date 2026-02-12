@@ -1,5 +1,7 @@
 """HR 数据查询 Tools — 封装员工薪资、考勤等只读查询，通过 RunContext 获取 employee_id"""
 
+import json
+
 from agno.run import RunContext
 
 from app.core.database import async_session_factory
@@ -8,11 +10,15 @@ from app.tools.hr.utils import get_employee_id
 
 
 async def get_employee_info(run_context: RunContext) -> str:
-    """查询当前员工的基本信息（姓名、工号、部门、岗位、职级、入职日期、状态）"""
+    """查询当前员工的基本信息和权限（姓名、工号、部门、岗位、职级、入职日期、状态、角色权限）"""
     employee_id = get_employee_id(run_context)
+    state = run_context.session_state
+    roles: list[str] = state.get("roles", []) if state else []  # type: ignore[union-attr]
     async with async_session_factory() as session:
         info = await hr_service.get_employee_info(session, employee_id)
-        return info.model_dump_json()
+        data = info.model_dump()
+        data["roles"] = roles
+        return json.dumps(data, ensure_ascii=False, default=str)
 
 
 async def get_salary_records(run_context: RunContext, year_month: str | None = None) -> str:
