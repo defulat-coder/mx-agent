@@ -1,0 +1,116 @@
+---
+description: 项目基础规则
+alwaysApply: true
+---
+
+# 项目规则
+
+## 包管理
+- 使用 uv 管理依赖和虚拟环境
+- 添加依赖用 `uv add`，不要用 pip install
+- 运行命令用 `uv run`
+- 执行 `uv add` 后必须执行 `uv sync` 确保锁文件和虚拟环境同步
+
+## 技术栈
+- Web 框架：FastAPI
+- AI 智能体：agno
+- Python >= 3.13
+
+## 项目结构
+
+```
+xm-agent/
+├── app/
+│   ├── __init__.py
+│   ├── main.py              # FastAPI 入口
+│   ├── config.py             # 配置
+│   ├── api/
+│   │   ├── __init__.py
+│   │   └── v1/
+│   │       ├── __init__.py
+│   │       ├── router.py     # 路由聚合
+│   │       └── endpoints/    # 各业务接口
+│   ├── agents/               # agno 智能体定义
+│   │   └── __init__.py
+│   ├── core/                 # 核心模块（中间件、异常、依赖注入等）
+│   │   └── __init__.py
+│   ├── models/               # Pydantic 模型 / 数据模型
+│   │   └── __init__.py
+│   ├── schemas/              # 请求/响应 schema
+│   │   └── __init__.py
+│   ├── services/             # 业务逻辑层
+│   │   └── __init__.py
+│   └── utils/                # 工具函数
+│       └── __init__.py
+├── pyproject.toml
+└── .env
+```
+
+## 编码规范
+- 类型注解必须完整
+- 异步优先，接口函数用 async def
+- 配置通过 pydantic-settings 管理，从环境变量/.env 读取
+
+## 注释规范
+
+### 模块级注释
+每个 `.py` 文件顶部用三引号 docstring 说明模块职责，一句话概括：
+```python
+"""HR 数据查询 Tools — 封装员工薪资、考勤等只读查询"""
+```
+
+### 类注释
+类定义下方用 docstring，说明职责和关键属性：
+```python
+class Employee(Base):
+    """员工基本信息模型
+
+    Attributes:
+        employee_no: 工号，全局唯一
+        status: 在职/离职/试用期
+    """
+```
+
+### 函数/方法注释
+- 公开函数必须有 docstring（Google 风格）
+- 私有函数（`_` 前缀）可省略，但复杂逻辑要加
+```python
+async def get_salary_records(employee_id: int, year_month: str | None = None) -> list[SalaryRecord]:
+    """查询员工薪资记录
+
+    Args:
+        employee_id: 员工 ID
+        year_month: 月份，格式 YYYY-MM，为空则返回最近 3 个月
+
+    Returns:
+        薪资记录列表
+
+    Raises:
+        NotFoundException: 员工不存在
+    """
+```
+
+### 行内注释
+- 只在"为什么"不明显时加，不注释"是什么"
+- `# noqa` / `# type: ignore` 必须附带原因
+```python
+# 强制过滤当前员工数据，防止越权
+query = query.where(SalaryRecord.employee_id == employee_id)
+```
+
+### ORM 模型字段
+- 每个 `mapped_column()` 必须包含 `comment="中文说明"` 参数
+```python
+name: Mapped[str] = mapped_column(String(64), comment="部门名称")
+```
+
+### Pydantic Schema 字段
+- 每个字段必须使用 `Field(description="中文说明")`
+```python
+employee_id: int = Field(description="员工 ID")
+name: str | None = Field(default=None, description="姓名")
+```
+
+### 禁止
+- 不写无意义注释（`# 定义变量`、`# 返回结果`）
+- 不写注释掉的代码，直接删除
