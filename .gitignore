@@ -18,6 +18,10 @@ data/
 # Logs
 log/
 
+# Cursor（只保留项目规则）
+.cursor/*
+!.cursor/rules/
+
 # IDE
 .idea/
 .vscode/
