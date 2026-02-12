@@ -128,6 +128,9 @@ uv run python main.py
 | `Overtime` | 加班记录 |
 | `PerformanceReview` | 绩效考评 |
 | `EmploymentHistory` | 在职履历 |
+| `Training` | 培训记录 |
+| `TalentReview` | 人才盘点（九宫格） |
+| `DevelopmentPlan` | 个人发展计划（IDP） |
 
 ## HR 助手功能
 
@@ -203,14 +206,50 @@ uv run python main.py
 - `approve_leave_request` — 审批请假申请
 - `approve_overtime_request` — 审批加班申请
 
+**管理者查询工具** (`tools/hr/admin_query.py`)：
+- `admin_get_all_employees` — 全员列表
+- `admin_get_employee_salary` — 任意员工薪资
+- `admin_get_employee_social_insurance` — 任意员工社保
+- `admin_get_employee_profile` — 任意员工完整档案
+- `admin_get_all_leave_requests` — 全公司请假记录
+- `admin_get_all_attendance` — 全公司考勤记录
+- `admin_get_all_overtime_records` — 全公司加班记录
+- `admin_get_department_headcount` — 部门人数统计
+- `admin_get_attendance_summary` — 考勤汇总报表
+- `admin_get_salary_summary` — 薪资汇总报表
+- `admin_get_leave_summary` — 假期汇总报表
+
+**管理者审批工具** (`tools/hr/admin_action.py`)：
+- `admin_approve_leave_request` — 全公司请假审批
+- `admin_approve_overtime_request` — 全公司加班审批
+
+**人才发展查询工具** (`tools/hr/talent_dev_query.py`)：
+- `td_get_employee_profile` — 员工完整档案
+- `td_get_employee_training` — 培训记录
+- `td_get_employee_talent_review` — 人才盘点（九宫格）
+- `td_get_employee_idp` — 个人发展计划
+- `td_get_employee_performance` — 绩效详情
+- `td_get_employee_history` — 岗位变动履历
+- `td_get_employee_attendance` — 考勤记录
+- `td_training_summary` — 培训完成率统计
+- `td_nine_grid_distribution` — 九宫格分布
+- `td_performance_distribution` — 绩效评级分布
+- `td_turnover_analysis` — 人员流动分析
+- `td_promotion_stats` — 晋升统计
+- `td_idp_summary` — IDP 达成率
+
+**路由层工具** (`agents/router_agent.py`)：
+- `get_current_user` — 获取当前登录用户信息
+
 ## 认证与权限
 
 - **认证方式**: JWT Token
 - **Token 载荷**: `employee_id`, `roles`, `department_id`
-- **权限控制**:
-  - 普通员工只能查询/操作自己的数据
-  - 主管可查看管辖部门及子部门的员工数据
-  - 主管不可查看下属薪资和社保数据
+- **角色体系**:
+  - **普通员工** — 查询/操作自己的数据
+  - **主管 (manager)** — 查看管辖部门员工数据（不含薪资社保），审批下属申请
+  - **管理者 (admin)** — 全公司数据查询（含薪资社保），全公司审批
+  - **人才发展 (talent_dev)** — 全公司员工档案、培训、盘点、IDP、分析报表
 
 ## 异常处理
 
