@@ -1,5 +1,7 @@
 """应用配置 — 从环境变量/.env 读取，包括 API、数据库、LLM、认证、日志等。"""
 
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -12,7 +14,8 @@ class Settings(BaseSettings):
         DEBUG: 是否开启调试模式
         DATABASE_URL: 异步 PostgreSQL 连接串
         LLM_MODEL: 大模型名称
-        OPENAI_API_KEY: OpenAI API 密钥
+        LLM_API_KEY: LLM API 密钥
+        LLM_BASE_URL: LLM API 地址
         AUTH_SECRET: JWT 签名密钥
         LOG_LEVEL: 日志级别
         LOG_FILE: 日志文件路径，为空则仅输出到控制台
@@ -28,11 +31,12 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # Database
-    DATABASE_URL: str = "sqlite+aiosqlite:///data/xm_agent.db"
+    DATABASE_URL: str = "sqlite+aiosqlite:///data/mx_agent.db"
 
     # LLM
-    LLM_MODEL: str = "gpt-4o"
-    OPENAI_API_KEY: str = ""
+    LLM_MODEL: str = "glm-4-plus"
+    LLM_API_KEY: str = ""
+    LLM_BASE_URL: str = "https://open.bigmodel.cn/api/paas/v4"
 
     # Auth
     AUTH_SECRET: str = "dev-secret-change-me"
@@ -45,3 +49,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+

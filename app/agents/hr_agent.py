@@ -3,10 +3,9 @@
 from pathlib import Path
 
 from agno.agent import Agent
-from agno.models.openai import OpenAIResponses
 from agno.skills import LocalSkills, Skills
 
-from app.config import settings
+from app.core.llm import get_model
 from app.tools.hr import employee_tools, manager_tools
 
 SKILLS_DIR = Path(__file__).parent.parent / "skills" / "hr"
@@ -15,7 +14,7 @@ hr_agent = Agent(
     id="hr-assistant",
     name="HR Assistant",
     role="马喜公司 HR 助手",
-    model=OpenAIResponses(id=settings.LLM_MODEL),
+    model=get_model(),
     skills=Skills(loaders=[LocalSkills(str(SKILLS_DIR))]),
     tools=[*employee_tools, *manager_tools],
     instructions=[

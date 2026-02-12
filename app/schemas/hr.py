@@ -1,6 +1,6 @@
 """HR 相关响应 Schema — 查询结果的 Pydantic 模型"""
 
-from datetime import date, time
+import datetime as dt
 from decimal import Decimal
 
 from pydantic import BaseModel, Field
@@ -15,7 +15,7 @@ class EmployeeInfoResponse(BaseModel):
     department: str | None = Field(default=None, description="部门名称")
     position: str = Field(description="职位")
     level: str = Field(description="职级")
-    hire_date: date | None = Field(default=None, description="入职日期")
+    hire_date: dt.date | None = Field(default=None, description="入职日期")
     status: str = Field(description="在职状态")
 
 
@@ -52,9 +52,9 @@ class SocialInsuranceResponse(BaseModel):
 class AttendanceResponse(BaseModel):
     """考勤记录"""
 
-    date: date = Field(description="考勤日期")
-    check_in: time | None = Field(default=None, description="签到时间")
-    check_out: time | None = Field(default=None, description="签退时间")
+    date: dt.date = Field(description="考勤日期")
+    check_in: dt.time | None = Field(default=None, description="签到时间")
+    check_out: dt.time | None = Field(default=None, description="签退时间")
     status: str = Field(description="考勤状态")
     remark: str = Field(description="备注")
 
@@ -72,8 +72,8 @@ class LeaveRequestResponse(BaseModel):
     """请假记录"""
 
     leave_type: str = Field(description="假期类型")
-    start_date: date = Field(description="开始日期")
-    end_date: date = Field(description="结束日期")
+    start_date: dt.date = Field(description="开始日期")
+    end_date: dt.date = Field(description="结束日期")
     days: Decimal = Field(description="请假天数")
     reason: str = Field(description="请假事由")
     status: str = Field(description="审批状态")
@@ -82,9 +82,9 @@ class LeaveRequestResponse(BaseModel):
 class OvertimeRecordResponse(BaseModel):
     """加班记录"""
 
-    date: date = Field(description="加班日期")
-    start_time: time = Field(description="开始时间")
-    end_time: time = Field(description="结束时间")
+    date: dt.date = Field(description="加班日期")
+    start_time: dt.time = Field(description="开始时间")
+    end_time: dt.time = Field(description="结束时间")
     hours: Decimal = Field(description="加班时长（小时）")
     type: str = Field(description="加班类型")
     status: str = Field(description="审批状态")
@@ -118,9 +118,9 @@ class TeamAttendanceResponse(BaseModel):
 
     employee_id: int = Field(description="员工 ID")
     employee_name: str = Field(description="员工姓名")
-    date: date = Field(description="考勤日期")
-    check_in: time | None = Field(default=None, description="签到时间")
-    check_out: time | None = Field(default=None, description="签退时间")
+    date: dt.date = Field(description="考勤日期")
+    check_in: dt.time | None = Field(default=None, description="签到时间")
+    check_out: dt.time | None = Field(default=None, description="签退时间")
     status: str = Field(description="考勤状态")
     remark: str = Field(description="备注")
 
@@ -132,8 +132,8 @@ class TeamLeaveRequestResponse(BaseModel):
     employee_id: int = Field(description="员工 ID")
     employee_name: str = Field(description="员工姓名")
     leave_type: str = Field(description="假期类型")
-    start_date: date = Field(description="开始日期")
-    end_date: date = Field(description="结束日期")
+    start_date: dt.date = Field(description="开始日期")
+    end_date: dt.date = Field(description="结束日期")
     days: Decimal = Field(description="请假天数")
     reason: str = Field(description="请假事由")
     status: str = Field(description="审批状态")
@@ -156,9 +156,9 @@ class TeamOvertimeRecordResponse(BaseModel):
     record_id: int = Field(description="加班记录 ID")
     employee_id: int = Field(description="员工 ID")
     employee_name: str = Field(description="员工姓名")
-    date: date = Field(description="加班日期")
-    start_time: time = Field(description="开始时间")
-    end_time: time = Field(description="结束时间")
+    date: dt.date = Field(description="加班日期")
+    start_time: dt.time = Field(description="开始时间")
+    end_time: dt.time = Field(description="结束时间")
     hours: Decimal = Field(description="加班时长（小时）")
     type: str = Field(description="加班类型")
     status: str = Field(description="审批状态")
@@ -187,8 +187,8 @@ class PerformanceReviewResponse(BaseModel):
 class EmploymentHistoryResponse(BaseModel):
     """在职履历记录"""
 
-    start_date: date = Field(description="开始日期")
-    end_date: date | None = Field(default=None, description="结束日期")
+    start_date: dt.date = Field(description="开始日期")
+    end_date: dt.date | None = Field(default=None, description="结束日期")
     department: str = Field(description="部门名称")
     position: str = Field(description="职位")
     level: str = Field(description="职级")

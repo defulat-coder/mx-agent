@@ -9,7 +9,7 @@ from app.main import app
 
 def make_token(
     employee_id: int = 1,
-    employee_no: str = "XM0001",
+    employee_no: str = "MX0001",
     name: str = "张三",
     secret: str = settings.AUTH_SECRET,
     expired: bool = False,

@@ -13,7 +13,7 @@ USERS = {
     "employee": {
         "sub": "1",
         "employee_id": 1,
-        "employee_no": "XM0001",
+        "employee_no": "MX0001",
         "name": "张三",
         "roles": ["employee"],
         "department_id": None,
@@ -21,7 +21,7 @@ USERS = {
     "manager": {
         "sub": "9",
         "employee_id": 9,
-        "employee_no": "XM0009",
+        "employee_no": "MX0009",
         "name": "郑晓明",
         "roles": ["employee", "manager"],
         "department_id": 2,

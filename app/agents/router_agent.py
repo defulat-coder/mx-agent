@@ -1,18 +1,18 @@
 """智能助手路由组 — 将用户请求分发到 HR/财务/法务子助手"""
 
-from agno.models.openai import OpenAIResponses
 from agno.team.team import Team
 
 from app.agents.finance_agent import finance_agent
 from app.agents.hr_agent import hr_agent
 from app.agents.legal_agent import legal_agent
-from app.config import settings
+from app.core.llm import get_model
 
 router_team = Team(
     id="router-team",
     name="马喜智能助手",
-    model=OpenAIResponses(id=settings.LLM_MODEL),
+    model=get_model(),
     respond_directly=True,
+    enable_agentic_memory=True,
     members=[hr_agent, finance_agent, legal_agent],
     instructions=[
         "你是马喜公司的智能助手入口，负责将用户请求路由到合适的子助手。",

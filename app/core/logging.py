@@ -29,7 +29,7 @@ class InterceptHandler(logging.Handler):
 
 def _patcher(record: dict) -> None:  # type: ignore[type-arg]  # loguru record 类型为 dict
     """向日志记录注入 request_id。"""
-    record["extra"]["request_id"] = get_request_id()
+    record["extra"]["request_id"] = get_request_id() or "-"
 
 
 def setup_logging() -> None:
@@ -53,6 +53,8 @@ def setup_logging() -> None:
 
     # 文件输出（可选）
     if settings.LOG_FILE:
+        from pathlib import Path
+        Path(settings.LOG_FILE).parent.mkdir(parents=True, exist_ok=True)
         logger.add(
             settings.LOG_FILE,
             level=settings.LOG_LEVEL,

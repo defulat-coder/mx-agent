@@ -4,7 +4,7 @@ from agno.run import RunContext
 
 from app.core.database import async_session_factory
 from app.services import hr as hr_service
-from app.tools.hr.manager_query import _check_manager
+from app.tools.hr.utils import get_manager_info
 
 
 async def approve_leave_request(
@@ -21,7 +21,7 @@ async def approve_leave_request(
         comment: 审批备注
     """
     try:
-        emp_id, dept_id = _check_manager(run_context)
+        emp_id, dept_id = get_manager_info(run_context)
     except ValueError as e:
         return str(e)
     async with async_session_factory() as session:
@@ -45,7 +45,7 @@ async def approve_overtime_request(
         comment: 审批备注
     """
     try:
-        emp_id, dept_id = _check_manager(run_context)
+        emp_id, dept_id = get_manager_info(run_context)
     except ValueError as e:
         return str(e)
     async with async_session_factory() as session:

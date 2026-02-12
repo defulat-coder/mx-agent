@@ -15,7 +15,8 @@ data/
 # Environment variables
 .env
 
+# Logs
+log/
+
 # IDE
 .idea/
-.cursor/
-.vscode/

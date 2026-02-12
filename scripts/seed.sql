@@ -2,16 +2,16 @@
 -- 使用前请确保表已通过 SQLAlchemy metadata.create_all 或 alembic 创建
 BEGIN;
 
-TRUNCATE TABLE employment_histories RESTART IDENTITY CASCADE;
-TRUNCATE TABLE performance_reviews RESTART IDENTITY CASCADE;
-TRUNCATE TABLE overtime_records RESTART IDENTITY CASCADE;
-TRUNCATE TABLE leave_requests RESTART IDENTITY CASCADE;
-TRUNCATE TABLE leave_balances RESTART IDENTITY CASCADE;
-TRUNCATE TABLE attendance_records RESTART IDENTITY CASCADE;
-TRUNCATE TABLE social_insurance_records RESTART IDENTITY CASCADE;
-TRUNCATE TABLE salary_records RESTART IDENTITY CASCADE;
-TRUNCATE TABLE employees RESTART IDENTITY CASCADE;
-TRUNCATE TABLE departments RESTART IDENTITY CASCADE;
+DELETE FROM employment_histories;
+DELETE FROM performance_reviews;
+DELETE FROM overtime_records;
+DELETE FROM leave_requests;
+DELETE FROM leave_balances;
+DELETE FROM attendance_records;
+DELETE FROM social_insurance_records;
+DELETE FROM salary_records;
+DELETE FROM employees;
+DELETE FROM departments;
 
 -- departments
 INSERT INTO departments (id, name, parent_id, manager_id) VALUES (1, '马喜集团', NULL, NULL);
@@ -26,26 +26,26 @@ INSERT INTO departments (id, name, parent_id, manager_id) VALUES (9, 'AI 组', 2
 INSERT INTO departments (id, name, parent_id, manager_id) VALUES (10, '测试组', 2, NULL);
 
 -- employees
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (1, '张三', 'XM0001', 7, '高级后端工程师', 'P7', '2021-03-15', '在职', 'zhangsan@ximalaya.com', '13800000001');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (2, '李四', 'XM0002', 7, '后端工程师', 'P5', '2022-07-01', '在职', 'lisi@ximalaya.com', '13800000002');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (3, '王五', 'XM0003', 8, '前端工程师', 'P6', '2021-09-01', '在职', 'wangwu@ximalaya.com', '13800000003');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (4, '赵六', 'XM0004', 9, '算法工程师', 'P7', '2020-06-15', '在职', 'zhaoliu@ximalaya.com', '13800000004');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (5, '钱七', 'XM0005', 3, '产品经理', 'P6', '2022-01-10', '在职', 'qianqi@ximalaya.com', '13800000005');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (6, '孙八', 'XM0006', 4, 'HRBP', 'P6', '2021-04-20', '在职', 'sunba@ximalaya.com', '13800000006');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (7, '周九', 'XM0007', 5, '财务主管', 'P7', '2019-08-01', '在职', 'zhoujiu@ximalaya.com', '13800000007');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (8, '吴十', 'XM0008', 6, '法务顾问', 'P6', '2023-02-15', '在职', 'wushi@ximalaya.com', '13800000008');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (9, '郑晓明', 'XM0009', 2, '技术总监', 'P9', '2018-03-01', '在职', 'zhengxm@ximalaya.com', '13800000009');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (10, '陈小红', 'XM0010', 7, '后端工程师', 'P5', '2024-06-01', '试用期', 'chenxh@ximalaya.com', '13800000010');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (11, '林志强', 'XM0011', 8, '前端工程师', 'P5', '2023-09-01', '在职', 'linzq@ximalaya.com', '13800000011');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (12, '黄丽丽', 'XM0012', 9, 'NLP 工程师', 'P6', '2022-11-01', '在职', 'huangll@ximalaya.com', '13800000012');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (13, '刘伟', 'XM0013', 10, '测试工程师', 'P5', '2023-04-01', '在职', 'liuwei@ximalaya.com', '13800000013');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (14, '杨芳', 'XM0014', 3, '产品经理', 'P5', '2024-01-15', '在职', 'yangfang@ximalaya.com', '13800000014');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (15, '何涛', 'XM0015', 4, '招聘专员', 'P4', '2024-03-01', '在职', 'hetao@ximalaya.com', '13800000015');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (16, '马骏', 'XM0016', 7, '后端工程师', 'P6', '2021-11-01', '在职', 'majun@ximalaya.com', '13800000016');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (17, '许晴', 'XM0017', 5, '会计', 'P5', '2022-05-01', '在职', 'xuqing@ximalaya.com', '13800000017');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (18, '高峰', 'XM0018', 10, '测试主管', 'P7', '2020-01-15', '在职', 'gaofeng@ximalaya.com', '13800000018');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (19, '罗敏', 'XM0019', 9, '算法实习生', 'P3', '2025-09-01', '试用期', 'luomin@ximalaya.com', '13800000019');
-INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (20, '谢强', 'XM0020', 8, '前端组长', 'P7', '2020-05-01', '在职', 'xieqiang@ximalaya.com', '13800000020');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (1, '张三', 'MX0001', 7, '高级后端工程师', 'P7', '2021-03-15', '在职', 'zhangsan@maxi.com', '13800000001');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (2, '李四', 'MX0002', 7, '后端工程师', 'P5', '2022-07-01', '在职', 'lisi@maxi.com', '13800000002');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (3, '王五', 'MX0003', 8, '前端工程师', 'P6', '2021-09-01', '在职', 'wangwu@maxi.com', '13800000003');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (4, '赵六', 'MX0004', 9, '算法工程师', 'P7', '2020-06-15', '在职', 'zhaoliu@maxi.com', '13800000004');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (5, '钱七', 'MX0005', 3, '产品经理', 'P6', '2022-01-10', '在职', 'qianqi@maxi.com', '13800000005');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (6, '孙八', 'MX0006', 4, 'HRBP', 'P6', '2021-04-20', '在职', 'sunba@maxi.com', '13800000006');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (7, '周九', 'MX0007', 5, '财务主管', 'P7', '2019-08-01', '在职', 'zhoujiu@maxi.com', '13800000007');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (8, '吴十', 'MX0008', 6, '法务顾问', 'P6', '2023-02-15', '在职', 'wushi@maxi.com', '13800000008');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (9, '郑晓明', 'MX0009', 2, '技术总监', 'P9', '2018-03-01', '在职', 'zhengxm@maxi.com', '13800000009');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (10, '陈小红', 'MX0010', 7, '后端工程师', 'P5', '2024-06-01', '试用期', 'chenxh@maxi.com', '13800000010');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (11, '林志强', 'MX0011', 8, '前端工程师', 'P5', '2023-09-01', '在职', 'linzq@maxi.com', '13800000011');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (12, '黄丽丽', 'MX0012', 9, 'NLP 工程师', 'P6', '2022-11-01', '在职', 'huangll@maxi.com', '13800000012');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (13, '刘伟', 'MX0013', 10, '测试工程师', 'P5', '2023-04-01', '在职', 'liuwei@maxi.com', '13800000013');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (14, '杨芳', 'MX0014', 3, '产品经理', 'P5', '2024-01-15', '在职', 'yangfang@maxi.com', '13800000014');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (15, '何涛', 'MX0015', 4, '招聘专员', 'P4', '2024-03-01', '在职', 'hetao@maxi.com', '13800000015');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (16, '马骏', 'MX0016', 7, '后端工程师', 'P6', '2021-11-01', '在职', 'majun@maxi.com', '13800000016');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (17, '许晴', 'MX0017', 5, '会计', 'P5', '2022-05-01', '在职', 'xuqing@maxi.com', '13800000017');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (18, '高峰', 'MX0018', 10, '测试主管', 'P7', '2020-01-15', '在职', 'gaofeng@maxi.com', '13800000018');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (19, '罗敏', 'MX0019', 9, '算法实习生', 'P3', '2025-09-01', '试用期', 'luomin@maxi.com', '13800000019');
+INSERT INTO employees (id, name, employee_no, department_id, position, level, hire_date, status, email, phone) VALUES (20, '谢强', 'MX0020', 8, '前端组长', 'P7', '2020-05-01', '在职', 'xieqiang@maxi.com', '13800000020');
 
 -- 回填部门负责人
 UPDATE departments SET manager_id = 9 WHERE id = 2;
@@ -1662,16 +1662,5 @@ INSERT INTO employment_histories (employee_id, start_date, end_date, department,
 INSERT INTO employment_histories (employee_id, start_date, end_date, department, position, level, change_type, remark) VALUES (20, '2020-11-01', '2022-04-30', '前端组', '前端工程师', 'P5', '转正', '');
 INSERT INTO employment_histories (employee_id, start_date, end_date, department, position, level, change_type, remark) VALUES (20, '2022-05-01', NULL, '前端组', '前端组长', 'P7', '晋升', '升任前端组长');
 
--- 重置自增序列
-SELECT setval(pg_get_serial_sequence('departments', 'id'), (SELECT COALESCE(MAX(id), 0) FROM departments));
-SELECT setval(pg_get_serial_sequence('employees', 'id'), (SELECT COALESCE(MAX(id), 0) FROM employees));
-SELECT setval(pg_get_serial_sequence('salary_records', 'id'), (SELECT COALESCE(MAX(id), 0) FROM salary_records));
-SELECT setval(pg_get_serial_sequence('social_insurance_records', 'id'), (SELECT COALESCE(MAX(id), 0) FROM social_insurance_records));
-SELECT setval(pg_get_serial_sequence('attendance_records', 'id'), (SELECT COALESCE(MAX(id), 0) FROM attendance_records));
-SELECT setval(pg_get_serial_sequence('leave_balances', 'id'), (SELECT COALESCE(MAX(id), 0) FROM leave_balances));
-SELECT setval(pg_get_serial_sequence('leave_requests', 'id'), (SELECT COALESCE(MAX(id), 0) FROM leave_requests));
-SELECT setval(pg_get_serial_sequence('overtime_records', 'id'), (SELECT COALESCE(MAX(id), 0) FROM overtime_records));
-SELECT setval(pg_get_serial_sequence('performance_reviews', 'id'), (SELECT COALESCE(MAX(id), 0) FROM performance_reviews));
-SELECT setval(pg_get_serial_sequence('employment_histories', 'id'), (SELECT COALESCE(MAX(id), 0) FROM employment_histories));
 
 COMMIT;
