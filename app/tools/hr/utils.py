@@ -9,7 +9,7 @@ from loguru import logger
 _MOCK_EMPLOYEES = [
     {"employee_id": 1, "roles": ["manager"], "department_id": 7, "_name": "张三（后端组长）"},
     {"employee_id": 2, "roles": [], "department_id": 7, "_name": "李四（后端工程师）"},
-    {"employee_id": 9, "roles": ["manager"], "department_id": 2, "_name": "郑晓明（技术总监）"},
+    {"employee_id": 9, "roles": ["manager", "admin"], "department_id": 2, "_name": "郑晓明（技术总监/管理者）"},
     {"employee_id": 5, "roles": [], "department_id": 3, "_name": "钱七（产品经理）"},
     {"employee_id": 4, "roles": ["manager"], "department_id": 9, "_name": "赵六（AI 组长）"},
 ]
@@ -38,7 +38,14 @@ def get_employee_id(run_context: RunContext) -> int:
     state = run_context.session_state
     if not state or "employee_id" not in state:
         _inject_mock_employee(run_context)
-    return run_context.session_state["employee_id"]  # type: ignore[index]
+        state = run_context.session_state
+    logger.info(
+        "当前用户: employee_id={eid}, roles={roles}, department_id={dept}",
+        eid=state["employee_id"],  # type: ignore[index]
+        roles=state.get("roles", []),  # type: ignore[union-attr]
+        dept=state.get("department_id"),  # type: ignore[union-attr]
+    )
+    return state["employee_id"]  # type: ignore[index]
 
 
 def get_manager_info(run_context: RunContext) -> tuple[int, int]:
@@ -56,3 +63,20 @@ def get_manager_info(run_context: RunContext) -> tuple[int, int]:
     if "manager" not in roles:
         raise ValueError("该功能仅限部门主管使用")
     return employee_id, state["department_id"]  # type: ignore[index]
+
+
+def get_admin_id(run_context: RunContext) -> int:
+    """从 session_state 提取管理者身份并校验角色。
+
+    Returns:
+        管理者的员工 ID
+
+    Raises:
+        ValueError: 非管理者角色
+    """
+    employee_id = get_employee_id(run_context)
+    state = run_context.session_state
+    roles: list[str] = state.get("roles", [])  # type: ignore[union-attr]
+    if "admin" not in roles:
+        raise ValueError("该功能仅限管理者使用")
+    return employee_id

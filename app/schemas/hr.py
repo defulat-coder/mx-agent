@@ -202,3 +202,53 @@ class EmployeeProfileResponse(BaseModel):
     info: EmployeeInfoResponse = Field(description="员工基本信息")
     performance_reviews: list[PerformanceReviewResponse] = Field(description="绩效考评记录列表")
     employment_histories: list[EmploymentHistoryResponse] = Field(description="在职履历列表")
+
+
+class EmployeeFullProfileResponse(EmployeeProfileResponse):
+    """员工完整档案（含薪资社保，管理者专用）"""
+
+    salary_records: list[SalaryRecordResponse] = Field(description="薪资明细列表")
+    social_insurance_records: list[SocialInsuranceResponse] = Field(description="社保缴纳列表")
+
+
+# ── 管理者汇总报表 Schema ────────────────────────────────────
+
+
+class DepartmentHeadcountResponse(BaseModel):
+    """部门人员统计"""
+
+    department_id: int = Field(description="部门 ID")
+    department_name: str = Field(description="部门名称")
+    active_count: int = Field(description="在职人数")
+    probation_count: int = Field(description="试用期人数")
+    total_count: int = Field(description="总人数（在职+试用期）")
+
+
+class AttendanceSummaryResponse(BaseModel):
+    """考勤汇总统计"""
+
+    normal_count: int = Field(description="正常打卡人次")
+    late_count: int = Field(description="迟到人次")
+    early_leave_count: int = Field(description="早退人次")
+    absent_count: int = Field(description="缺卡人次")
+    outside_count: int = Field(description="外勤人次")
+    start_date: dt.date = Field(description="统计起始日期")
+    end_date: dt.date = Field(description="统计截止日期")
+
+
+class SalarySummaryResponse(BaseModel):
+    """部门薪资汇总"""
+
+    department_id: int = Field(description="部门 ID")
+    department_name: str = Field(description="部门名称")
+    employee_count: int = Field(description="员工数")
+    total_net_salary: Decimal = Field(description="实发薪资总额")
+    avg_net_salary: Decimal = Field(description="平均实发薪资")
+
+
+class LeaveSummaryResponse(BaseModel):
+    """假期汇总统计"""
+
+    leave_type: str = Field(description="假期类型")
+    total_days_used: Decimal = Field(description="已使用总天数")
+    pending_count: int = Field(description="待审批申请数")
