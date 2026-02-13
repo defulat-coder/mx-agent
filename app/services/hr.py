@@ -1587,3 +1587,33 @@ async def get_employee_certificates(
         )
         for r in rows
     ]
+
+
+async def search_employee_by_name(session: AsyncSession, name: str) -> list[dict]:
+    """根据姓名模糊搜索员工，返回 id、姓名、工号、部门、岗位、职级。
+
+    Args:
+        name: 员工姓名（支持模糊匹配）
+
+    Returns:
+        匹配的员工列表
+    """
+    stmt = (
+        select(Employee, Department.name.label("dept_name"))
+        .outerjoin(Department, Employee.department_id == Department.id)
+        .where(Employee.name.contains(name))
+        .where(Employee.status != "离职")
+        .order_by(Employee.id)
+    )
+    rows = (await session.execute(stmt)).all()
+    return [
+        {
+            "employee_id": emp.id,
+            "name": emp.name,
+            "employee_no": emp.employee_no,
+            "department": dept_name or "",
+            "position": emp.position,
+            "level": emp.level,
+        }
+        for emp, dept_name in rows
+    ]

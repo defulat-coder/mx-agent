@@ -35,6 +35,7 @@ from app.tools.hr.talent_dev_query import (
     td_nine_grid_distribution,
     td_performance_distribution,
     td_promotion_stats,
+    td_search_employee,
     td_training_summary,
     td_turnover_analysis,
 )
@@ -120,6 +121,7 @@ admin_action_tools = [
 admin_tools = admin_query_tools + admin_action_tools
 
 talent_dev_tools = [
+    td_search_employee,
     td_get_employee_profile,
     td_get_employee_training,
     td_get_employee_talent_review,

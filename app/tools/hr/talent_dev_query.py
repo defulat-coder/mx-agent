@@ -261,3 +261,18 @@ async def td_get_employee_certificates(
     async with async_session_factory() as session:
         records = await hr_service.get_employee_certificates(session, employee_id, category)
         return "[" + ",".join(r.model_dump_json() for r in records) + "]"
+
+
+async def td_search_employee(
+    run_context: RunContext,
+    name: str,
+) -> str:
+    """根据姓名搜索员工，返回匹配的员工 ID、姓名、工号、部门、岗位、职级。支持模糊匹配。"""
+    try:
+        get_talent_dev_id(run_context)
+    except ValueError as e:
+        return str(e)
+    async with async_session_factory() as session:
+        import json
+        results = await hr_service.search_employee_by_name(session, name)
+        return json.dumps(results, ensure_ascii=False)
