@@ -38,6 +38,23 @@ class Settings(BaseSettings):
     LLM_API_KEY: str = ""
     LLM_BASE_URL: str = "https://open.bigmodel.cn/api/paas/v4"
 
+    # Embedding / Knowledge
+    EMBEDDING_MODEL: str = "embedding-3"
+    EMBEDDING_API_KEY: str = ""
+    EMBEDDING_BASE_URL: str = ""
+    KNOWLEDGE_DIR: str = "data/knowledge/docs"
+    VECTOR_DB_DIR: str = "data/knowledge/lancedb"
+
+    @property
+    def embedding_api_key(self) -> str:
+        """Embedding API Key，未设置则回退到 LLM_API_KEY"""
+        return self.EMBEDDING_API_KEY or self.LLM_API_KEY
+
+    @property
+    def embedding_base_url(self) -> str:
+        """Embedding Base URL，未设置则回退到 LLM_BASE_URL"""
+        return self.EMBEDDING_BASE_URL or self.LLM_BASE_URL
+
     # Auth
     AUTH_SECRET: str = "dev-secret-change-me"
 

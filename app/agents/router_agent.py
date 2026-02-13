@@ -12,6 +12,7 @@ from app.agents.it_agent import it_agent
 from app.agents.legal_agent import legal_agent
 from app.core.database import async_session_factory
 from app.core.llm import get_model
+from app.knowledge import company_knowledge
 from app.services import hr as hr_service
 from app.tools.hr.utils import get_employee_id
 
@@ -36,6 +37,8 @@ router_team = Team(
     add_history_to_context=True,
     num_history_runs=5,
     enable_agentic_memory=True,
+    knowledge=company_knowledge,
+    search_knowledge=True,
     members=[hr_agent, it_agent, admin_agent, finance_agent, legal_agent],
     tools=[get_current_user],
     instructions=[
@@ -74,6 +77,8 @@ router_team = Team(
 - 汇总所有助手的回复，按步骤整理成清晰的流程清单
 - 如果某个助手返回的信息不完整，标注"具体请咨询 XX 部门"
 """,
+        # 知识库检索规则
+        "当用户提问涉及公司制度、规范、流程等内容，且子助手的 Tools/Skills 无法覆盖时，搜索知识库获取企业文档中的相关内容来回答。知识库包含员工手册、财务管理制度、IT管理规范、行政管理制度、法务合规手册等企业制度文档。",
         "如果无法判断归属，友好告知用户当前支持的功能范围。",
     ],
     markdown=True,

@@ -26,9 +26,13 @@ from app.core.middleware import RequestIDMiddleware, RequestLoggingMiddleware
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
-    """应用生命周期：启动时初始化日志和业务数据库，关闭时释放连接。"""
+    """应用生命周期：启动时初始化日志、业务数据库和知识库，关闭时释放连接。"""
     setup_logging()
     await init_db()
+
+    from app.knowledge.loader import load_knowledge
+    await load_knowledge()
+
     yield
     await engine.dispose()
 
