@@ -12,8 +12,8 @@ Router Agent SHALL 接收用户消息，识别意图，将请求分发到对应�
 - **THEN** Router Agent 将请求分发到 Finance Assistant
 
 #### Scenario: 法务相关问题路由
-- **WHEN** 用户消息涉及法务相关话题
-- **THEN** Router Agent 将请求分发到 Legal Agent（Phase 3，当前返回"功能开发中"）
+- **WHEN** 用户消息涉及法务相关问题（合同查询、合同模板、合同审查、法律咨询、合规问题等）
+- **THEN** Router Agent 将请求分发到 Legal Assistant
 
 ### Requirement: 兜底回复
 Router Agent SHALL 在无法识别意图时提供友好的兜底回复。

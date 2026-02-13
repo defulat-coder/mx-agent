@@ -39,3 +39,14 @@
 #### Scenario: get_finance_id 校验
 - **WHEN** 财务人员工具被调用
 - **THEN** `app/tools/finance/utils.py` 的 `get_finance_id` 校验当前用户具有 `finance` 角色，否则返回权限不足
+
+### Requirement: 法务角色
+系统 SHALL 支持 `legal` 角色，允许法务人员访问全公司合同管理、审查、条款分析等法务功能。
+
+#### Scenario: Mock 用户 legal 角色
+- **WHEN** 开发/测试环境
+- **THEN** `_MOCK_EMPLOYEES` 中郑晓明具有 `legal` 角色，`generate_token.py` 的 manager 用户包含 `legal`
+
+#### Scenario: get_legal_id 校验
+- **WHEN** 法务人员工具被调用
+- **THEN** `app/tools/legal/utils.py` 的 `get_legal_id` 校验当前用户具有 `legal` 角色，否则返回权限不足

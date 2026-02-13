@@ -38,3 +38,7 @@
 #### Scenario: 财务模型建表
 - **WHEN** 应用启动调用 `init_db`
 - **THEN** `import app.models.finance` 确保财务相关表自动创建
+
+#### Scenario: 法务模型建表
+- **WHEN** 应用启动调用 `init_db`
+- **THEN** `import app.models.legal` 确保法务相关表自动创建

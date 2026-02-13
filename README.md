@@ -23,7 +23,7 @@
 │                     AgentOS 运行时 (Agno)                         │
 │                                                                   │
 │                      ┌─────────────────┐                          │
-│                      │  Router Team    │ ← 智能路由分发            │
+│                      │  Router Team    │ ← 智能路由 + 跨域协作      │
 │                      │  (智能助手入口)   │                          │
 │                      └───────┬─────────┘                          │
 │       ┌──────────┼──────────┬──────────┬──────────┐         │
@@ -467,6 +467,16 @@ uv run python main.py
 | `Contract` | 合同记录（编号/标题/甲乙方/金额/期限/状态/摘要/关键条款） |
 | `ContractReview` | 合同审查记录（审查人/动作/意见） |
 
+## 跨域协作
+
+Router Team 支持识别涉及多个部门的跨域场景，依次协调多个子 Agent 并汇总回复：
+
+| 场景 | 调度链路 |
+|------|---------|
+| 新员工入职 | HR → IT → Admin → Finance |
+| 员工离职 | HR → IT → Admin → Finance |
+| 出差全流程 | Admin → HR → Finance |
+
 ## 模型评估
 
 各角色 Agent 评估用例：
@@ -479,8 +489,12 @@ uv run python main.py
 | 人才发展 (talent_dev) | `tests/test_evaluation_talent_dev_role.md` | 23 | ~60 |
 | 人才发现引擎 | `tests/test_evaluation_talent_discovery.md` | 6 | ~80 |
 | IT 运维助手 | `tests/test_evaluation_it_assistant.md` | 12 | 61 |
+| 行政助手 | `tests/test_evaluation_admin_assistant.md` | 18 | 51 |
+| 财务助手 | `tests/test_evaluation_finance_assistant.md` | 14 | 49 |
+| 法务助手 | `tests/test_evaluation_legal_assistant.md` | 8 | 48 |
+| 跨域协作 | `tests/test_evaluation_cross_domain.md` | — | 15 |
 
-评估维度：路由识别、功能查询、业务办理、Skills 咨询、权限边界、工具选择歧义、边界异常。
+评估维度：路由识别、功能查询、业务办理、Skills 咨询、权限边界、工具选择歧义、边界异常、跨域协调。
 
 ## 异常处理
 
