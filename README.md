@@ -31,9 +31,9 @@
 │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌────────┐ ┌───────┐ │
 │  │HR Agent │ │IT Agent │ │Admin    │ │Finance │ │ Legal │ │
 │  │(已上线)  │ │(已上线)  │ │Agent   │ │Agent   │ │ Agent │ │
-│  │55 Tools │ │12 Tools │ │(已上线)  │ │(已上线) │ │(开发中)│ │
-│  │8 Skills │ │5 Skills │ │18 Tools │ │14 Tools│ │       │ │
-│  │         │ │         │ │3 Skills │ │3 Skills│ │       │ │
+│  │55 Tools │ │12 Tools │ │(已上线)  │ │(已上线) │ │(已上线)│ │
+│  │8 Skills │ │5 Skills │ │18 Tools │ │14 Tools│ │8 Tools│ │
+│  │         │ │         │ │3 Skills │ │3 Skills│ │3 Skills│ │
 │  └─────────┘ └─────────┘ └─────────┘ └────────┘ └───────┘ │
 └───────────────────────────┬───────────────────────────────────────┘
                             │
@@ -50,6 +50,7 @@
 │  │ · 用品/快递/访客  │ │                 │ │                 │     │
 │  │ · 报销/预算      │ │                 │ │                 │     │
 │  │ · 应收/应付      │ │                 │ │                 │     │
+│  │ · 合同/模板/审查  │ │                 │ │                 │     │
 │  └─────────────────┘ └─────────────────┘ └─────────────────┘     │
 └───────────────────────────────────────────────────────────────────┘
 ```
@@ -80,7 +81,7 @@ app/
 │   ├── it_agent.py          #   IT 运维助手
 │   ├── admin_agent.py       #   行政助手
 │   ├── finance_agent.py     #   财务助手
-│   └── legal_agent.py       #   法务助手 (开发中)
+│   └── legal_agent.py       #   法务助手
 ├── api/v1/                  # REST API 路由
 ├── core/                    # 基础设施
 │   ├── database.py          #   数据库连接
@@ -95,19 +96,22 @@ app/
 │   ├── hr/                  #   HR ORM 模型 (16 张表)
 │   ├── it/                  #   IT ORM 模型 (3 张表)
 │   ├── admin/               #   行政 ORM 模型 (6 张表)
-│   └── finance/             #   财务 ORM 模型 (6 张表)
+│   ├── finance/             #   财务 ORM 模型 (6 张表)
+│   └── legal/               #   法务 ORM 模型 (3 张表)
 ├── schemas/                 # Pydantic 请求/响应 Schema
 ├── services/                # 业务逻辑层
 ├── skills/
 │   ├── hr/                  #   HR Skills (8 个知识库)
 │   ├── it/                  #   IT Skills (5 个知识库)
 │   ├── admin/               #   行政 Skills (3 个知识库)
-│   └── finance/             #   财务 Skills (3 个知识库)
+│   ├── finance/             #   财务 Skills (3 个知识库)
+│   └── legal/               #   法务 Skills (3 个知识库)
 ├── tools/
 │   ├── hr/                  #   HR Tools (55 个)
 │   ├── it/                  #   IT Tools (12 个)
 │   ├── admin/               #   行政 Tools (18 个)
-│   └── finance/             #   财务 Tools (14 个)
+│   ├── finance/             #   财务 Tools (14 个)
+│   └── legal/               #   法务 Tools (8 个)
 ```
 
 ## 快速启动
@@ -199,6 +203,7 @@ uv run python main.py
 | **IT 管理员** (it_admin) | 全部工单管理、设备分配回收、统计报表 | 全公司 |
 | **行政人员** (admin_staff) | 预订管理、用品审批、快递登记、访客管理、统计 | 全公司 |
 | **财务人员** (finance) | 报销审核、预算分析、应收应付、开票、费用报表 | 全公司 |
+| **法务人员** (legal) | 合同台账、合同审查、到期预警、条款分析、统计报表 | 全公司 |
 
 ## HR 助手
 
@@ -423,6 +428,44 @@ uv run python main.py
 | `BudgetUsage` | 预算使用流水（关联报销单/金额） |
 | `Payable` | 应付账款（供应商/金额/到期日/状态） |
 | `Receivable` | 应收账款（客户/金额/到期日/状态） |
+
+## 法务助手
+
+### Skills 知识库
+
+| Skill | 描述 | 权限 |
+|-------|------|------|
+| `labor-law` | 劳动法知识（劳动合同法/试用期/解雇保护/经济补偿） | 全员 |
+| `contract-knowledge` | 合同知识（签订流程/竞业限制/保密协议/知识产权） | 全员 |
+| `compliance` | 合规知识（反腐败/数据隐私/审计配合） | 全员 |
+
+### Tools 工具集
+
+#### 员工自助
+
+| 工具 | 文件 | 说明 |
+|------|------|------|
+| `leg_get_templates` | `tools/legal/query.py` | 查询合同模板列表（按类型筛选） |
+| `leg_get_template_download` | `tools/legal/query.py` | 获取模板下载链接（OA 地址） |
+| `leg_get_my_contracts` | `tools/legal/query.py` | 查询我的合同审批进度 |
+
+#### 法务人员权限
+
+| 工具 | 文件 | 说明 |
+|------|------|------|
+| `leg_admin_get_contracts` | `tools/legal/admin_query.py` | 全公司合同台账（多条件筛选） |
+| `leg_admin_get_expiring` | `tools/legal/admin_query.py` | 到期预警（默认 30 天内） |
+| `leg_admin_get_stats` | `tools/legal/admin_query.py` | 合同统计报表 |
+| `leg_admin_review_contract` | `tools/legal/admin_action.py` | 审查合同（通过/退回） |
+| `leg_admin_analyze_contract` | `tools/legal/admin_action.py` | LLM 辅助条款分析（风险识别+建议） |
+
+### 数据模型（3 张表）
+
+| 模型 | 说明 |
+|------|------|
+| `ContractTemplate` | 合同模板（名称/类型/说明/下载链接） |
+| `Contract` | 合同记录（编号/标题/甲乙方/金额/期限/状态/摘要/关键条款） |
+| `ContractReview` | 合同审查记录（审查人/动作/意见） |
 
 ## 模型评估
 

@@ -22,6 +22,7 @@ async def init_db() -> None:
     import app.models.it  # noqa: F401
     import app.models.admin  # noqa: F401
     import app.models.finance  # noqa: F401
+    import app.models.legal  # noqa: F401
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
