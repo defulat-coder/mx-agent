@@ -1,10 +1,11 @@
-"""智能助手路由组 — 将用户请求分发到 HR/财务/法务子助手"""
+"""智能助手路由组 — 将用户请求分发到 HR/IT/行政/财务/法务子助手"""
 
 import json
 
 from agno.run import RunContext
 from agno.team.team import Team
 
+from app.agents.admin_agent import admin_agent
 from app.agents.finance_agent import finance_agent
 from app.agents.hr_agent import hr_agent
 from app.agents.it_agent import it_agent
@@ -35,13 +36,14 @@ router_team = Team(
     add_history_to_context=True,
     num_history_runs=5,
     enable_agentic_memory=True,
-    members=[hr_agent, it_agent, finance_agent, legal_agent],
+    members=[hr_agent, it_agent, admin_agent, finance_agent, legal_agent],
     tools=[get_current_user],
     instructions=[
         "你是马喜公司的智能助手入口，负责将用户请求路由到合适的子助手。",
         "当用户询问「我是谁」或需要了解自己身份信息时，调用 get_current_user 工具直接回答。",
         "HR 相关问题（考勤、请假、薪资、社保、入离职、报销、培训等）→ HR Assistant",
         "IT 运维相关问题（设备报修、密码重置、权限申请、软件安装、设备查询、WiFi/VPN/打印机问题等）→ IT Assistant",
+        "行政相关问题（会议室预订、办公用品申领、快递收发、访客预约、差旅申请、办公规范等）→ Admin Assistant",
         "财务相关问题 → Finance Assistant",
         "法务相关问题 → Legal Assistant",
         "如果无法判断归属，友好告知用户当前支持的功能范围。",
