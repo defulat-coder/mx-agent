@@ -143,6 +143,10 @@ uv run python main.py
 | `Training` | 培训记录 |
 | `TalentReview` | 人才盘点（九宫格） |
 | `DevelopmentPlan` | 个人发展计划（IDP） |
+| `Skill` | 技能标签 |
+| `Education` | 教育背景 |
+| `ProjectExperience` | 项目经历 |
+| `Certificate` | 证书认证 |
 
 ## 认证与权限
 
@@ -230,12 +234,41 @@ uv run python main.py
 | `td_get_employee_performance` | `tools/hr/talent_dev_query.py` | 绩效详情 |
 | `td_get_employee_history` | `tools/hr/talent_dev_query.py` | 岗位变动履历 |
 | `td_get_employee_attendance` | `tools/hr/talent_dev_query.py` | 考勤记录 |
+| `td_get_employee_skills` | `tools/hr/talent_dev_query.py` | 技能标签 |
+| `td_get_employee_education` | `tools/hr/talent_dev_query.py` | 教育背景 |
+| `td_get_employee_projects` | `tools/hr/talent_dev_query.py` | 项目经历 |
+| `td_get_employee_certificates` | `tools/hr/talent_dev_query.py` | 证书认证 |
 | `td_training_summary` | `tools/hr/talent_dev_query.py` | 培训完成率统计 |
 | `td_nine_grid_distribution` | `tools/hr/talent_dev_query.py` | 九宫格分布 |
 | `td_performance_distribution` | `tools/hr/talent_dev_query.py` | 绩效评级分布 |
 | `td_turnover_analysis` | `tools/hr/talent_dev_query.py` | 人员流动分析 |
 | `td_promotion_stats` | `tools/hr/talent_dev_query.py` | 晋升统计 |
 | `td_idp_summary` | `tools/hr/talent_dev_query.py` | IDP 达成率 |
+
+#### 人才发现（talent_dev 权限）
+
+| 工具 | 文件 | 说明 |
+|------|------|------|
+| `td_discover_hidden_talent` | `tools/hr/discovery.py` | 识别被埋没的高潜人才 |
+| `td_assess_flight_risk` | `tools/hr/discovery.py` | 流失风险预警 |
+| `td_promotion_readiness` | `tools/hr/discovery.py` | 晋升准备度评估 |
+| `td_find_candidates` | `tools/hr/discovery.py` | 岗位适配推荐 |
+| `td_talent_portrait` | `tools/hr/discovery.py` | 完整人才画像 |
+| `td_team_capability_gap` | `tools/hr/discovery.py` | 团队能力短板分析 |
+
+## 模型评估
+
+各角色 Agent 评估用例：
+
+| 角色 | 文件 | 工具数 | 用例数 |
+|------|------|--------|--------|
+| 普通员工 | `tests/test_evaluation_employee_role.md` | 10 | ~40 |
+| 主管 (manager) | `tests/test_evaluation_manager_role.md` | 18 | ~40 |
+| 管理者 (admin) | `tests/test_evaluation_admin_role.md` | 23 | ~35 |
+| 人才发展 (talent_dev) | `tests/test_evaluation_talent_dev_role.md` | 23 | ~60 |
+| 人才发现引擎 | `tests/test_evaluation_talent_discovery.md` | 6 | ~80 |
+
+评估维度：功能查询、业务办理、权限边界、工具选择歧义、多工具组合、边界异常。
 
 ## 异常处理
 
