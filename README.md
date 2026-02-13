@@ -1,6 +1,6 @@
 # 马喜智能助手 (mx-agent)
 
-基于 FastAPI + Agno 的企业级 AI 智能助手，支持 HR、财务、法务等多领域智能问答与业务办理。
+基于 FastAPI + Agno 的企业级 AI 智能助手，支持 HR、IT 运维、财务、法务等多领域智能问答与业务办理。
 
 ## 系统架构
 
@@ -26,19 +26,14 @@
 │                      │  Router Team    │ ← 智能路由分发            │
 │                      │  (智能助手入口)   │                          │
 │                      └───────┬─────────┘                          │
-│              ┌───────────────┼───────────────┐                    │
-│              ▼               ▼               ▼                    │
-│       ┌───────────┐  ┌────────────┐  ┌───────────┐               │
-│       │ HR Agent  │  │ Finance    │  │ Legal     │               │
-│       │ (已上线)   │  │ Agent      │  │ Agent     │               │
-│       └─────┬─────┘  │ (开发中)    │  │ (开发中)   │               │
-│             │        └────────────┘  └───────────┘               │
-│       ┌─────┴─────┐                                               │
-│       ▼           ▼                                               │
-│   ┌────────┐ ┌─────────┐                                          │
-│   │ Skills │ │  Tools  │                                          │
-│   │ 知识库  │ │  工具集  │                                          │
-│   └────────┘ └─────────┘                                          │
+│       ┌──────────────┼──────────┬──────────┐                │
+│       ▼              ▼          ▼          ▼                │
+│  ┌───────────┐ ┌───────────┐ ┌────────┐ ┌───────┐          │
+│  │ HR Agent  │ │ IT Agent  │ │Finance │ │ Legal │          │
+│  │ (已上线)   │ │ (已上线)   │ │Agent   │ │ Agent │          │
+│  │ 55 Tools  │ │ 12 Tools  │ │(开发中) │ │(开发中)│          │
+│  │ 8 Skills  │ │ 5 Skills  │ │        │ │       │          │
+│  └───────────┘ └───────────┘ └────────┘ └───────┘          │
 └───────────────────────────┬───────────────────────────────────────┘
                             │
                             ▼
@@ -49,6 +44,7 @@
 │  │ · 员工/部门      │ │ · 会话记忆       │ │ (HR审批系统)     │     │
 │  │ · 考勤/薪资      │ │ · 追踪数据       │ │                 │     │
 │  │ · 假期/社保      │ │                 │ │                 │     │
+│  │ · IT设备/工单    │ │                 │ │                 │     │
 │  └─────────────────┘ └─────────────────┘ └─────────────────┘     │
 └───────────────────────────────────────────────────────────────────┘
 ```
@@ -76,22 +72,30 @@ app/
 ├── agents/                  # 智能体定义
 │   ├── router_agent.py      #   路由智能体 (Team)
 │   ├── hr_agent.py          #   HR 助手
+│   ├── it_agent.py          #   IT 运维助手
 │   ├── finance_agent.py     #   财务助手 (开发中)
 │   └── legal_agent.py       #   法务助手 (开发中)
 ├── api/v1/                  # REST API 路由
 ├── core/                    # 基础设施
 │   ├── database.py          #   数据库连接
 │   ├── llm.py               #   LLM 配置
+│   ├── masking.py           #   敏感数据脱敏
 │   ├── middleware.py         #   中间件 (RequestID / 日志)
 │   ├── exceptions.py        #   异常处理
 │   ├── error_codes.py       #   错误码定义
 │   ├── logging.py           #   日志配置
 │   └── context.py           #   请求上下文
-├── models/hr/               # SQLAlchemy ORM 模型
+├── models/
+│   ├── hr/                  #   HR ORM 模型 (16 张表)
+│   └── it/                  #   IT ORM 模型 (3 张表)
 ├── schemas/                 # Pydantic 请求/响应 Schema
 ├── services/                # 业务逻辑层
-├── skills/hr/               # Agent Skills (制度知识库)
-└── tools/hr/                # Agent Tools (数据查询/业务办理)
+├── skills/
+│   ├── hr/                  #   HR Skills (8 个知识库)
+│   └── it/                  #   IT Skills (5 个知识库)
+├── tools/
+│   ├── hr/                  #   HR Tools (55 个)
+│   └── it/                  #   IT Tools (12 个)
 ```
 
 ## 快速启动
@@ -128,6 +132,8 @@ uv run python main.py
 
 ## 数据模型
 
+### HR 模型（16 张表）
+
 | 模型 | 说明 |
 |------|------|
 | `Employee` | 员工基本信息 |
@@ -148,6 +154,14 @@ uv run python main.py
 | `ProjectExperience` | 项目经历 |
 | `Certificate` | 证书认证 |
 
+### IT 模型（3 张表）
+
+| 模型 | 说明 |
+|------|------|
+| `ITAsset` | IT 设备资产（编号/类型/品牌/状态/使用人） |
+| `ITTicket` | IT 工单（报修/密码重置/软件安装/权限申请） |
+| `ITAssetHistory` | 设备流转记录（分配/回收/调拨） |
+
 ## 认证与权限
 
 - **认证方式**: JWT Token
@@ -159,6 +173,7 @@ uv run python main.py
 | **主管** (manager) | 查看管辖部门员工数据（不含薪资社保），审批下属申请 | 本部门 |
 | **管理者** (admin) | 全公司数据查询（含薪资社保），全公司审批 | 全公司 |
 | **人才发展** (talent_dev) | 员工档案、培训、盘点、IDP、分析报表 | 全公司 |
+| **IT 管理员** (it_admin) | 全部工单管理、设备分配回收、统计报表 | 全公司 |
 
 ## HR 助手
 
@@ -256,6 +271,42 @@ uv run python main.py
 | `td_talent_portrait` | `tools/hr/discovery.py` | 完整人才画像 |
 | `td_team_capability_gap` | `tools/hr/discovery.py` | 团队能力短板分析 |
 
+## IT 运维助手
+
+### Skills 知识库
+
+| Skill | 描述 | 权限 |
+|-------|------|------|
+| `wifi-vpn` | WiFi/VPN 连接排查指南 | 全员 |
+| `printer` | 打印机安装和故障排查 | 全员 |
+| `email` | 邮箱配置和常见问题 | 全员 |
+| `security` | 信息安全制度和规范 | 全员 |
+| `device-policy` | 设备使用规范和借用流程 | 全员 |
+
+### Tools 工具集
+
+#### 员工自助
+
+| 工具 | 文件 | 说明 |
+|------|------|------|
+| `it_get_my_tickets` | `tools/it/query.py` | 查询我的工单列表 |
+| `it_get_ticket_detail` | `tools/it/query.py` | 查询工单详情 |
+| `it_get_my_assets` | `tools/it/query.py` | 查询我的设备 |
+| `it_create_ticket` | `tools/it/action.py` | 创建 IT 工单 |
+
+#### IT 管理员权限
+
+| 工具 | 文件 | 说明 |
+|------|------|------|
+| `it_admin_get_tickets` | `tools/it/admin_query.py` | 全部工单查询（多条件筛选） |
+| `it_admin_get_assets` | `tools/it/admin_query.py` | 全部设备查询 |
+| `it_admin_ticket_stats` | `tools/it/admin_query.py` | 工单统计报表 |
+| `it_admin_asset_stats` | `tools/it/admin_query.py` | 设备统计报表 |
+| `it_admin_fault_trend` | `tools/it/admin_query.py` | 故障趋势分析 |
+| `it_admin_handle_ticket` | `tools/it/admin_action.py` | 处理工单（受理/解决/关闭） |
+| `it_admin_assign_asset` | `tools/it/admin_action.py` | 分配设备给员工 |
+| `it_admin_reclaim_asset` | `tools/it/admin_action.py` | 回收设备 |
+
 ## 模型评估
 
 各角色 Agent 评估用例：
@@ -267,8 +318,9 @@ uv run python main.py
 | 管理者 (admin) | `tests/test_evaluation_admin_role.md` | 23 | ~35 |
 | 人才发展 (talent_dev) | `tests/test_evaluation_talent_dev_role.md` | 23 | ~60 |
 | 人才发现引擎 | `tests/test_evaluation_talent_discovery.md` | 6 | ~80 |
+| IT 运维助手 | `tests/test_evaluation_it_assistant.md` | 12 | 61 |
 
-评估维度：功能查询、业务办理、权限边界、工具选择歧义、多工具组合、边界异常。
+评估维度：路由识别、功能查询、业务办理、Skills 咨询、权限边界、工具选择歧义、边界异常。
 
 ## 异常处理
 
