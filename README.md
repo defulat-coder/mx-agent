@@ -1,6 +1,6 @@
 # 马喜智能助手 (mx-agent)
 
-基于 FastAPI + Agno 的企业级 AI 智能助手，支持 HR、IT 运维、财务、法务等多领域智能问答与业务办理。
+基于 FastAPI + Agno 的企业级 AI 智能助手，支持 HR、IT 运维、行政、财务、法务等多领域智能问答与业务办理。
 
 ## 系统架构
 
@@ -26,14 +26,15 @@
 │                      │  Router Team    │ ← 智能路由分发            │
 │                      │  (智能助手入口)   │                          │
 │                      └───────┬─────────┘                          │
-│       ┌──────────────┼──────────┬──────────┐                │
-│       ▼              ▼          ▼          ▼                │
-│  ┌───────────┐ ┌───────────┐ ┌────────┐ ┌───────┐          │
-│  │ HR Agent  │ │ IT Agent  │ │Finance │ │ Legal │          │
-│  │ (已上线)   │ │ (已上线)   │ │Agent   │ │ Agent │          │
-│  │ 55 Tools  │ │ 12 Tools  │ │(开发中) │ │(开发中)│          │
-│  │ 8 Skills  │ │ 5 Skills  │ │        │ │       │          │
-│  └───────────┘ └───────────┘ └────────┘ └───────┘          │
+│       ┌──────────┼──────────┬──────────┬──────────┐         │
+│       ▼          ▼          ▼          ▼          ▼         │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌────────┐ ┌───────┐ │
+│  │HR Agent │ │IT Agent │ │Admin    │ │Finance │ │ Legal │ │
+│  │(已上线)  │ │(已上线)  │ │Agent   │ │Agent   │ │ Agent │ │
+│  │55 Tools │ │12 Tools │ │(已上线)  │ │(开发中) │ │(开发中)│ │
+│  │8 Skills │ │5 Skills │ │18 Tools │ │        │ │       │ │
+│  │         │ │         │ │3 Skills │ │        │ │       │ │
+│  └─────────┘ └─────────┘ └─────────┘ └────────┘ └───────┘ │
 └───────────────────────────┬───────────────────────────────────────┘
                             │
                             ▼
@@ -45,6 +46,8 @@
 │  │ · 考勤/薪资      │ │ · 追踪数据       │ │                 │     │
 │  │ · 假期/社保      │ │                 │ │                 │     │
 │  │ · IT设备/工单    │ │                 │ │                 │     │
+│  │ · 会议室/预订    │ │                 │ │                 │     │
+│  │ · 用品/快递/访客  │ │                 │ │                 │     │
 │  └─────────────────┘ └─────────────────┘ └─────────────────┘     │
 └───────────────────────────────────────────────────────────────────┘
 ```
@@ -73,6 +76,7 @@ app/
 │   ├── router_agent.py      #   路由智能体 (Team)
 │   ├── hr_agent.py          #   HR 助手
 │   ├── it_agent.py          #   IT 运维助手
+│   ├── admin_agent.py       #   行政助手
 │   ├── finance_agent.py     #   财务助手 (开发中)
 │   └── legal_agent.py       #   法务助手 (开发中)
 ├── api/v1/                  # REST API 路由
@@ -87,15 +91,18 @@ app/
 │   └── context.py           #   请求上下文
 ├── models/
 │   ├── hr/                  #   HR ORM 模型 (16 张表)
-│   └── it/                  #   IT ORM 模型 (3 张表)
+│   ├── it/                  #   IT ORM 模型 (3 张表)
+│   └── admin/               #   行政 ORM 模型 (6 张表)
 ├── schemas/                 # Pydantic 请求/响应 Schema
 ├── services/                # 业务逻辑层
 ├── skills/
 │   ├── hr/                  #   HR Skills (8 个知识库)
-│   └── it/                  #   IT Skills (5 个知识库)
+│   ├── it/                  #   IT Skills (5 个知识库)
+│   └── admin/               #   行政 Skills (3 个知识库)
 ├── tools/
 │   ├── hr/                  #   HR Tools (55 个)
-│   └── it/                  #   IT Tools (12 个)
+│   ├── it/                  #   IT Tools (12 个)
+│   └── admin/               #   行政 Tools (18 个)
 ```
 
 ## 快速启动
@@ -162,6 +169,17 @@ uv run python main.py
 | `ITTicket` | IT 工单（报修/密码重置/软件安装/权限申请） |
 | `ITAssetHistory` | 设备流转记录（分配/回收/调拨） |
 
+### 行政模型（6 张表）
+
+| 模型 | 说明 |
+|------|------|
+| `MeetingRoom` | 会议室（名称/楼层/容量/设备/状态） |
+| `RoomBooking` | 会议室预订（30 分钟槽位制，含冲突检测） |
+| `OfficeSupply` | 办公用品库存（名称/分类/库存/单位） |
+| `SupplyRequest` | 办公用品申领单（审批后自动扣减库存） |
+| `Express` | 快递收发记录（单号/类型/状态） |
+| `Visitor` | 访客预约（访客信息/来访日期/接待人/状态） |
+
 ## 认证与权限
 
 - **认证方式**: JWT Token
@@ -174,6 +192,7 @@ uv run python main.py
 | **管理者** (admin) | 全公司数据查询（含薪资社保），全公司审批 | 全公司 |
 | **人才发展** (talent_dev) | 员工档案、培训、盘点、IDP、分析报表 | 全公司 |
 | **IT 管理员** (it_admin) | 全部工单管理、设备分配回收、统计报表 | 全公司 |
+| **行政人员** (admin_staff) | 预订管理、用品审批、快递登记、访客管理、统计 | 全公司 |
 
 ## HR 助手
 
@@ -306,6 +325,46 @@ uv run python main.py
 | `it_admin_handle_ticket` | `tools/it/admin_action.py` | 处理工单（受理/解决/关闭） |
 | `it_admin_assign_asset` | `tools/it/admin_action.py` | 分配设备给员工 |
 | `it_admin_reclaim_asset` | `tools/it/admin_action.py` | 回收设备 |
+
+## 行政助手
+
+### Skills 知识库
+
+| Skill | 描述 | 权限 |
+|-------|------|------|
+| `travel-policy` | 差旅管理制度（交通/住宿/餐费标准、审批流程） | 全员 |
+| `office-rules` | 办公管理规范（工位/公共区域/用品领用） | 全员 |
+| `meeting-room-rules` | 会议室使用规范（预订/取消/超时规则） | 全员 |
+
+### Tools 工具集
+
+#### 员工自助
+
+| 工具 | 文件 | 说明 |
+|------|------|------|
+| `adm_get_available_rooms` | `tools/admin/query.py` | 查询可用会议室（支持时间段筛选） |
+| `adm_get_my_bookings` | `tools/admin/query.py` | 查询我的预订记录 |
+| `adm_get_my_express` | `tools/admin/query.py` | 查询我的快递记录 |
+| `adm_get_my_visitors` | `tools/admin/query.py` | 查询我的访客预约 |
+| `adm_book_room` | `tools/admin/action.py` | 预订会议室（30 分钟槽位，冲突检测） |
+| `adm_cancel_booking` | `tools/admin/action.py` | 取消预订（开始前 30 分钟） |
+| `adm_request_supply` | `tools/admin/action.py` | 申领办公用品 |
+| `adm_book_visitor` | `tools/admin/action.py` | 预约访客来访 |
+| `adm_apply_travel` | `tools/admin/action.py` | 差旅申请（返回 OA 审批链接） |
+
+#### 行政人员权限
+
+| 工具 | 文件 | 说明 |
+|------|------|------|
+| `adm_admin_get_all_bookings` | `tools/admin/admin_query.py` | 全部预订查询（按会议室/状态/日期） |
+| `adm_admin_get_supply_requests` | `tools/admin/admin_query.py` | 全部申领单查询 |
+| `adm_admin_get_supply_stock` | `tools/admin/admin_query.py` | 库存查询 |
+| `adm_admin_get_all_express` | `tools/admin/admin_query.py` | 全部快递查询 |
+| `adm_admin_get_visitors` | `tools/admin/admin_query.py` | 全部访客预约查询 |
+| `adm_admin_usage_stats` | `tools/admin/admin_query.py` | 行政综合统计 |
+| `adm_admin_release_room` | `tools/admin/admin_action.py` | 设置会议室状态（维护/恢复） |
+| `adm_admin_approve_supply` | `tools/admin/admin_action.py` | 审批申领单（通过自动扣库存） |
+| `adm_admin_register_express` | `tools/admin/admin_action.py` | 登记快递 |
 
 ## 模型评估
 
