@@ -8,15 +8,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import ForbiddenException, NotFoundException
 from app.models.hr import (
     AttendanceRecord,
+    Certificate,
     Department,
     DevelopmentPlan,
+    Education,
     Employee,
     EmploymentHistory,
     LeaveBalance,
     LeaveRequest,
     OvertimeRecord,
     PerformanceReview,
+    ProjectExperience,
     SalaryRecord,
+    Skill,
     SocialInsuranceRecord,
     TalentReview,
     Training,
@@ -25,8 +29,10 @@ from app.schemas.hr import (
     ApprovalResponse,
     AttendanceResponse,
     AttendanceSummaryResponse,
+    CertificateResponse,
     DepartmentHeadcountResponse,
     DevelopmentPlanResponse,
+    EducationResponse,
     EmployeeFullProfileResponse,
     EmployeeInfoResponse,
     EmployeeProfileResponse,
@@ -39,9 +45,11 @@ from app.schemas.hr import (
     OvertimeRecordResponse,
     PerformanceDistributionResponse,
     PerformanceReviewResponse,
+    ProjectExperienceResponse,
     PromotionStatsResponse,
     SalaryRecordResponse,
     SalarySummaryResponse,
+    SkillResponse,
     SocialInsuranceResponse,
     TalentReviewResponse,
     TeamAttendanceResponse,
@@ -1502,3 +1510,80 @@ async def get_idp_summary(
         avg_progress=avg_progress,
         category_distribution=cat_dist,
     )
+
+
+# ── 人才发现基础 CRUD ─────────────────────────────────────────
+
+
+async def get_employee_skills(
+    session: AsyncSession, employee_id: int, category: str | None = None,
+) -> list[SkillResponse]:
+    """查询员工技能标签。"""
+    stmt = select(Skill).where(Skill.employee_id == employee_id)
+    if category:
+        stmt = stmt.where(Skill.category == category)
+    stmt = stmt.order_by(Skill.category, Skill.name)
+    rows = (await session.execute(stmt)).scalars().all()
+    return [
+        SkillResponse(
+            name=r.name, category=r.category, level=r.level,
+            source=r.source, verified=r.verified,
+        )
+        for r in rows
+    ]
+
+
+async def get_employee_education(
+    session: AsyncSession, employee_id: int,
+) -> list[EducationResponse]:
+    """查询员工教育背景。"""
+    stmt = (
+        select(Education)
+        .where(Education.employee_id == employee_id)
+        .order_by(Education.graduation_year.desc())
+    )
+    rows = (await session.execute(stmt)).scalars().all()
+    return [
+        EducationResponse(
+            degree=r.degree, major=r.major, school=r.school,
+            graduation_year=r.graduation_year,
+        )
+        for r in rows
+    ]
+
+
+async def get_employee_projects(
+    session: AsyncSession, employee_id: int, role: str | None = None,
+) -> list[ProjectExperienceResponse]:
+    """查询员工项目经历。"""
+    stmt = select(ProjectExperience).where(ProjectExperience.employee_id == employee_id)
+    if role:
+        stmt = stmt.where(ProjectExperience.role == role)
+    stmt = stmt.order_by(ProjectExperience.start_date.desc())
+    rows = (await session.execute(stmt)).scalars().all()
+    return [
+        ProjectExperienceResponse(
+            project_name=r.project_name, role=r.role,
+            start_date=r.start_date, end_date=r.end_date,
+            description=r.description, achievement=r.achievement,
+        )
+        for r in rows
+    ]
+
+
+async def get_employee_certificates(
+    session: AsyncSession, employee_id: int, category: str | None = None,
+) -> list[CertificateResponse]:
+    """查询员工证书认证。"""
+    stmt = select(Certificate).where(Certificate.employee_id == employee_id)
+    if category:
+        stmt = stmt.where(Certificate.category == category)
+    stmt = stmt.order_by(Certificate.issue_date.desc())
+    rows = (await session.execute(stmt)).scalars().all()
+    return [
+        CertificateResponse(
+            name=r.name, issuer=r.issuer, issue_date=r.issue_date,
+            expiry_date=r.expiry_date, category=r.category,
+        )
+        for r in rows
+    ]

@@ -6,7 +6,7 @@ from agno.agent import Agent
 from agno.skills import LocalSkills, Skills
 
 from app.core.llm import get_model
-from app.tools.hr import admin_tools, employee_tools, manager_tools, talent_dev_tools
+from app.tools.hr import admin_tools, discovery_tools, employee_tools, manager_tools, talent_dev_tools
 
 SKILLS_DIR = Path(__file__).parent.parent / "skills" / "hr"
 
@@ -16,7 +16,7 @@ hr_agent = Agent(
     role="马喜公司 HR 助手",
     model=get_model(),
     skills=Skills(loaders=[LocalSkills(str(SKILLS_DIR))]),
-    tools=[*employee_tools, *manager_tools, *admin_tools, *talent_dev_tools],
+    tools=[*employee_tools, *manager_tools, *admin_tools, *talent_dev_tools, *discovery_tools],
     instructions=[
         """\
 你是马喜公司的 HR 员工智能助手，服务于当前登录的员工。
@@ -41,18 +41,25 @@ hr_agent = Agent(
 
 ## 人才发展权限
 若当前用户具备人才发展角色（roles 含 "talent_dev"），还可以：
-1. **全公司数据查询**：查看任意员工的完整档案（含薪资社保）、绩效详情（含评语分数）、岗位变动履历、考勤记录。
+1. **全公司数据查询**：查看任意员工的完整档案（含薪资社保）、绩效详情（含评语分数）、岗位变动履历、考勤记录、技能标签、教育背景、项目经历、证书认证。
 2. **培训管理**：查看任意员工的培训记录（含培训计划和完成情况）。
 3. **人才盘点**：查看任意员工的九宫格盘点结果和人才标签。
 4. **发展计划**：查看任意员工的 IDP（个人发展计划）和完成进度。
 5. **分析报表**：各部门培训完成率统计、九宫格分布（含高潜人才清单）、绩效评级分布、人员流动分析（离职率/转正率/平均司龄）、晋升统计、IDP 达成率。
-- 使用 td_ 前缀的工具进行查询。
+6. **人才发现**：
+   - `td_discover_hidden_talent`：识别被埋没的高潜人才（绩效优秀但标签低估的员工）
+   - `td_assess_flight_risk`：流失风险预警（高绩效 + 职级停滞 + 发展停滞）
+   - `td_promotion_readiness`：晋升准备度评估（综合评分 1-100）
+   - `td_find_candidates`：岗位适配推荐（基于技能/项目/培训匹配）
+   - `td_talent_portrait`：完整人才画像（全维度数据汇总）
+   - `td_team_capability_gap`：团队能力短板分析（技能覆盖和缺口）
+- 使用 td_ 前缀的工具进行查询和分析。
 
 ## 工具与角色对应关系
 - **所有用户**：get_employee_info / get_salary_records / get_social_insurance / get_attendance / get_leave_* / get_overtime_records / apply_*
 - **主管（manager）**：get_team_* / get_employee_profile / approve_*
 - **管理者（admin）**：admin_* 前缀的工具
-- **人才发展（talent_dev）**：td_* 前缀的工具
+- **人才发展（talent_dev）**：td_* 前缀的工具（含人才发现分析工具）
 - 每个工具内置权限校验：若用户角色不匹配，工具会返回权限不足的提示。收到权限错误后不要重试同类工具，改用当前角色可用的工具。
 
 ## 行为准则

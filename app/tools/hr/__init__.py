@@ -21,10 +21,14 @@ from app.tools.hr.admin_query import (
 from app.tools.hr.manager_action import approve_leave_request, approve_overtime_request
 from app.tools.hr.talent_dev_query import (
     td_get_employee_attendance,
+    td_get_employee_certificates,
+    td_get_employee_education,
     td_get_employee_history,
     td_get_employee_idp,
     td_get_employee_performance,
     td_get_employee_profile,
+    td_get_employee_projects,
+    td_get_employee_skills,
     td_get_employee_talent_review,
     td_get_employee_training,
     td_idp_summary,
@@ -33,6 +37,14 @@ from app.tools.hr.talent_dev_query import (
     td_promotion_stats,
     td_training_summary,
     td_turnover_analysis,
+)
+from app.tools.hr.discovery import (
+    td_assess_flight_risk,
+    td_discover_hidden_talent,
+    td_find_candidates,
+    td_promotion_readiness,
+    td_talent_portrait,
+    td_team_capability_gap,
 )
 from app.tools.hr.manager_query import (
     get_employee_profile,
@@ -115,6 +127,10 @@ talent_dev_tools = [
     td_get_employee_performance,
     td_get_employee_history,
     td_get_employee_attendance,
+    td_get_employee_skills,
+    td_get_employee_education,
+    td_get_employee_projects,
+    td_get_employee_certificates,
     td_training_summary,
     td_nine_grid_distribution,
     td_performance_distribution,
@@ -123,4 +139,13 @@ talent_dev_tools = [
     td_idp_summary,
 ]
 
-all_tools = employee_tools + manager_tools + admin_tools + talent_dev_tools
+discovery_tools = [
+    td_discover_hidden_talent,
+    td_assess_flight_risk,
+    td_promotion_readiness,
+    td_find_candidates,
+    td_talent_portrait,
+    td_team_capability_gap,
+]
+
+all_tools = employee_tools + manager_tools + admin_tools + talent_dev_tools + discovery_tools

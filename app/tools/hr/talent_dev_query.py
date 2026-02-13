@@ -199,3 +199,65 @@ async def td_idp_summary(
     async with async_session_factory() as session:
         result = await hr_service.get_idp_summary(session, plan_year)
         return result.model_dump_json()
+
+
+# ── 人才发现新增数据查询 ───────────────────────────────────────
+
+
+async def td_get_employee_skills(
+    run_context: RunContext,
+    employee_id: int,
+    category: str | None = None,
+) -> str:
+    """查询任意员工的技能标签列表。可按分类过滤（技术/管理/业务/通用）。"""
+    try:
+        get_talent_dev_id(run_context)
+    except ValueError as e:
+        return str(e)
+    async with async_session_factory() as session:
+        records = await hr_service.get_employee_skills(session, employee_id, category)
+        return "[" + ",".join(r.model_dump_json() for r in records) + "]"
+
+
+async def td_get_employee_education(
+    run_context: RunContext,
+    employee_id: int,
+) -> str:
+    """查询任意员工的教育背景（学历、专业、院校）"""
+    try:
+        get_talent_dev_id(run_context)
+    except ValueError as e:
+        return str(e)
+    async with async_session_factory() as session:
+        records = await hr_service.get_employee_education(session, employee_id)
+        return "[" + ",".join(r.model_dump_json() for r in records) + "]"
+
+
+async def td_get_employee_projects(
+    run_context: RunContext,
+    employee_id: int,
+    role: str | None = None,
+) -> str:
+    """查询任意员工的项目参与经历。可按角色过滤（负责人/核心成员/参与者）。"""
+    try:
+        get_talent_dev_id(run_context)
+    except ValueError as e:
+        return str(e)
+    async with async_session_factory() as session:
+        records = await hr_service.get_employee_projects(session, employee_id, role)
+        return "[" + ",".join(r.model_dump_json() for r in records) + "]"
+
+
+async def td_get_employee_certificates(
+    run_context: RunContext,
+    employee_id: int,
+    category: str | None = None,
+) -> str:
+    """查询任意员工的证书认证。可按分类过滤（专业技术/管理/语言/行业）。"""
+    try:
+        get_talent_dev_id(run_context)
+    except ValueError as e:
+        return str(e)
+    async with async_session_factory() as session:
+        records = await hr_service.get_employee_certificates(session, employee_id, category)
+        return "[" + ",".join(r.model_dump_json() for r in records) + "]"

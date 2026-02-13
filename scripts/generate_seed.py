@@ -17,12 +17,13 @@ def q(v: str) -> str:
 
 
 # ── 建表（如果用 alembic 已建则跳过） ─────────────────────────
-sql("-- HR 测试数据 —— 自动生成，覆盖 10 张表")
+sql("-- HR 测试数据 —— 自动生成，覆盖 14 张表")
 sql("-- 使用前请确保表已通过 SQLAlchemy metadata.create_all 或 alembic 创建")
 sql("BEGIN;\n")
 
 # ── 清空旧数据 ──────────────────────────────────────────────
 for t in [
+    "certificates", "project_experiences", "educations", "skills",
     "development_plans", "talent_reviews", "trainings",
     "employment_histories", "performance_reviews",
     "overtime_records", "leave_requests", "leave_balances",
@@ -584,6 +585,185 @@ for eid, py, goal, cat, acts, st, prog, dl in idp_records:
     )
 sql("")
 
+# ── 14. skills（技能标签） ─────────────────────────────────────
+sql("-- skills")
+
+skill_pool = [
+    # (name, category, levels)
+    ("Python", "技术", ["中级", "高级", "专家"]),
+    ("Java", "技术", ["初级", "中级", "高级"]),
+    ("Go", "技术", ["初级", "中级"]),
+    ("JavaScript", "技术", ["中级", "高级"]),
+    ("TypeScript", "技术", ["中级", "高级"]),
+    ("React", "技术", ["中级", "高级"]),
+    ("Vue", "技术", ["初级", "中级"]),
+    ("SQL", "技术", ["中级", "高级"]),
+    ("Docker", "技术", ["中级", "高级"]),
+    ("Kubernetes", "技术", ["初级", "中级"]),
+    ("机器学习", "技术", ["中级", "高级", "专家"]),
+    ("NLP", "技术", ["中级", "高级"]),
+    ("大模型应用", "技术", ["初级", "中级", "高级"]),
+    ("测试自动化", "技术", ["中级", "高级"]),
+    ("性能测试", "技术", ["初级", "中级"]),
+    ("项目管理", "管理", ["初级", "中级", "高级"]),
+    ("团队管理", "管理", ["初级", "中级"]),
+    ("OKR", "管理", ["中级", "高级"]),
+    ("需求分析", "业务", ["中级", "高级"]),
+    ("数据分析", "业务", ["初级", "中级", "高级"]),
+    ("财务分析", "业务", ["中级", "高级"]),
+    ("法律合规", "业务", ["中级", "高级"]),
+    ("沟通表达", "通用", ["中级", "高级"]),
+    ("演讲汇报", "通用", ["初级", "中级"]),
+    ("英语", "通用", ["初级", "中级", "高级"]),
+]
+
+# 每个员工根据岗位分配 3-6 个技能
+emp_skill_map: dict[int, list[str]] = {
+    1:  ["Python", "SQL", "Docker", "Kubernetes", "项目管理", "沟通表达"],
+    2:  ["Python", "SQL", "Docker"],
+    3:  ["JavaScript", "TypeScript", "React", "Vue", "沟通表达"],
+    4:  ["Python", "机器学习", "NLP", "大模型应用", "Docker"],
+    5:  ["需求分析", "数据分析", "项目管理", "沟通表达", "演讲汇报"],
+    6:  ["沟通表达", "项目管理", "数据分析", "英语"],
+    7:  ["财务分析", "SQL", "数据分析", "英语"],
+    8:  ["法律合规", "沟通表达", "英语"],
+    9:  ["Python", "项目管理", "团队管理", "OKR", "Docker", "Kubernetes"],
+    10: ["Python", "SQL"],
+    11: ["JavaScript", "React", "TypeScript"],
+    12: ["Python", "NLP", "机器学习", "大模型应用"],
+    13: ["测试自动化", "性能测试", "Python", "SQL"],
+    14: ["需求分析", "数据分析", "演讲汇报"],
+    15: ["沟通表达", "英语"],
+    16: ["Python", "Go", "SQL", "Docker", "Kubernetes"],
+    17: ["财务分析", "SQL", "数据分析"],
+    18: ["测试自动化", "性能测试", "Python", "团队管理", "项目管理"],
+    19: ["Python", "机器学习"],
+    20: ["JavaScript", "TypeScript", "React", "Vue", "团队管理", "项目管理"],
+}
+
+skill_name_to_info = {s[0]: (s[1], s[2]) for s in skill_pool}
+skill_records: list[tuple] = []
+
+for eid, skill_names in emp_skill_map.items():
+    for sname in skill_names:
+        cat, levels = skill_name_to_info[sname]
+        level = random.choice(levels)
+        source = random.choice(["自评", "自评", "上级评", "认证"])
+        verified = source in ("上级评", "认证") or random.random() > 0.5
+        skill_records.append((eid, sname, cat, level, source, verified))
+
+for eid, sname, cat, level, source, verified in skill_records:
+    sql(
+        f"INSERT INTO skills (employee_id, name, category, level, source, verified) "
+        f"VALUES ({eid}, {q(sname)}, {q(cat)}, {q(level)}, {q(source)}, {1 if verified else 0});"
+    )
+sql("")
+
+# ── 15. educations（教育背景） ────────────────────────────────
+sql("-- educations")
+
+education_data = [
+    (1,  "本科", "计算机科学与技术", "华中科技大学", 2018),
+    (1,  "硕士", "软件工程", "华中科技大学", 2021),
+    (2,  "本科", "软件工程", "武汉大学", 2022),
+    (3,  "本科", "数字媒体技术", "浙江大学", 2019),
+    (4,  "本科", "人工智能", "北京大学", 2017),
+    (4,  "硕士", "计算机科学", "北京大学", 2020),
+    (5,  "本科", "信息管理", "复旦大学", 2019),
+    (5,  "MBA", "工商管理", "中欧商学院", 2022),
+    (6,  "本科", "人力资源管理", "中国人民大学", 2018),
+    (7,  "本科", "会计学", "上海财经大学", 2016),
+    (8,  "本科", "法学", "中国政法大学", 2020),
+    (8,  "硕士", "国际商法", "中国政法大学", 2023),
+    (9,  "本科", "计算机科学与技术", "清华大学", 2014),
+    (9,  "硕士", "计算机科学", "清华大学", 2017),
+    (10, "本科", "软件工程", "电子科技大学", 2024),
+    (11, "本科", "计算机科学与技术", "南京大学", 2023),
+    (12, "本科", "计算机科学与技术", "中山大学", 2019),
+    (12, "硕士", "自然语言处理", "中山大学", 2022),
+    (13, "本科", "软件测试", "西安电子科技大学", 2023),
+    (14, "本科", "工业设计", "同济大学", 2021),
+    (15, "大专", "人力资源管理", "深圳职业技术学院", 2022),
+    (16, "本科", "计算机科学与技术", "厦门大学", 2019),
+    (17, "本科", "会计学", "中南财经政法大学", 2022),
+    (18, "本科", "软件工程", "哈尔滨工业大学", 2016),
+    (18, "硕士", "软件工程", "哈尔滨工业大学", 2019),
+    (19, "本科", "人工智能", "上海交通大学", 2025),
+    (20, "本科", "计算机科学与技术", "东南大学", 2017),
+]
+
+for eid, degree, major, school, grad_year in education_data:
+    sql(
+        f"INSERT INTO educations (employee_id, degree, major, school, graduation_year) "
+        f"VALUES ({eid}, {q(degree)}, {q(major)}, {q(school)}, {grad_year});"
+    )
+sql("")
+
+# ── 16. project_experiences（项目经历） ────────────────────────
+sql("-- project_experiences")
+
+project_data = [
+    (1,  "智能客服系统", "核心成员", "2022-03-01", "2022-09-30", "基于 LLM 的智能客服系统开发", "系统上线后客服效率提升 40%"),
+    (1,  "微服务架构迁移", "负责人", "2023-06-01", "2024-01-31", "将单体应用拆分为微服务架构", "完成 12 个服务拆分，零故障上线"),
+    (1,  "HR 智能助手", "负责人", "2025-06-01", None, "马喜智能助手 HR 模块开发", "完成核心功能上线"),
+    (2,  "HR 智能助手", "核心成员", "2025-08-01", None, "HR 助手后端 API 开发", "独立完成考勤和薪资模块"),
+    (3,  "企业门户改版", "核心成员", "2022-01-01", "2022-06-30", "公司门户网站前端重构", "页面加载速度提升 60%"),
+    (3,  "数据可视化平台", "负责人", "2023-09-01", "2024-03-31", "搭建公司内部数据看板系统", "覆盖 5 个业务部门的数据需求"),
+    (4,  "智能推荐引擎", "负责人", "2021-01-01", "2021-12-31", "基于协同过滤的推荐系统", "推荐点击率提升 25%"),
+    (4,  "大模型微调平台", "核心成员", "2024-01-01", "2024-09-30", "企业级大模型微调与部署平台", "支持 3 个业务场景的模型微调"),
+    (4,  "HR 智能助手", "核心成员", "2025-06-01", None, "HR 助手 AI Agent 模块开发", "设计并实现多 Agent 协作架构"),
+    (5,  "产品体验优化", "负责人", "2022-06-01", "2022-12-31", "用户体验全面优化项目", "NPS 评分从 30 提升到 55"),
+    (5,  "HR 智能助手", "参与者", "2025-06-01", None, "HR 助手产品设计", "完成产品需求文档和交互设计"),
+    (9,  "技术中台建设", "负责人", "2019-06-01", "2020-12-31", "搭建公司技术中台", "统一技术栈，研发效率提升 30%"),
+    (9,  "HR 智能助手", "负责人", "2025-03-01", None, "马喜智能助手整体架构和推进", "从 0 到 1 搭建 AI Agent 平台"),
+    (12, "情感分析系统", "核心成员", "2023-03-01", "2023-12-31", "中文情感分析模型训练与部署", "模型准确率达到 92%"),
+    (12, "HR 智能助手", "参与者", "2025-09-01", None, "HR 助手 NLP 能力支持", "优化意图识别准确率"),
+    (16, "支付系统重构", "核心成员", "2022-06-01", "2023-03-31", "支付系统从 PHP 迁移到 Go", "系统 QPS 提升 5 倍"),
+    (16, "HR 智能助手", "核心成员", "2025-07-01", None, "HR 助手后端开发", "完成权限和审批模块"),
+    (18, "自动化测试平台", "负责人", "2021-06-01", "2022-06-30", "搭建持续测试平台", "测试覆盖率从 40% 提升到 85%"),
+    (18, "HR 智能助手", "参与者", "2025-08-01", None, "HR 助手质量保障", "搭建自动化回归测试"),
+    (20, "组件库建设", "负责人", "2021-06-01", "2022-03-31", "统一前端组件库开发", "组件复用率达到 70%"),
+    (20, "数据可视化平台", "核心成员", "2023-09-01", "2024-03-31", "数据看板前端开发", "实现 20+ 可视化图表组件"),
+]
+
+for eid, pname, role, sd, ed, desc, ach in project_data:
+    ed_val = q(ed) if ed else "NULL"
+    sql(
+        f"INSERT INTO project_experiences (employee_id, project_name, role, start_date, end_date, description, achievement) "
+        f"VALUES ({eid}, {q(pname)}, {q(role)}, {q(sd)}, {ed_val}, {q(desc)}, {q(ach)});"
+    )
+sql("")
+
+# ── 17. certificates（证书认证） ──────────────────────────────
+sql("-- certificates")
+
+certificate_data = [
+    (1,  "AWS Solutions Architect", "Amazon", "2023-06-15", "2026-06-15", "专业技术"),
+    (1,  "PMP", "PMI", "2024-03-01", "2027-03-01", "管理"),
+    (4,  "TensorFlow Developer", "Google", "2022-09-01", "2025-09-01", "专业技术"),
+    (5,  "PMP", "PMI", "2023-11-01", "2026-11-01", "管理"),
+    (5,  "NPDP", "PDMA", "2024-08-01", None, "管理"),
+    (7,  "CPA", "中国注册会计师协会", "2020-01-15", None, "专业技术"),
+    (8,  "法律职业资格证", "司法部", "2021-03-01", None, "专业技术"),
+    (9,  "CKA", "CNCF", "2021-08-01", "2024-08-01", "专业技术"),
+    (9,  "PMP", "PMI", "2020-05-01", "2023-05-01", "管理"),
+    (12, "华为 HCIA-AI", "华为", "2023-05-01", "2026-05-01", "专业技术"),
+    (16, "CKA", "CNCF", "2024-01-15", "2027-01-15", "专业技术"),
+    (17, "初级会计师", "财政部", "2022-11-01", None, "专业技术"),
+    (18, "ISTQB 高级测试经理", "ISTQB", "2022-04-01", None, "专业技术"),
+    (20, "Google UX Design", "Google", "2023-07-01", None, "专业技术"),
+    (6,  "人力资源管理师（二级）", "人社部", "2021-09-01", None, "专业技术"),
+    (6,  "SHRM-CP", "SHRM", "2023-12-01", "2026-12-01", "管理"),
+]
+
+for eid, cname, issuer, issue_d, expiry_d, cat in certificate_data:
+    exp_val = q(expiry_d) if expiry_d else "NULL"
+    sql(
+        f"INSERT INTO certificates (employee_id, name, issuer, issue_date, expiry_date, category) "
+        f"VALUES ({eid}, {q(cname)}, {q(issuer)}, {q(issue_d)}, {exp_val}, {q(cat)});"
+    )
+sql("")
+
 sql("\nCOMMIT;")
 
 # ── 输出 ────────────────────────────────────────────────────
@@ -609,3 +789,7 @@ print(f"  employment_histories:     {len(hist_data)}")
 print(f"  trainings:                {len(training_records)}")
 print(f"  talent_reviews:           {len(talent_review_records)}")
 print(f"  development_plans:        {len(idp_records)}")
+print(f"  skills:                   {len(skill_records)}")
+print(f"  educations:               {len(education_data)}")
+print(f"  project_experiences:      {len(project_data)}")
+print(f"  certificates:             {len(certificate_data)}")

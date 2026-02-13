@@ -359,3 +359,46 @@ class IdpSummaryResponse(BaseModel):
     completion_rate: float = Field(description="完成率")
     avg_progress: float = Field(description="平均进度")
     category_distribution: dict[str, int] = Field(description="各类目标分布")
+
+
+# ── 人才发现新增基础 Schema ────────────────────────────────────
+
+
+class SkillResponse(BaseModel):
+    """技能标签"""
+
+    name: str = Field(description="技能名称")
+    category: str = Field(description="技能分类（技术/管理/业务/通用）")
+    level: str = Field(description="技能等级（初级/中级/高级/专家）")
+    source: str = Field(description="来源（自评/上级评/认证）")
+    verified: bool = Field(description="是否已确认")
+
+
+class EducationResponse(BaseModel):
+    """教育背景"""
+
+    degree: str = Field(description="学历")
+    major: str = Field(description="专业")
+    school: str = Field(description="院校名称")
+    graduation_year: int = Field(description="毕业年份")
+
+
+class ProjectExperienceResponse(BaseModel):
+    """项目经历"""
+
+    project_name: str = Field(description="项目名称")
+    role: str = Field(description="角色（负责人/核心成员/参与者）")
+    start_date: dt.date = Field(description="开始日期")
+    end_date: dt.date | None = Field(default=None, description="结束日期")
+    description: str = Field(description="项目描述")
+    achievement: str = Field(description="关键成果")
+
+
+class CertificateResponse(BaseModel):
+    """证书认证"""
+
+    name: str = Field(description="证书名称")
+    issuer: str = Field(description="颁发机构")
+    issue_date: dt.date = Field(description="颁发日期")
+    expiry_date: dt.date | None = Field(default=None, description="有效期")
+    category: str = Field(description="证书分类（专业技术/管理/语言/行业）")
