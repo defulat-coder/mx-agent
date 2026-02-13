@@ -5,6 +5,7 @@ from agno.run import RunContext
 from app.core.database import async_session_factory
 from app.services import hr as hr_service
 from app.tools.hr.utils import get_manager_info
+from loguru import logger
 
 
 async def approve_leave_request(
@@ -20,6 +21,11 @@ async def approve_leave_request(
         action: 通过/拒绝
         comment: 审批备注
     """
+    logger.info(
+        "tool=approve_leave_request | request_id={request_id} action={action}",
+        request_id=request_id,
+        action=action,
+    )
     try:
         emp_id, dept_id = get_manager_info(run_context)
     except ValueError as e:
@@ -44,6 +50,11 @@ async def approve_overtime_request(
         action: 通过/拒绝
         comment: 审批备注
     """
+    logger.info(
+        "tool=approve_overtime_request | record_id={record_id} action={action}",
+        record_id=record_id,
+        action=action,
+    )
     try:
         emp_id, dept_id = get_manager_info(run_context)
     except ValueError as e:

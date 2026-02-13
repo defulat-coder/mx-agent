@@ -6,6 +6,7 @@ from urllib.parse import urlencode
 from agno.run import RunContext
 
 from app.tools.hr.utils import get_employee_id
+from loguru import logger
 
 
 _HR_BASE_URL = "https://hr.example.com"
@@ -26,6 +27,12 @@ async def apply_leave(
         end_date: 结束日期 YYYY-MM-DD
         reason: 请假原因
     """
+    logger.info(
+        "tool=apply_leave | leave_type={leave_type} start_date={start_date} end_date={end_date}",
+        leave_type=leave_type,
+        start_date=start_date,
+        end_date=end_date,
+    )
     employee_id = get_employee_id(run_context)
     params = urlencode({
         "employee_id": employee_id,
@@ -57,6 +64,12 @@ async def apply_overtime(
         end_time: 结束时间 HH:MM
         overtime_type: 加班类型（工作日/周末/节假日）
     """
+    logger.info(
+        "tool=apply_overtime | date={date} start_time={start_time} end_time={end_time}",
+        date=date,
+        start_time=start_time,
+        end_time=end_time,
+    )
     employee_id = get_employee_id(run_context)
     params = urlencode({
         "employee_id": employee_id,
@@ -86,6 +99,11 @@ async def apply_reimbursement(
         amount: 报销金额
         description: 费用说明
     """
+    logger.info(
+        "tool=apply_reimbursement | type={reimbursement_type} amount={amount}",
+        reimbursement_type=reimbursement_type,
+        amount=amount,
+    )
     employee_id = get_employee_id(run_context)
     params = urlencode({
         "employee_id": employee_id,

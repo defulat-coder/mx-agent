@@ -2,6 +2,7 @@
 
 from datetime import date, datetime
 
+from loguru import logger
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -108,6 +109,7 @@ async def get_salary_records(
         employee_id: 员工 ID
         year_month: 月份 YYYY-MM，为空则返回最近 3 个月
     """
+    logger.info("查询薪资记录 | employee_id={eid} year_month={ym}", eid=employee_id, ym=year_month or "最近3月")
     stmt = select(SalaryRecord).where(SalaryRecord.employee_id == employee_id)
     if year_month:
         stmt = stmt.where(SalaryRecord.year_month == year_month)
@@ -139,6 +141,7 @@ async def get_social_insurance(
         employee_id: 员工 ID
         year_month: 月份 YYYY-MM，为空则返回最近 1 个月
     """
+    logger.info("查询社保记录 | employee_id={eid} year_month={ym}", eid=employee_id, ym=year_month or "最近1月")
     stmt = select(SocialInsuranceRecord).where(SocialInsuranceRecord.employee_id == employee_id)
     if year_month:
         stmt = stmt.where(SocialInsuranceRecord.year_month == year_month)
@@ -621,6 +624,7 @@ async def get_employee_profile(
         ForbiddenException: 目标员工不在管辖范围内
         NotFoundException: 员工不存在
     """
+    logger.info("查询员工档案 | manager={mid} target={tid}", mid=manager_employee_id, tid=target_employee_id)
     managed_ids = await get_managed_employee_ids(session, manager_employee_id, department_id)
     await _verify_employee_in_scope(session, target_employee_id, managed_ids)
 
@@ -682,6 +686,7 @@ async def approve_leave_request(
         NotFoundException: 申请不存在
         ForbiddenException: 无权审批
     """
+    logger.info("审批请假 | approver={mid} request_id={rid} action={act}", mid=manager_employee_id, rid=request_id, act=action)
     leave_req = (await session.execute(
         select(LeaveRequest).where(LeaveRequest.id == request_id)
     )).scalar_one_or_none()
@@ -735,6 +740,7 @@ async def approve_overtime_request(
         NotFoundException: 记录不存在
         ForbiddenException: 无权审批
     """
+    logger.info("审批加班 | approver={mid} record_id={rid} action={act}", mid=manager_employee_id, rid=record_id, act=action)
     ot_record = (await session.execute(
         select(OvertimeRecord).where(OvertimeRecord.id == record_id)
     )).scalar_one_or_none()
@@ -789,6 +795,7 @@ async def get_any_employee_salary(
     session: AsyncSession, employee_id: int, year_month: str | None = None,
 ) -> list[SalaryRecordResponse]:
     """查询任意员工的薪资明细（管理者专用）。"""
+    logger.info("管理者查询薪资 | target_employee_id={eid} year_month={ym}", eid=employee_id, ym=year_month or "最近3月")
     return await get_salary_records(session, employee_id, year_month)
 
 
@@ -796,6 +803,7 @@ async def get_any_employee_social_insurance(
     session: AsyncSession, employee_id: int, year_month: str | None = None,
 ) -> list[SocialInsuranceResponse]:
     """查询任意员工的社保明细（管理者专用）。"""
+    logger.info("管理者查询社保 | target_employee_id={eid} year_month={ym}", eid=employee_id, ym=year_month or "最近3月")
     return await get_social_insurance(session, employee_id, year_month)
 
 
@@ -807,6 +815,7 @@ async def get_any_employee_profile(
     Raises:
         NotFoundException: 员工不存在
     """
+    logger.info("查询完整档案 | target_employee_id={eid}", eid=target_employee_id)
     info = await get_employee_info(session, target_employee_id)
 
     perf_rows = (await session.execute(
@@ -1100,6 +1109,7 @@ async def admin_approve_leave_request(
     session: AsyncSession, request_id: int, action: str, comment: str = "",
 ) -> ApprovalResponse:
     """管理者审批请假申请（全公司范围，无部门限制）。"""
+    logger.info("管理者审批请假 | request_id={rid} action={act}", rid=request_id, act=action)
     leave_req = (await session.execute(
         select(LeaveRequest).where(LeaveRequest.id == request_id)
     )).scalar_one_or_none()
@@ -1120,6 +1130,7 @@ async def admin_approve_overtime_request(
     session: AsyncSession, record_id: int, action: str, comment: str = "",
 ) -> ApprovalResponse:
     """管理者审批加班申请（全公司范围，无部门限制）。"""
+    logger.info("管理者审批加班 | record_id={rid} action={act}", rid=record_id, act=action)
     ot_record = (await session.execute(
         select(OvertimeRecord).where(OvertimeRecord.id == record_id)
     )).scalar_one_or_none()

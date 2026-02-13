@@ -5,10 +5,12 @@ from agno.run import RunContext
 from app.core.database import async_session_factory
 from app.services import hr as hr_service
 from app.tools.hr.utils import get_admin_id
+from loguru import logger
 
 
 async def admin_get_all_employees(run_context: RunContext) -> str:
     """查询全公司员工列表（所有部门）"""
+    logger.info("tool=admin_get_all_employees")
     try:
         get_admin_id(run_context)
     except ValueError as e:
@@ -24,6 +26,7 @@ async def admin_get_employee_salary(
     year_month: str | None = None,
 ) -> str:
     """查询任意员工的薪资明细。year_month 格式 YYYY-MM，不传则返回最近 3 个月。"""
+    logger.info("tool=admin_get_employee_salary | employee_id={employee_id} year_month={year_month}", employee_id=employee_id, year_month=year_month)
     try:
         get_admin_id(run_context)
     except ValueError as e:
@@ -39,6 +42,7 @@ async def admin_get_employee_social_insurance(
     year_month: str | None = None,
 ) -> str:
     """查询任意员工的社保缴纳明细。year_month 格式 YYYY-MM，不传则返回最近 3 个月。"""
+    logger.info("tool=admin_get_employee_social_insurance | employee_id={employee_id} year_month={year_month}", employee_id=employee_id, year_month=year_month)
     try:
         get_admin_id(run_context)
     except ValueError as e:
@@ -53,6 +57,7 @@ async def admin_get_employee_profile(
     employee_id: int,
 ) -> str:
     """查询任意员工的完整档案（含基本信息、绩效、履历、薪资、社保）"""
+    logger.info("tool=admin_get_employee_profile | employee_id={employee_id}", employee_id=employee_id)
     try:
         get_admin_id(run_context)
     except ValueError as e:
@@ -67,6 +72,7 @@ async def admin_get_all_leave_requests(
     status: str | None = None,
 ) -> str:
     """查询全公司请假记录。可传 status="待审批" 过滤。"""
+    logger.info("tool=admin_get_all_leave_requests | status={status}", status=status)
     try:
         get_admin_id(run_context)
     except ValueError as e:
@@ -83,6 +89,7 @@ async def admin_get_all_attendance(
     status: str | None = None,
 ) -> str:
     """查询全公司考勤记录。日期格式 YYYY-MM-DD，可传 status 过滤。"""
+    logger.info("tool=admin_get_all_attendance | start_date={start_date} end_date={end_date} status={status}", start_date=start_date, end_date=end_date, status=status)
     try:
         get_admin_id(run_context)
     except ValueError as e:
@@ -98,6 +105,7 @@ async def admin_get_all_overtime_records(
     status: str | None = None,
 ) -> str:
     """查询全公司加班记录。year_month 格式 YYYY-MM，可传 status 过滤。"""
+    logger.info("tool=admin_get_all_overtime_records | year_month={year_month} status={status}", year_month=year_month, status=status)
     try:
         get_admin_id(run_context)
     except ValueError as e:
@@ -112,6 +120,7 @@ async def admin_get_all_overtime_records(
 
 async def admin_get_department_headcount(run_context: RunContext) -> str:
     """各部门人员统计（在职、试用期人数）"""
+    logger.info("tool=admin_get_department_headcount")
     try:
         get_admin_id(run_context)
     except ValueError as e:
@@ -127,6 +136,7 @@ async def admin_get_attendance_summary(
     end_date: str | None = None,
 ) -> str:
     """全公司考勤汇总（正常/迟到/早退/缺卡/外勤人次）。日期格式 YYYY-MM-DD。"""
+    logger.info("tool=admin_get_attendance_summary | start_date={start_date} end_date={end_date}", start_date=start_date, end_date=end_date)
     try:
         get_admin_id(run_context)
     except ValueError as e:
@@ -141,6 +151,7 @@ async def admin_get_salary_summary(
     year_month: str | None = None,
 ) -> str:
     """各部门薪资汇总（员工数、薪资总额、平均薪资）。year_month 格式 YYYY-MM。"""
+    logger.info("tool=admin_get_salary_summary | year_month={year_month}", year_month=year_month)
     try:
         get_admin_id(run_context)
     except ValueError as e:
@@ -152,6 +163,7 @@ async def admin_get_salary_summary(
 
 async def admin_get_leave_summary(run_context: RunContext) -> str:
     """假期使用与待审批汇总（各假期类型已用天数、待审批数量）"""
+    logger.info("tool=admin_get_leave_summary")
     try:
         get_admin_id(run_context)
     except ValueError as e:

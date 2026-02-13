@@ -2,6 +2,7 @@
 
 from datetime import date
 
+from loguru import logger
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -61,6 +62,7 @@ async def discover_hidden_talent(
     session: AsyncSession, department_id: int | None = None,
 ) -> HiddenTalentResult:
     """被埋没高潜识别：绩效优秀 + 培训活跃 + IDP 完成率高，但标签低估。"""
+    logger.info("人才发现-高潜识别 | department_id={did}", did=department_id or "全公司")
     employees = await _get_active_employees(session, department_id)
     if not employees:
         return HiddenTalentResult(candidates=[], total=0)
@@ -162,6 +164,7 @@ async def assess_flight_risk(
     session: AsyncSession, department_id: int | None = None,
 ) -> FlightRiskResult:
     """流失风险预警：高绩效 + 职级停留 + IDP 状态 + 加班趋势。"""
+    logger.info("人才发现-流失风险 | department_id={did}", did=department_id or "全公司")
     employees = await _get_active_employees(session, department_id)
     if not employees:
         return FlightRiskResult(candidates=[], total=0)
@@ -258,6 +261,7 @@ async def evaluate_promotion_readiness(
     department_id: int | None = None,
 ) -> PromotionReadinessResult:
     """晋升准备度评估：综合评分 1-100。"""
+    logger.info("人才发现-晋升评估 | employee_id={eid} department_id={did}", eid=employee_id, did=department_id)
     if employee_id:
         emp = (await session.execute(
             select(Employee).where(Employee.id == employee_id)
@@ -352,6 +356,7 @@ async def find_candidates(
     session: AsyncSession, requirements: str,
 ) -> CandidateMatchResult:
     """岗位适配推荐：基于技能 + 项目 + 培训关键词匹配。"""
+    logger.info("人才发现-岗位适配 | requirements={req}", req=requirements)
     keywords = [kw.strip() for kw in requirements.replace("，", ",").replace("、", ",").split(",") if kw.strip()]
     if not keywords:
         keywords = requirements.split()
@@ -464,6 +469,7 @@ async def build_talent_portrait(
     session: AsyncSession, employee_id: int,
 ) -> TalentPortraitResult:
     """完整人才画像：汇总所有维度数据。"""
+    logger.info("人才发现-人才画像 | employee_id={eid}", eid=employee_id)
     info = await get_employee_info(session, employee_id)
 
     edu_rows = (await session.execute(
@@ -512,6 +518,7 @@ async def analyze_team_capability_gap(
     session: AsyncSession, department_id: int,
 ) -> TeamCapabilityGapResult:
     """团队能力短板分析：技能覆盖和缺口。"""
+    logger.info("人才发现-能力短板 | department_id={did}", did=department_id)
     dept = (await session.execute(
         select(Department).where(Department.id == department_id)
     )).scalar_one_or_none()

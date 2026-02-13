@@ -7,10 +7,12 @@ from agno.run import RunContext
 from app.core.database import async_session_factory
 from app.services import hr as hr_service
 from app.tools.hr.utils import get_employee_id
+from loguru import logger
 
 
 async def get_employee_info(run_context: RunContext) -> str:
     """查询当前员工的基本信息和权限（姓名、工号、部门、岗位、职级、入职日期、状态、角色权限）"""
+    logger.info("tool=get_employee_info")
     employee_id = get_employee_id(run_context)
     state = run_context.session_state
     roles: list[str] = state.get("roles", []) if state else []  # type: ignore[union-attr]
@@ -23,6 +25,7 @@ async def get_employee_info(run_context: RunContext) -> str:
 
 async def get_salary_records(run_context: RunContext, year_month: str | None = None) -> str:
     """查询当前员工的薪资明细。year_month 格式 YYYY-MM，不传则返回最近 3 个月。"""
+    logger.info("tool=get_salary_records | year_month={year_month}", year_month=year_month)
     employee_id = get_employee_id(run_context)
     async with async_session_factory() as session:
         records = await hr_service.get_salary_records(session, employee_id, year_month)
@@ -31,6 +34,7 @@ async def get_salary_records(run_context: RunContext, year_month: str | None = N
 
 async def get_social_insurance(run_context: RunContext, year_month: str | None = None) -> str:
     """查询当前员工的社保公积金缴纳明细。year_month 格式 YYYY-MM，不传则返回最近 1 个月。"""
+    logger.info("tool=get_social_insurance | year_month={year_month}", year_month=year_month)
     employee_id = get_employee_id(run_context)
     async with async_session_factory() as session:
         records = await hr_service.get_social_insurance(session, employee_id, year_month)
@@ -41,6 +45,11 @@ async def get_attendance(
     run_context: RunContext, start_date: str | None = None, end_date: str | None = None,
 ) -> str:
     """查询当前员工的考勤记录。日期格式 YYYY-MM-DD，不传则返回当月至今。"""
+    logger.info(
+        "tool=get_attendance | start_date={start_date} end_date={end_date}",
+        start_date=start_date,
+        end_date=end_date,
+    )
     employee_id = get_employee_id(run_context)
     async with async_session_factory() as session:
         records = await hr_service.get_attendance(session, employee_id, start_date, end_date)
@@ -49,6 +58,7 @@ async def get_attendance(
 
 async def get_leave_balance(run_context: RunContext) -> str:
     """查询当前员工的各类假期余额（年假、调休、病假等）"""
+    logger.info("tool=get_leave_balance")
     employee_id = get_employee_id(run_context)
     async with async_session_factory() as session:
         records = await hr_service.get_leave_balance(session, employee_id)
@@ -57,6 +67,7 @@ async def get_leave_balance(run_context: RunContext) -> str:
 
 async def get_leave_requests(run_context: RunContext, year: int | None = None) -> str:
     """查询当前员工的请假申请记录。year 为年度，不传则当前年。"""
+    logger.info("tool=get_leave_requests | year={year}", year=year)
     employee_id = get_employee_id(run_context)
     async with async_session_factory() as session:
         records = await hr_service.get_leave_requests(session, employee_id, year)
@@ -65,6 +76,7 @@ async def get_leave_requests(run_context: RunContext, year: int | None = None) -
 
 async def get_overtime_records(run_context: RunContext, year_month: str | None = None) -> str:
     """查询当前员工的加班记录。year_month 格式 YYYY-MM，不传则返回当月。"""
+    logger.info("tool=get_overtime_records | year_month={year_month}", year_month=year_month)
     employee_id = get_employee_id(run_context)
     async with async_session_factory() as session:
         records = await hr_service.get_overtime_records(session, employee_id, year_month)

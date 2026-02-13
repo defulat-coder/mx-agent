@@ -5,10 +5,12 @@ from agno.run import RunContext
 from app.core.database import async_session_factory
 from app.services import hr as hr_service
 from app.tools.hr.utils import get_manager_info
+from loguru import logger
 
 
 async def get_team_members(run_context: RunContext) -> str:
     """查询团队成员列表（管辖部门递归子部门内所有员工的基本信息）"""
+    logger.info("tool=get_team_members")
     try:
         emp_id, dept_id = get_manager_info(run_context)
     except ValueError as e:
@@ -26,6 +28,7 @@ async def get_team_attendance(
     end_date: str | None = None,
 ) -> str:
     """查询团队考勤记录。可指定 employee_id 查单人，或传 status="异常" 查全员异常。日期格式 YYYY-MM-DD。"""
+    logger.info("tool=get_team_attendance | employee_id={employee_id} status={status} start_date={start_date} end_date={end_date}", employee_id=employee_id, status=status, start_date=start_date, end_date=end_date)
     try:
         emp_id, dept_id = get_manager_info(run_context)
     except ValueError as e:
@@ -87,6 +90,7 @@ async def get_employee_profile(
     employee_id: int,
 ) -> str:
     """查询指定员工的完整档案（基本信息 + 绩效考评历史 + 在职履历），不含薪资和社保。"""
+    logger.info("tool=get_employee_profile | employee_id={employee_id}", employee_id=employee_id)
     try:
         emp_id, dept_id = get_manager_info(run_context)
     except ValueError as e:
