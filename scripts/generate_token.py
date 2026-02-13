@@ -23,7 +23,7 @@ USERS = {
         "employee_id": 9,
         "employee_no": "MX0009",
         "name": "郑晓明",
-        "roles": ["employee", "manager"],
+        "roles": ["employee", "manager", "admin", "talent_dev", "it_admin"],
         "department_id": 2,
     },
 }
