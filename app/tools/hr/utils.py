@@ -9,7 +9,7 @@ from loguru import logger
 _MOCK_EMPLOYEES = [
     # {"employee_id": 1, "roles": ["manager"], "department_id": 7, "_name": "张三（后端组长）"},
     # {"employee_id": 2, "roles": [], "department_id": 7, "_name": "李四（后端工程师）"},
-    {"employee_id": 9, "roles": ["manager", "admin", "talent_dev", "it_admin", "admin_staff"], "department_id": 2, "_name": "郑晓明（技术总监/管理者/人才发展/IT管理员/行政）"},
+    {"employee_id": 9, "roles": ["manager", "admin", "talent_dev", "it_admin", "admin_staff", "finance"], "department_id": 2, "_name": "郑晓明（技术总监/管理者/人才发展/IT管理员/行政/财务）"},
     {"employee_id": 5, "roles": [], "department_id": 3, "_name": "钱七（产品经理）"},
     {"employee_id": 4, "roles": ["manager"], "department_id": 9, "_name": "赵六（AI 组长）"},
     {"employee_id": 6, "roles": ["talent_dev"], "department_id": 4, "_name": "孙八（HRBP/人才发展）"},

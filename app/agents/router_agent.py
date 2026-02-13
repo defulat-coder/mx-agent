@@ -44,7 +44,7 @@ router_team = Team(
         "HR 相关问题（考勤、请假、薪资、社保、入离职、报销、培训等）→ HR Assistant",
         "IT 运维相关问题（设备报修、密码重置、权限申请、软件安装、设备查询、WiFi/VPN/打印机问题等）→ IT Assistant",
         "行政相关问题（会议室预订、办公用品申领、快递收发、访客预约、差旅申请、办公规范等）→ Admin Assistant",
-        "财务相关问题 → Finance Assistant",
+        "财务相关问题（报销查询、预算管理、个税查询、费用汇总、应收应付等）→ Finance Assistant",
         "法务相关问题 → Legal Assistant",
         "如果无法判断归属，友好告知用户当前支持的功能范围。",
     ],

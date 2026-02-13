@@ -31,3 +31,10 @@
 #### Scenario: 配置读取
 - **WHEN** 应用启动
 - **THEN** 从 `DATABASE_URL` 环境变量读取数据库连接字符串
+
+### Requirement: 模型导入与建表
+`init_db` 函数 SHALL 导入所有业务模型模块以触发 ORM 表创建。
+
+#### Scenario: 财务模型建表
+- **WHEN** 应用启动调用 `init_db`
+- **THEN** `import app.models.finance` 确保财务相关表自动创建

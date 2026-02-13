@@ -8,8 +8,8 @@ Router Agent SHALL 接收用户消息，识别意图，将请求分发到对应�
 - **THEN** Router Agent 将请求分发到 HR Agent 处理
 
 #### Scenario: 财务相关问题路由
-- **WHEN** 用户消息涉及财务相关话题
-- **THEN** Router Agent 将请求分发到 Finance Agent（Phase 2，当前返回"功能开发中"）
+- **WHEN** 用户消息涉及财务相关问题（报销查询、预算管理、个税查询、费用汇总、应收应付等）
+- **THEN** Router Agent 将请求分发到 Finance Assistant
 
 #### Scenario: 法务相关问题路由
 - **WHEN** 用户消息涉及法务相关话题

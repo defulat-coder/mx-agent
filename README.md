@@ -31,9 +31,9 @@
 │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌────────┐ ┌───────┐ │
 │  │HR Agent │ │IT Agent │ │Admin    │ │Finance │ │ Legal │ │
 │  │(已上线)  │ │(已上线)  │ │Agent   │ │Agent   │ │ Agent │ │
-│  │55 Tools │ │12 Tools │ │(已上线)  │ │(开发中) │ │(开发中)│ │
-│  │8 Skills │ │5 Skills │ │18 Tools │ │        │ │       │ │
-│  │         │ │         │ │3 Skills │ │        │ │       │ │
+│  │55 Tools │ │12 Tools │ │(已上线)  │ │(已上线) │ │(开发中)│ │
+│  │8 Skills │ │5 Skills │ │18 Tools │ │14 Tools│ │       │ │
+│  │         │ │         │ │3 Skills │ │3 Skills│ │       │ │
 │  └─────────┘ └─────────┘ └─────────┘ └────────┘ └───────┘ │
 └───────────────────────────┬───────────────────────────────────────┘
                             │
@@ -48,6 +48,8 @@
 │  │ · IT设备/工单    │ │                 │ │                 │     │
 │  │ · 会议室/预订    │ │                 │ │                 │     │
 │  │ · 用品/快递/访客  │ │                 │ │                 │     │
+│  │ · 报销/预算      │ │                 │ │                 │     │
+│  │ · 应收/应付      │ │                 │ │                 │     │
 │  └─────────────────┘ └─────────────────┘ └─────────────────┘     │
 └───────────────────────────────────────────────────────────────────┘
 ```
@@ -77,7 +79,7 @@ app/
 │   ├── hr_agent.py          #   HR 助手
 │   ├── it_agent.py          #   IT 运维助手
 │   ├── admin_agent.py       #   行政助手
-│   ├── finance_agent.py     #   财务助手 (开发中)
+│   ├── finance_agent.py     #   财务助手
 │   └── legal_agent.py       #   法务助手 (开发中)
 ├── api/v1/                  # REST API 路由
 ├── core/                    # 基础设施
@@ -92,17 +94,20 @@ app/
 ├── models/
 │   ├── hr/                  #   HR ORM 模型 (16 张表)
 │   ├── it/                  #   IT ORM 模型 (3 张表)
-│   └── admin/               #   行政 ORM 模型 (6 张表)
+│   ├── admin/               #   行政 ORM 模型 (6 张表)
+│   └── finance/             #   财务 ORM 模型 (6 张表)
 ├── schemas/                 # Pydantic 请求/响应 Schema
 ├── services/                # 业务逻辑层
 ├── skills/
 │   ├── hr/                  #   HR Skills (8 个知识库)
 │   ├── it/                  #   IT Skills (5 个知识库)
-│   └── admin/               #   行政 Skills (3 个知识库)
+│   ├── admin/               #   行政 Skills (3 个知识库)
+│   └── finance/             #   财务 Skills (3 个知识库)
 ├── tools/
 │   ├── hr/                  #   HR Tools (55 个)
 │   ├── it/                  #   IT Tools (12 个)
-│   └── admin/               #   行政 Tools (18 个)
+│   ├── admin/               #   行政 Tools (18 个)
+│   └── finance/             #   财务 Tools (14 个)
 ```
 
 ## 快速启动
@@ -193,6 +198,7 @@ uv run python main.py
 | **人才发展** (talent_dev) | 员工档案、培训、盘点、IDP、分析报表 | 全公司 |
 | **IT 管理员** (it_admin) | 全部工单管理、设备分配回收、统计报表 | 全公司 |
 | **行政人员** (admin_staff) | 预订管理、用品审批、快递登记、访客管理、统计 | 全公司 |
+| **财务人员** (finance) | 报销审核、预算分析、应收应付、开票、费用报表 | 全公司 |
 
 ## HR 助手
 
@@ -365,6 +371,58 @@ uv run python main.py
 | `adm_admin_release_room` | `tools/admin/admin_action.py` | 设置会议室状态（维护/恢复） |
 | `adm_admin_approve_supply` | `tools/admin/admin_action.py` | 审批申领单（通过自动扣库存） |
 | `adm_admin_register_express` | `tools/admin/admin_action.py` | 登记快递 |
+
+## 财务助手
+
+### Skills 知识库
+
+| Skill | 描述 | 权限 |
+|-------|------|------|
+| `reimbursement-policy` | 报销政策（标准/流程/限额/票据要求） | 全员 |
+| `budget-rules` | 预算管理制度（编制/调整/超支审批） | 全员 |
+| `tax-knowledge` | 个税计算与专项扣除知识 | 全员 |
+
+### Tools 工具集
+
+#### 员工自助
+
+| 工具 | 文件 | 说明 |
+|------|------|------|
+| `fin_get_my_reimbursements` | `tools/finance/query.py` | 查询我的报销记录 |
+| `fin_get_reimbursement_detail` | `tools/finance/query.py` | 查询报销单详情 |
+| `fin_get_department_budget` | `tools/finance/query.py` | 查询部门预算概况 |
+| `fin_get_my_tax` | `tools/finance/query.py` | 查询个人个税明细（跨域读 HR 薪资） |
+
+#### 主管权限
+
+| 工具 | 文件 | 说明 |
+|------|------|------|
+| `fin_mgr_get_budget_overview` | `tools/finance/manager_query.py` | 部门预算执行总览 |
+| `fin_mgr_get_expense_detail` | `tools/finance/manager_query.py` | 部门费用明细 |
+| `fin_mgr_get_budget_alert` | `tools/finance/manager_query.py` | 预算预警（超支/接近上限） |
+
+#### 财务人员权限
+
+| 工具 | 文件 | 说明 |
+|------|------|------|
+| `fin_admin_get_all_reimbursements` | `tools/finance/admin_query.py` | 全公司报销查询（多条件筛选） |
+| `fin_admin_get_expense_summary` | `tools/finance/admin_query.py` | 费用汇总报表 |
+| `fin_admin_get_budget_analysis` | `tools/finance/admin_query.py` | 预算分析报表 |
+| `fin_admin_get_payables` | `tools/finance/admin_query.py` | 应付账款查询 |
+| `fin_admin_get_receivables` | `tools/finance/admin_query.py` | 应收账款查询 |
+| `fin_admin_review_reimbursement` | `tools/finance/admin_action.py` | 审核报销单（通过自动扣预算） |
+| `fin_admin_process_invoice_request` | `tools/finance/admin_action.py` | 处理开票申请 |
+
+### 数据模型（6 张表）
+
+| 模型 | 说明 |
+|------|------|
+| `Reimbursement` | 报销单（申请人/部门/金额/状态） |
+| `ReimbursementItem` | 报销明细行（费用类型/金额/日期） |
+| `Budget` | 部门年度预算（科目/总额/已用/余额） |
+| `BudgetUsage` | 预算使用流水（关联报销单/金额） |
+| `Payable` | 应付账款（供应商/金额/到期日/状态） |
+| `Receivable` | 应收账款（客户/金额/到期日/状态） |
 
 ## 模型评估
 

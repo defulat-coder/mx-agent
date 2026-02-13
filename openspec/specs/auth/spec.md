@@ -28,3 +28,14 @@
 #### Scenario: 上下文注入
 - **WHEN** /v1/chat 接口接收到已认证的请求
 - **THEN** employee_id 通过 run_context 传入 Agent，Agent 的所有 Tool 调用均可获取该 employee_id
+
+### Requirement: 财务角色
+系统 SHALL 支持 `finance` 角色，允许财务人员访问全公司报销审核、预算分析、应收应付等财务管理功能。
+
+#### Scenario: Mock 用户 finance 角色
+- **WHEN** 开发/测试环境
+- **THEN** `_MOCK_EMPLOYEES` 中郑晓明具有 `finance` 角色，`generate_token.py` 的 manager 用户包含 `finance`
+
+#### Scenario: get_finance_id 校验
+- **WHEN** 财务人员工具被调用
+- **THEN** `app/tools/finance/utils.py` 的 `get_finance_id` 校验当前用户具有 `finance` 角色，否则返回权限不足
