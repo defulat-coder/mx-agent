@@ -6,7 +6,7 @@ from collections.abc import AsyncGenerator
 from agno.db.sqlite import SqliteDb
 from agno.os import AgentOS
 from agno.os.middleware import JWTMiddleware
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -102,6 +102,26 @@ app.add_middleware(
         "/trace_session_stats",
     ],
 )
+
+
+@app.middleware("http")
+async def cors_middleware(request: Request, call_next):
+    origin = request.headers.get("origin", "")
+
+    if request.method == "OPTIONS":
+        response = Response(status_code=200)
+    else:
+        response = await call_next(request)
+
+    if origin:
+        response.headers["access-control-allow-origin"] = origin
+        response.headers["access-control-allow-credentials"] = "true"
+        response.headers["access-control-allow-methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
+        response.headers["access-control-allow-headers"] = "content-type, authorization, x-requested-with, accept, origin"
+        response.headers["access-control-max-age"] = "600"
+
+    return response
+
 
 if __name__ == "__main__":
     agent_os.serve(app="app.main:app", reload=True)
