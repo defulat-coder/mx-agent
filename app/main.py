@@ -3,6 +3,10 @@
 from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
 
+# 在导入 Agno 相关模块之前初始化 tracing，确保我们的 TracerProvider 优先
+from app.core.tracing import setup_tracing, flush_traces
+setup_tracing()
+
 from agno.db.sqlite import SqliteDb
 from agno.os import AgentOS
 from agno.os.middleware import JWTMiddleware
@@ -34,6 +38,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     await load_knowledge()
 
     yield
+    flush_traces()  # 确保所有 traces 在关闭前发送
     await engine.dispose()
 
 
