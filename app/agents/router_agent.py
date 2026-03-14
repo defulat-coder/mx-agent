@@ -12,6 +12,7 @@ from app.agents.it_agent import it_agent
 from app.agents.legal_agent import legal_agent
 from app.core.database import async_session_factory
 from app.core.llm import get_model
+from app.core.tracing import set_user_attributes
 from app.knowledge import company_knowledge
 from app.services import hr as hr_service
 from app.tools.hr.utils import get_employee_id
@@ -22,6 +23,10 @@ async def get_current_user(run_context: RunContext) -> str:
     employee_id = get_employee_id(run_context)
     state = run_context.session_state
     roles: list[str] = state.get("roles", []) if state else []  # type: ignore[union-attr]
+
+    # 注入用户身份信息到 tracing
+    set_user_attributes(employee_id=employee_id, roles=roles)
+
     async with async_session_factory() as session:
         info = await hr_service.get_employee_info(session, employee_id)
         data = info.model_dump()

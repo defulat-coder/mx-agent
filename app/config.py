@@ -64,6 +64,11 @@ class Settings(BaseSettings):
     LOG_ROTATION: str = "500 MB"
     LOG_RETENTION: str = "10 days"
 
+    # Langfuse Tracing
+    LANGFUSE_SECRET_KEY: str | None = None
+    LANGFUSE_PUBLIC_KEY: str | None = None
+    LANGFUSE_BASE_URL: str = "https://cloud.langfuse.com"
+
 
 settings = Settings()
 
