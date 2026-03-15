@@ -13,9 +13,9 @@ from app.tools.finance import fin_admin_tools, fin_employee_tools, fin_manager_t
 SKILLS_DIR = Path(__file__).parent.parent / "skills" / "finance"
 
 
-def get_finance_tools(run_context: RunContext) -> list[Callable]:
+def get_finance_tools(run_context: RunContext | None = None, *_, **__) -> list[Callable]:
     """根据用户角色动态返回财务 tools"""
-    state = run_context.session_state or {}
+    state = (run_context.session_state if run_context else None) or {}
     roles: list[str] = state.get("roles", [])
     tools = list(fin_employee_tools)  # 所有用户都有基础权限
     if "manager" in roles:

@@ -13,9 +13,9 @@ from app.tools.admin import adm_admin_tools, adm_employee_tools
 SKILLS_DIR = Path(__file__).parent.parent / "skills" / "admin"
 
 
-def get_admin_tools(run_context: RunContext) -> list[Callable]:
+def get_admin_tools(run_context: RunContext | None = None, *_, **__) -> list[Callable]:
     """根据用户角色动态返回行政 tools"""
-    state = run_context.session_state or {}
+    state = (run_context.session_state if run_context else None) or {}
     roles: list[str] = state.get("roles", [])
     tools = list(adm_employee_tools)  # 所有用户都有基础权限
     if "admin_staff" in roles:
