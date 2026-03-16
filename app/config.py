@@ -57,6 +57,7 @@ class Settings(BaseSettings):
 
     # Auth
     AUTH_SECRET: str = "dev-secret-change-me"
+    ALLOW_MOCK_IDENTITY: bool = False
 
     # Logging
     LOG_LEVEL: str = "INFO"

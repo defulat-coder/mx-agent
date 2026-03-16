@@ -1,11 +1,14 @@
 """鉴权相关测试"""
 
 import time
+from types import SimpleNamespace
 
 import jwt
+import pytest
 from httpx import AsyncClient
 
 from app.config import settings
+from app.tools.hr.utils import get_employee_id
 from tests.conftest import make_token
 
 
@@ -54,3 +57,32 @@ async def test_token_missing_employee_id(client: AsyncClient):
     )
     assert resp.status_code == 401
     assert "employee_id" in resp.json()["message"]
+
+
+def test_mock_identity_disabled_by_default():
+    old_debug = settings.DEBUG
+    old_allow_mock = settings.ALLOW_MOCK_IDENTITY
+    try:
+        settings.DEBUG = False
+        settings.ALLOW_MOCK_IDENTITY = False
+        run_context = SimpleNamespace(session_id="s1", session_state=None)
+        with pytest.raises(ValueError, match="未检测到登录态"):
+            get_employee_id(run_context)  # type: ignore[arg-type]
+    finally:
+        settings.DEBUG = old_debug
+        settings.ALLOW_MOCK_IDENTITY = old_allow_mock
+
+
+def test_mock_identity_enabled_can_inject():
+    old_debug = settings.DEBUG
+    old_allow_mock = settings.ALLOW_MOCK_IDENTITY
+    try:
+        settings.DEBUG = False
+        settings.ALLOW_MOCK_IDENTITY = True
+        run_context = SimpleNamespace(session_id="s2", session_state=None)
+        employee_id = get_employee_id(run_context)  # type: ignore[arg-type]
+        assert isinstance(employee_id, int)
+        assert run_context.session_state["employee_id"] == employee_id
+    finally:
+        settings.DEBUG = old_debug
+        settings.ALLOW_MOCK_IDENTITY = old_allow_mock

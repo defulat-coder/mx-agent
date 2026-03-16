@@ -1,9 +1,9 @@
 """HR Tools 辅助函数 — 从 RunContext 安全提取身份信息"""
 
-import random
-
 from agno.run import RunContext
 from loguru import logger
+
+from app.config import settings
 
 # 模拟员工数据，用于 os.agno.com 等无 JWT 场景的调试
 _MOCK_EMPLOYEES = [
@@ -31,13 +31,17 @@ def _inject_mock_employee(run_context: RunContext) -> None:
 
 
 def get_employee_id(run_context: RunContext) -> int:
-    """从 session_state 提取 employee_id，无登录态时注入模拟员工。
+    """从 session_state 提取 employee_id。
+
+    仅在 DEBUG 或 ALLOW_MOCK_IDENTITY=true 时允许注入模拟员工。
 
     Returns:
         员工 ID
     """
     state = run_context.session_state
     if not state or "employee_id" not in state:
+        if not settings.DEBUG and not settings.ALLOW_MOCK_IDENTITY:
+            raise ValueError("未检测到登录态，请先完成认证")
         _inject_mock_employee(run_context)
         state = run_context.session_state
     logger.info(
