@@ -541,7 +541,9 @@ uv run python scripts/run_evals.py
 uv run python scripts/run_evals.py --id-prefix EMP
 uv run python scripts/run_evals.py --id-prefix EMP,ADM,CD
 uv run python scripts/run_evals.py --output-json data/evals/cases.json
-uv run python scripts/run_evals.py --mode execute --limit 20 --base-url http://localhost:8000 --endpoint /v1/chat
+uv run python scripts/run_evals.py --mode execute --limit 20 --base-url http://localhost:8000
+uv run python scripts/run_evals.py --mode execute --endpoint /v1/chat --request-mode json
+uv run python scripts/run_evals.py --mode execute --show-failed 10 --output-json data/evals/results.json
 ```
 
 ## 异常处理

@@ -2,6 +2,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+from collections import Counter
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -23,10 +24,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--limit", type=int, default=0, help="限制执行前 N 条用例，0 为不限制")
     parser.add_argument("--base-url", default="http://localhost:8000", help="评估接口地址")
-    parser.add_argument("--endpoint", default="/v1/chat", help="评估接口路径")
+    parser.add_argument("--endpoint", default="/teams/router-team/runs", help="评估接口路径")
+    parser.add_argument(
+        "--request-mode",
+        choices=["auto", "json", "form"],
+        default="auto",
+        help="请求编码方式，auto 会按 endpoint 自动选择",
+    )
     parser.add_argument("--message-field", default="message", help="请求体中的输入字段名")
     parser.add_argument("--auth-token", default="", help="Bearer Token")
     parser.add_argument("--timeout", type=float, default=30.0, help="接口超时秒数")
+    parser.add_argument("--show-failed", type=int, default=5, help="打印前 N 条失败样例，0 表示不打印")
     parser.add_argument("--output-json", default="", help="输出完整用例 JSON 文件路径")
     return parser
 
@@ -63,6 +71,7 @@ def run_execute_mode(args: argparse.Namespace, cases: list) -> list[dict]:
         timeout=args.timeout,
         auth_token=args.auth_token,
         message_field=args.message_field,
+        request_mode=args.request_mode,
     )
     try:
         results = execute_cases(cases, requester)
@@ -71,11 +80,29 @@ def run_execute_mode(args: argparse.Namespace, cases: list) -> list[dict]:
     passed = sum(1 for result in results if result.ok)
     errors = sum(1 for result in results if result.error)
     tool_miss = sum(1 for result in results if result.tool_match is False)
+    status_counter = Counter(result.status_code for result in results if result.status_code is not None)
+    reason_counter = Counter(result.fail_reason for result in results if result.fail_reason)
     print(f"执行用例数: {len(results)}")
     print(f"通过数: {passed}")
     print(f"失败数: {len(results) - passed}")
     print(f"请求异常数: {errors}")
     print(f"工具匹配失败数: {tool_miss}")
+    if status_counter:
+        print("状态码分布:")
+        for code, count in sorted(status_counter.items(), key=lambda item: item[0]):
+            print(f"- {code}: {count}")
+    if reason_counter:
+        print("失败原因分布:")
+        for reason, count in sorted(reason_counter.items(), key=lambda item: item[0]):
+            print(f"- {reason}: {count}")
+    if args.show_failed > 0:
+        failed_results = [result for result in results if not result.ok]
+        if failed_results:
+            print(f"失败样例 Top {min(args.show_failed, len(failed_results))}:")
+            for result in failed_results[: args.show_failed]:
+                print(
+                    f"- {result.case_id} | reason={result.fail_reason} | status={result.status_code} | preview={result.response_preview[:60]}"
+                )
     return [
         {
             "id": result.case_id,
@@ -83,6 +110,7 @@ def run_execute_mode(args: argparse.Namespace, cases: list) -> list[dict]:
             "status_code": result.status_code,
             "tool_match": result.tool_match,
             "error": result.error,
+            "fail_reason": result.fail_reason,
             "response_preview": result.response_preview,
         }
         for result in results

@@ -1,4 +1,4 @@
-from app.evals.executor import execute_cases, score_case
+from app.evals.executor import HttpEvalRequester, execute_cases, score_case
 from app.evals.runner import EvalCase
 
 
@@ -20,6 +20,7 @@ def test_score_case_tool_match():
     result = score_case(case, 200, {"reply": "将调用 get_salary_info 获取数据"})
     assert result.ok is True
     assert result.tool_match is True
+    assert result.fail_reason is None
 
 
 def test_score_case_tool_mismatch():
@@ -27,6 +28,14 @@ def test_score_case_tool_mismatch():
     result = score_case(case, 200, {"reply": "返回普通文本"})
     assert result.ok is False
     assert result.tool_match is False
+    assert result.fail_reason == "tool_mismatch"
+
+
+def test_score_case_http_status_failure():
+    case = make_case("EMP-01", "get_salary_info")
+    result = score_case(case, 401, {"message": "未认证"})
+    assert result.ok is False
+    assert result.fail_reason == "http_401_unauthorized"
 
 
 def test_execute_cases_collects_errors():
@@ -39,3 +48,44 @@ def test_execute_cases_collects_errors():
     assert len(results) == 1
     assert results[0].ok is False
     assert results[0].error == "boom"
+    assert results[0].fail_reason == "request_error"
+
+
+def test_execute_cases_classifies_timeout_error():
+    case = make_case("EMP-09", "get_salary_info")
+
+    def requester(_: EvalCase) -> tuple[int, dict]:
+        raise RuntimeError("request timeout after 30s")
+
+    results = execute_cases([case], requester)
+    assert results[0].fail_reason == "request_timeout"
+
+
+def test_score_case_http_5xx_failure_reason():
+    case = make_case("EMP-10", "get_salary_info")
+    result = score_case(case, 502, {"message": "upstream error"})
+    assert result.ok is False
+    assert result.fail_reason == "http_5xx_upstream"
+
+
+def test_score_case_matches_nested_tool_calls():
+    case = make_case("EMP-03", "get_salary_info")
+    response = {
+        "content": "已处理你的请求",
+        "member_responses": [
+            {"tool_calls": [{"function": {"name": "get_salary_info"}}]},
+        ],
+    }
+    result = score_case(case, 200, response)
+    assert result.ok is True
+    assert result.tool_match is True
+
+
+def test_requester_auto_mode_for_team_runs():
+    requester = HttpEvalRequester(
+        base_url="http://localhost:8000",
+        endpoint="/teams/router-team/runs",
+        request_mode="auto",
+    )
+    assert requester._resolved_mode() == "form"
+    requester.close()
