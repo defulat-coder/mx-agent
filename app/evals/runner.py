@@ -110,3 +110,23 @@ def summarize_cases(cases: Iterable[EvalCase]) -> dict[str, int]:
         prefix = case.case_id.split("-", 1)[0]
         summary[prefix] = summary.get(prefix, 0) + 1
     return dict(sorted(summary.items(), key=lambda item: item[0]))
+
+
+def normalize_prefixes(prefixes: str | Iterable[str]) -> set[str]:
+    if isinstance(prefixes, str):
+        raw_items = prefixes.split(",")
+    else:
+        raw_items = list(prefixes)
+    normalized: set[str] = set()
+    for item in raw_items:
+        value = item.strip().upper().rstrip("-")
+        if value:
+            normalized.add(value)
+    return normalized
+
+
+def filter_cases_by_prefixes(cases: Iterable[EvalCase], prefixes: str | Iterable[str]) -> list[EvalCase]:
+    selected = normalize_prefixes(prefixes)
+    if not selected:
+        return list(cases)
+    return [case for case in cases if case.case_id.split("-", 1)[0].upper() in selected]

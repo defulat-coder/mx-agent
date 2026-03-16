@@ -1,4 +1,10 @@
-from app.evals.runner import collect_eval_cases, parse_eval_markdown, summarize_cases
+from app.evals.runner import (
+    collect_eval_cases,
+    filter_cases_by_prefixes,
+    normalize_prefixes,
+    parse_eval_markdown,
+    summarize_cases,
+)
 
 
 def test_parse_single_markdown_file():
@@ -16,3 +22,17 @@ def test_collect_all_eval_cases():
     assert prefixes["EMP"] > 0
     assert prefixes["ADM"] > 0
     assert prefixes["CD"] > 0
+
+
+def test_normalize_prefixes():
+    prefixes = normalize_prefixes(" emp, adm-, cd ")
+    assert prefixes == {"EMP", "ADM", "CD"}
+
+
+def test_filter_cases_by_prefixes():
+    cases = collect_eval_cases("tests")
+    filtered = filter_cases_by_prefixes(cases, "emp,adm")
+    filtered_prefixes = summarize_cases(filtered)
+    assert set(filtered_prefixes) <= {"EMP", "ADM"}
+    assert filtered_prefixes["EMP"] > 0
+    assert filtered_prefixes["ADM"] > 0
