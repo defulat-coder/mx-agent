@@ -92,29 +92,43 @@ Dataset 名称默认为 `mx-agent-evals`，可通过参数覆盖。
 
 ### 3.2 `app/evals/langfuse_eval.py`
 
-核心函数：
+核心数据类与函数：
 
 ```python
+@dataclass
+class EvalRunSummary:
+    run_name: str
+    total: int
+    passed: int
+    tool_match_rate: float
+    avg_response_quality: float | None
+    failed: list[FailedItem]  # {case_id, fail_reason, response_preview}
+
 def get_or_create_dataset(name: str) -> Dataset
+
 def upsert_dataset_item(dataset_name: str, case: EvalCase) -> DatasetItem
-def run_eval_experiment(
+# upsert key: case_id 作为 external_id，Langfuse 以 external_id 去重，迁移脚本可安全重复执行
+
+async def run_eval_experiment(
     dataset_name: str,
-    run_name: str,
+    run_name: str,                          # 默认追加时间戳后缀保证唯一性
     requester: HttpEvalRequester,
-    judge_fn: Callable,
+    judge_fn: Callable[[str, str, str], Awaitable[JudgeResult]],  # (user_input, expected_behavior, response_text)
     id_prefix: str = "",
     limit: int = 0,
 ) -> EvalRunSummary
 ```
 
-`run_eval_experiment` 执行逻辑：
+`run_eval_experiment` 执行逻辑（async）：
 1. 拉取 dataset items（按 id_prefix/limit 过滤）
-2. 对每条 item 调用 `requester` 发起请求
-3. 从响应头或响应体提取 `trace_id`
-4. 调用 `item.link(run_name, trace_id)` 关联 trace
+2. 对每条 item 调用 `requester` 发起请求，返回 `HttpEvalResponse`
+3. 从响应头 `X-Trace-Id` 或响应体 `trace_id` 字段提取 trace_id
+4. 调用 `langfuse_client.create_dataset_run_item(run_name=..., dataset_item_id=..., trace_id=...)` 关联 trace
 5. 计算 `tool_match`（规则）并上报 score
-6. 调用 `judge_fn` 获取 `response_quality` 并上报 score
+6. `await judge_fn(...)` 获取 `response_quality` 并上报 score
 7. 汇总统计返回 `EvalRunSummary`
+
+> **同步/异步统一**：`run_eval_experiment` 统一为 `async def`；CLI 脚本通过 `asyncio.run()` 顶层调用；FastAPI endpoint 使用 `async def` 直接 await。
 
 ### 3.3 `app/evals/judge.py`
 
@@ -173,7 +187,7 @@ uv run python scripts/migrate_evals.py \
 
 ### 3.5 评测触发 — FastAPI
 
-新增 endpoint：
+新增 endpoint，**复用现有 JWT 鉴权中间件**（需有效 Bearer Token）：
 
 ```
 POST /v1/evals/runs
@@ -184,12 +198,25 @@ Authorization: Bearer <token>
   "dataset_name": "mx-agent-evals",   // 可选，默认 mx-agent-evals
   "id_prefix": "EMP,HR",              // 可选，空则全量
   "limit": 20,                        // 可选，0=不限制
-  "run_name": "run-2026-03-23"        // 可选，默认按时间戳生成
+  "run_name": "run-2026-03-23"        // 可选，实际写入时追加时间戳后缀确保唯一
+}
+```
+
+**执行方式**：使用 FastAPI `BackgroundTasks` 后台执行，接口立即返回 `run_name`，避免大批量用例导致 HTTP 超时：
+
+```
+Response 202:
+{
+  "run_name": "run-2026-03-23-143012",   // 实际使用的唯一 run_name
+  "status": "started",
+  "message": "评测已在后台启动，请在 Langfuse UI 或通过 GET 接口查询进度"
 }
 
+GET /v1/evals/runs/{run_name}
 Response 200:
 {
   "run_name": "run-2026-03-23-143012",
+  "status": "completed" | "running" | "failed",
   "total": 20,
   "passed": 17,
   "tool_match_rate": 0.85,
@@ -197,6 +224,8 @@ Response 200:
   "failed": [...]
 }
 ```
+
+> 后台任务结果暂存内存（`dict`），服务重启后丢失；如需持久化可后续扩展到数据库，当前阶段不实现。
 
 ---
 
@@ -237,7 +266,10 @@ Agent API 响应中需携带 `trace_id`，优先级：
 ## 7. 对现有代码的影响
 
 - `app/evals/runner.py`：零改动
-- `app/evals/executor.py`：保留 `HttpEvalRequester`，移除 `score_case`、`execute_cases`（由新模块接管）
+- `app/evals/executor.py`：
+  - 保留 `HttpEvalRequester`
+  - **扩展返回值**：`__call__` 返回类型从 `tuple[int, dict]` 改为 `HttpEvalResponse`（新增响应头字段，用于提取 `X-Trace-Id`）
+  - 移除 `score_case`、`execute_cases`（由新模块接管）
 - `app/core/tracing.py`：零改动，`get_langfuse_client()` 被新模块复用
 - 现有 tracing 链路：不受影响
 - `app/api/v1/router.py`：新增 evals router 注册
@@ -247,6 +279,8 @@ Agent API 响应中需携带 `trace_id`，优先级：
 ## 8. 依赖
 
 现有依赖已满足（`langfuse` 已在项目中），无需新增 package。
+
+Langfuse SDK 版本要求：`langfuse >= 2.x`（项目已安装）。Dataset Item 的 `external_id` 去重和 `create_dataset_run_item` API 在 2.x 及以上版本可用。
 
 ---
 
