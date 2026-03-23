@@ -8,7 +8,7 @@ from app.evals.runner import (
 
 
 def test_parse_single_markdown_file():
-    cases = parse_eval_markdown("tests/test_evaluation_employee_role.md")
+    cases = parse_eval_markdown("tests/archived/test_evaluation_employee_role.md")
     ids = {case.case_id for case in cases}
     assert "EMP-01" in ids
     assert "EDGE-05" in ids
@@ -16,7 +16,7 @@ def test_parse_single_markdown_file():
 
 
 def test_collect_all_eval_cases():
-    cases = collect_eval_cases("tests")
+    cases = collect_eval_cases("tests/archived")
     assert len(cases) >= 300
     prefixes = summarize_cases(cases)
     assert prefixes["EMP"] > 0
@@ -30,7 +30,7 @@ def test_normalize_prefixes():
 
 
 def test_filter_cases_by_prefixes():
-    cases = collect_eval_cases("tests")
+    cases = collect_eval_cases("tests/archived")
     filtered = filter_cases_by_prefixes(cases, "emp,adm")
     filtered_prefixes = summarize_cases(filtered)
     assert set(filtered_prefixes) <= {"EMP", "ADM"}
