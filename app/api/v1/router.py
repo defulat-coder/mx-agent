@@ -2,4 +2,7 @@
 
 from fastapi import APIRouter
 
+from app.api.v1.endpoints.evals import router as evals_router
+
 v1_router = APIRouter()
+v1_router.include_router(evals_router)
