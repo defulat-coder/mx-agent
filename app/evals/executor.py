@@ -6,6 +6,13 @@ from app.evals.runner import EvalCase
 
 
 @dataclass(slots=True)
+class HttpEvalResponse:
+    status_code: int
+    body: dict[str, Any]
+    headers: dict[str, str]
+
+
+@dataclass(slots=True)
 class EvalResult:
     case_id: str
     ok: bool
@@ -128,13 +135,13 @@ def score_case(case: EvalCase, status_code: int, response_json: dict[str, Any]) 
 
 def execute_cases(
     cases: Iterable[EvalCase],
-    requester: Callable[[EvalCase], tuple[int, dict[str, Any]]],
+    requester: Callable[[EvalCase], HttpEvalResponse],
 ) -> list[EvalResult]:
     results: list[EvalResult] = []
     for case in cases:
         try:
-            status_code, response_json = requester(case)
-            results.append(score_case(case, status_code, response_json))
+            eval_response = requester(case)
+            results.append(score_case(case, eval_response.status_code, eval_response.body))
         except Exception as exc:
             results.append(
                 EvalResult(
@@ -177,7 +184,7 @@ class HttpEvalRequester:
             return "form"
         return "json"
 
-    def __call__(self, case: EvalCase) -> tuple[int, dict[str, Any]]:
+    def __call__(self, case: EvalCase) -> HttpEvalResponse:
         payload = {self.message_field: case.user_input}
         mode = self._resolved_mode()
         if mode == "form":
@@ -187,10 +194,14 @@ class HttpEvalRequester:
         else:
             response = self._client.post(self.endpoint, json=payload)
         try:
-            response_json = response.json()
+            body = response.json()
         except Exception:
-            response_json = {"message": response.text}
-        return response.status_code, response_json
+            body = {"message": response.text}
+        return HttpEvalResponse(
+            status_code=response.status_code,
+            body=body,
+            headers=dict(response.headers),
+        )
 
     def close(self) -> None:
         self._client.close()

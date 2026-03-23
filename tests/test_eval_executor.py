@@ -1,4 +1,4 @@
-from app.evals.executor import HttpEvalRequester, execute_cases, score_case
+from app.evals.executor import HttpEvalRequester, HttpEvalResponse, execute_cases, score_case
 from app.evals.runner import EvalCase
 
 
@@ -41,7 +41,7 @@ def test_score_case_http_status_failure():
 def test_execute_cases_collects_errors():
     case = make_case("EMP-02", "get_attendance_summary")
 
-    def requester(_: EvalCase) -> tuple[int, dict]:
+    def requester(_: EvalCase) -> HttpEvalResponse:
         raise RuntimeError("boom")
 
     results = execute_cases([case], requester)
@@ -54,7 +54,7 @@ def test_execute_cases_collects_errors():
 def test_execute_cases_classifies_timeout_error():
     case = make_case("EMP-09", "get_salary_info")
 
-    def requester(_: EvalCase) -> tuple[int, dict]:
+    def requester(_: EvalCase) -> HttpEvalResponse:
         raise RuntimeError("request timeout after 30s")
 
     results = execute_cases([case], requester)
