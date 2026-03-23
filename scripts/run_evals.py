@@ -33,6 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--message-field", default="message", help="请求体中的输入字段名")
     parser.add_argument("--auth-token", default="", help="Bearer Token")
     parser.add_argument("--timeout", type=float, default=30.0, help="接口超时秒数")
+    parser.add_argument("--concurrency", type=int, default=5, help="最大并发数")
     return parser
 
 
@@ -65,9 +66,10 @@ async def main_async(args: argparse.Namespace) -> None:
             judge_fn=judge_fn,
             id_prefix=args.id_prefix,
             limit=args.limit,
+            concurrency=args.concurrency,
         )
     finally:
-        requester.close()
+        await requester.close()
 
     print(f"run_name:      {summary.run_name}")
     print(f"总用例数:      {summary.total}")

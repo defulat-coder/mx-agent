@@ -172,7 +172,7 @@ class HttpEvalRequester:
         headers: dict[str, str] = {}
         if auth_token:
             headers["Authorization"] = f"Bearer {auth_token}"
-        self._client = httpx.Client(base_url=base_url, timeout=timeout, headers=headers)
+        self._client = httpx.AsyncClient(base_url=base_url, timeout=timeout, headers=headers)
         self.endpoint = endpoint
         self.message_field = message_field
         self.request_mode = request_mode
@@ -184,15 +184,15 @@ class HttpEvalRequester:
             return "form"
         return "json"
 
-    def __call__(self, case: EvalCase) -> HttpEvalResponse:
+    async def __call__(self, case: EvalCase) -> HttpEvalResponse:
         payload = {self.message_field: case.user_input}
         mode = self._resolved_mode()
         if mode == "form":
             payload["stream"] = "false"
             payload["monitor"] = "false"
-            response = self._client.post(self.endpoint, data=payload)
+            response = await self._client.post(self.endpoint, data=payload)
         else:
-            response = self._client.post(self.endpoint, json=payload)
+            response = await self._client.post(self.endpoint, json=payload)
         try:
             body = response.json()
         except Exception:
@@ -203,5 +203,5 @@ class HttpEvalRequester:
             headers=dict(response.headers),
         )
 
-    def close(self) -> None:
-        self._client.close()
+    async def close(self) -> None:
+        await self._client.aclose()

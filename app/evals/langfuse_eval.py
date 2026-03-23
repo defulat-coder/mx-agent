@@ -1,6 +1,7 @@
 """Langfuse 评测核心 — Dataset 管理、实验执行、双指标打分上报"""
 from __future__ import annotations
 
+import asyncio
 import re
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
@@ -11,6 +12,9 @@ from app.core.tracing import get_langfuse_client
 from app.evals.executor import HttpEvalRequester, HttpEvalResponse
 from app.evals.judge import JudgeResult
 from app.evals.runner import EvalCase
+
+# 默认并发数
+DEFAULT_CONCURRENCY = 5
 
 
 @dataclass(slots=True)
@@ -131,16 +135,18 @@ async def run_eval_experiment(
     judge_fn: Callable[[str, str, str], Awaitable[JudgeResult]],
     id_prefix: str = "",
     limit: int = 0,
+    concurrency: int = DEFAULT_CONCURRENCY,
 ) -> EvalRunSummary:
     """执行评测实验，上报双指标分数到 Langfuse。
 
     Args:
         dataset_name: Langfuse Dataset 名称
         run_name: 实验名称前缀，None 则自动生成（追加时间戳）
-        requester: HTTP 请求执行器
+        requester: HTTP 请求执行器（async callable）
         judge_fn: LLM judge 函数，签名 (user_input, expected_behavior, response_text) -> JudgeResult
         id_prefix: 按 case_id 前缀过滤，逗号分隔，空则全量
         limit: 最多执行条数，0=不限制
+        concurrency: 最大并发数
 
     Returns:
         EvalRunSummary 汇总结果
@@ -149,6 +155,7 @@ async def run_eval_experiment(
     client = get_langfuse_client()
 
     # 降级：client=None（未配置）或 get_dataset 失败（连接异常）均跳过上报
+    logger.info(f"正在从 Langfuse 获取 Dataset '{dataset_name}' ...")
     try:
         dataset = client.get_dataset(dataset_name) if client else None
     except Exception as e:
@@ -158,12 +165,15 @@ async def run_eval_experiment(
     items = []
     if dataset:
         items = list(dataset.items)
+        logger.info(f"Dataset 共 {len(items)} 条 items")
         if id_prefix:
             prefixes = {p.strip().upper() for p in id_prefix.split(",") if p.strip()}
             items = [
                 it for it in items
-                if it.input.get("case_id", "").split("-", 1)[0].upper() in prefixes
+                if (it.input.get("original_case_id") or it.input.get("case_id", ""))
+                .split("-", 1)[0].upper() in prefixes
             ]
+            logger.info(f"按前缀 {id_prefix} 过滤后剩余 {len(items)} 条")
         if limit > 0:
             items = items[:limit]
 
@@ -180,13 +190,22 @@ async def run_eval_experiment(
             avg_response_quality=None,
         )
 
+    logger.info(f"开始评测: {len(items)} 条用例，并发={concurrency}，run={actual_run_name}")
+
+    # 并发控制
+    semaphore = asyncio.Semaphore(concurrency)
+    lock = asyncio.Lock()
+
+    # 共享结果
     total = 0
     passed = 0
     tool_matches: list[bool] = []
     quality_scores: list[float] = []
     failed_items: list[FailedItem] = []
+    completed = 0
 
-    for item in items:
+    async def _eval_one(idx: int, item: object) -> None:
+        nonlocal total, passed, completed
         inp = item.input or {}
         exp = item.expected_output or {}
         case = EvalCase(
@@ -199,92 +218,118 @@ async def run_eval_experiment(
             expected_behavior=exp.get("expected_behavior", ""),
             raw={},
         )
-        total += 1
-        trace_id: str | None = None
-        fail_reason: str | None = None
 
-        try:
-            resp = requester(case)
-            trace_id = _extract_trace_id(resp)
-        except Exception as exc:
-            msg = str(exc).lower()
-            fail_reason = "request_timeout" if "timeout" in msg else "request_error"
-            failed_items.append(
-                FailedItem(case_id=case.case_id, fail_reason=fail_reason, response_preview="")
-            )
-            continue
+        async with semaphore:
+            logger.info(f"[{idx + 1}/{len(items)}] 开始: {case.case_id} - {case.user_input[:40]}")
+            trace_id: str | None = None
+            fail_reason: str | None = None
 
-        # 关联 trace 到当前 run
-        if client and trace_id:
             try:
-                client.create_dataset_run_item(
-                    run_name=actual_run_name,
-                    dataset_item_id=item.id,
-                    trace_id=trace_id,
-                )
-            except Exception as e:
-                logger.debug(f"关联 trace 失败 case={case.case_id}: {e}")
+                resp = await requester(case)
+                trace_id = _extract_trace_id(resp)
+            except Exception as exc:
+                msg = str(exc).lower()
+                fail_reason = "request_timeout" if "timeout" in msg else "request_error"
+                async with lock:
+                    total += 1
+                    completed += 1
+                    failed_items.append(
+                        FailedItem(case_id=case.case_id, fail_reason=fail_reason, response_preview="")
+                    )
+                logger.warning(f"[{idx + 1}/{len(items)}] 失败: {case.case_id} - {fail_reason}")
+                return
 
-        # 规则打分: tool_match
-        tool_match = _compute_tool_match(case, resp)
-        if tool_match is not None:
-            tool_matches.append(tool_match)
+            # 关联 trace 到当前 run
+            if client and trace_id:
+                try:
+                    client.create_dataset_run_item(
+                        run_name=actual_run_name,
+                        dataset_item_id=item.id,
+                        trace_id=trace_id,
+                    )
+                except Exception as e:
+                    logger.debug(f"关联 trace 失败 case={case.case_id}: {e}")
 
-        # HTTP 状态检查
-        if resp.status_code != 200:
-            fail_reason = f"http_{resp.status_code}"
-        elif tool_match is False:
-            fail_reason = "tool_mismatch"
+            # 规则打分: tool_match
+            tool_match = _compute_tool_match(case, resp)
 
-        # 上报 tool_match score
-        if client and trace_id and tool_match is not None:
+            # HTTP 状态检查
+            if resp.status_code != 200:
+                fail_reason = f"http_{resp.status_code}"
+            elif tool_match is False:
+                fail_reason = "tool_mismatch"
+
+            # 上报 tool_match score
+            if client and trace_id and tool_match is not None:
+                try:
+                    client.score(
+                        trace_id=trace_id,
+                        name="tool_match",
+                        value=1.0 if tool_match else 0.0,
+                        data_type="NUMERIC",
+                    )
+                except Exception as e:
+                    logger.debug(f"上报 tool_match score 失败: {e}")
+
+            # LLM judge: response_quality
+            response_text = _collect_response_text(resp.body)
+            judge_score: float | None = None
             try:
-                client.score(
-                    trace_id=trace_id,
-                    name="tool_match",
-                    value=1.0 if tool_match else 0.0,
-                    data_type="NUMERIC",
-                )
+                judge_result = await judge_fn(case.user_input, case.expected_behavior, response_text)
+                if judge_result.score is not None:
+                    judge_score = judge_result.score
+                    if client and trace_id:
+                        try:
+                            client.score(
+                                trace_id=trace_id,
+                                name="response_quality",
+                                value=judge_result.score,
+                                comment=judge_result.reason,
+                                data_type="NUMERIC",
+                            )
+                        except Exception as e:
+                            logger.debug(f"上报 response_quality score 失败: {e}")
             except Exception as e:
-                logger.debug(f"上报 tool_match score 失败: {e}")
+                logger.debug(f"LLM judge 失败 case={case.case_id}: {e}")
 
-        # LLM judge: response_quality
-        response_text = _collect_response_text(resp.body)
-        try:
-            judge_result = await judge_fn(case.user_input, case.expected_behavior, response_text)
-            if judge_result.score is not None:
-                quality_scores.append(judge_result.score)
-                if client and trace_id:
-                    try:
-                        client.score(
-                            trace_id=trace_id,
-                            name="response_quality",
-                            value=judge_result.score,
-                            comment=judge_result.reason,
-                            data_type="NUMERIC",
+            # 综合判断是否通过
+            case_ok = resp.status_code == 200 and tool_match is not False
+
+            async with lock:
+                total += 1
+                completed += 1
+                if tool_match is not None:
+                    tool_matches.append(tool_match)
+                if judge_score is not None:
+                    quality_scores.append(judge_score)
+                if case_ok:
+                    passed += 1
+                elif fail_reason:
+                    failed_items.append(
+                        FailedItem(
+                            case_id=case.case_id,
+                            fail_reason=fail_reason,
+                            response_preview=response_text[:160],
                         )
-                    except Exception as e:
-                        logger.debug(f"上报 response_quality score 失败: {e}")
-        except Exception as e:
-            logger.debug(f"LLM judge 失败 case={case.case_id}: {e}")
+                    )
 
-        # 综合判断是否通过
-        case_ok = resp.status_code == 200 and tool_match is not False
-        if case_ok:
-            passed += 1
-        elif fail_reason:
-            failed_items.append(
-                FailedItem(
-                    case_id=case.case_id,
-                    fail_reason=fail_reason,
-                    response_preview=response_text[:160],
-                )
-            )
+            status = "PASS" if case_ok else f"FAIL({fail_reason})"
+            logger.info(f"[{completed}/{len(items)}] 完成: {case.case_id} - {status}")
+
+    # 并发执行所有用例
+    tasks = [_eval_one(i, item) for i, item in enumerate(items)]
+    await asyncio.gather(*tasks)
 
     tool_match_rate = (
         sum(1 for m in tool_matches if m) / len(tool_matches) if tool_matches else 0.0
     )
     avg_quality = sum(quality_scores) / len(quality_scores) if quality_scores else None
+
+    logger.info(
+        f"评测完成: {total} 条, 通过 {passed}, "
+        f"工具匹配率 {tool_match_rate:.1%}, "
+        f"平均质量 {avg_quality:.2f}" if avg_quality is not None else f"评测完成: {total} 条, 通过 {passed}, 工具匹配率 {tool_match_rate:.1%}"
+    )
 
     return EvalRunSummary(
         run_name=actual_run_name,

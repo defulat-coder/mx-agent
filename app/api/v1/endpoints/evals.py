@@ -81,7 +81,7 @@ async def _run_background(run_name: str, req: EvalRunRequest) -> None:
     except Exception as e:
         _run_results[run_name] = f"failed: {e}"
     finally:
-        requester.close()
+        await requester.close()
 
 
 @router.post("/runs", response_model=EvalRunStarted, status_code=202)
