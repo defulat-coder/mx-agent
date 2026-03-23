@@ -16,6 +16,28 @@ from app.evals.judge import llm_judge
 from app.evals.langfuse_eval import run_eval_experiment
 
 
+def _parse_roles(raw: str) -> list[str]:
+    roles = [r.strip() for r in raw.split(",") if r.strip()]
+    return roles
+
+
+def _build_auth_token(args: argparse.Namespace) -> str:
+    if args.auth_token:
+        return args.auth_token
+
+    try:
+        import jwt
+    except ImportError as e:
+        raise RuntimeError("缺少 pyjwt，无法自动生成评测登录态 token") from e
+
+    payload = {
+        "employee_id": args.employee_id,
+        "roles": _parse_roles(args.roles),
+        "department_id": args.department_id,
+    }
+    return jwt.encode(payload, settings.AUTH_SECRET, algorithm="HS256")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="从 Langfuse Dataset 执行评测并上报分数")
     parser.add_argument("--dataset-name", default="mx-agent-evals", help="Langfuse Dataset 名称")
@@ -31,7 +53,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="请求编码方式",
     )
     parser.add_argument("--message-field", default="message", help="请求体中的输入字段名")
-    parser.add_argument("--auth-token", default="", help="Bearer Token")
+    parser.add_argument("--auth-token", default="", help="Bearer Token（传入时优先使用）")
+    parser.add_argument("--employee-id", type=int, default=9, help="自动生成 token 的 employee_id")
+    parser.add_argument(
+        "--roles",
+        default="manager,admin,talent_dev,it_admin,admin_staff,finance,legal",
+        help="自动生成 token 的 roles，逗号分隔",
+    )
+    parser.add_argument("--department-id", type=int, default=2, help="自动生成 token 的 department_id")
     parser.add_argument("--timeout", type=float, default=30.0, help="接口超时秒数")
     parser.add_argument("--concurrency", type=int, default=5, help="最大并发数")
     parser.add_argument("--judge-concurrency", type=int, default=2, help="LLM Judge 最大并发数")
@@ -41,12 +70,13 @@ def build_parser() -> argparse.ArgumentParser:
 async def main_async(args: argparse.Namespace) -> None:
     """评测主逻辑（异步）。"""
     setup_tracing()
+    auth_token = _build_auth_token(args)
 
     requester = HttpEvalRequester(
         base_url=args.base_url,
         endpoint=args.endpoint,
         timeout=args.timeout,
-        auth_token=args.auth_token,
+        auth_token=auth_token,
         message_field=args.message_field,
         request_mode=args.request_mode,
     )
