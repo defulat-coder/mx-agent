@@ -1,5 +1,16 @@
 # 评估模块独立说明
 
+> **⚠ 已重构**：评测模块已迁移至 Langfuse Dataset。本文档描述旧架构供参考，新架构请参考
+> `docs/superpowers/specs/2026-03-23-langfuse-evals-design.md`。
+>
+> **快速开始（新架构）：**
+> 1. 迁移用例：`uv run python scripts/migrate_evals.py`
+> 2. 执行评测：`uv run python scripts/run_evals.py --limit 20 --auth-token <token>`
+> 3. 查看结果：登录 Langfuse UI → Datasets → mx-agent-evals
+> 4. API 触发：`POST /v1/evals/runs`，查询进度：`GET /v1/evals/runs/{run_name}`
+>
+> 历史 Markdown 用例已归档至 `tests/archived/`。
+
 ## 1. 目标与范围
 
 本项目评估模块用于将 `tests/test_evaluation_*.md` 中的用例结构化解析后，按需进行：
