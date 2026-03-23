@@ -33,6 +33,18 @@ class JudgeResult:
     reason: str
 
 
+_judge_clients: dict[tuple[str, str], AsyncOpenAI] = {}
+
+
+def _get_judge_client(api_key: str, base_url: str) -> AsyncOpenAI:
+    key = (api_key, base_url)
+    client = _judge_clients.get(key)
+    if client is None:
+        client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+        _judge_clients[key] = client
+    return client
+
+
 async def llm_judge(
     user_input: str,
     expected_behavior: str,
@@ -54,7 +66,7 @@ async def llm_judge(
     Returns:
         JudgeResult，score=None 表示解析失败
     """
-    client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+    client = _get_judge_client(api_key=api_key, base_url=base_url)
     prompt = _JUDGE_PROMPT.format(
         user_input=user_input,
         expected_behavior=expected_behavior,

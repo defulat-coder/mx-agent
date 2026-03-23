@@ -136,6 +136,7 @@ async def run_eval_experiment(
     id_prefix: str = "",
     limit: int = 0,
     concurrency: int = DEFAULT_CONCURRENCY,
+    judge_concurrency: int | None = None,
 ) -> EvalRunSummary:
     """执行评测实验，上报双指标分数到 Langfuse。
 
@@ -147,17 +148,19 @@ async def run_eval_experiment(
         id_prefix: 按 case_id 前缀过滤，逗号分隔，空则全量
         limit: 最多执行条数，0=不限制
         concurrency: 最大并发数
+        judge_concurrency: LLM judge 最大并发数，None=跟随 concurrency
 
     Returns:
         EvalRunSummary 汇总结果
     """
     actual_run_name = _make_run_name(run_name)
     client = get_langfuse_client()
+    judge_limit = max(1, min(concurrency, judge_concurrency or concurrency))
 
     # 降级：client=None（未配置）或 get_dataset 失败（连接异常）均跳过上报
     logger.info(f"正在从 Langfuse 获取 Dataset '{dataset_name}' ...")
     try:
-        dataset = client.get_dataset(dataset_name) if client else None
+        dataset = await asyncio.to_thread(client.get_dataset, dataset_name) if client else None
     except Exception as e:
         logger.warning(f"获取 Langfuse Dataset 失败: {e}，将跳过上报")
         dataset = None
@@ -194,6 +197,7 @@ async def run_eval_experiment(
 
     # 并发控制
     semaphore = asyncio.Semaphore(concurrency)
+    judge_semaphore = asyncio.Semaphore(judge_limit)
     lock = asyncio.Lock()
 
     # 共享结果
@@ -242,7 +246,8 @@ async def run_eval_experiment(
             # 关联 trace 到当前 run
             if client and trace_id:
                 try:
-                    client.create_dataset_run_item(
+                    await asyncio.to_thread(
+                        client.create_dataset_run_item,
                         run_name=actual_run_name,
                         dataset_item_id=item.id,
                         trace_id=trace_id,
@@ -262,7 +267,8 @@ async def run_eval_experiment(
             # 上报 tool_match score
             if client and trace_id and tool_match is not None:
                 try:
-                    client.score(
+                    await asyncio.to_thread(
+                        client.score,
                         trace_id=trace_id,
                         name="tool_match",
                         value=1.0 if tool_match else 0.0,
@@ -275,12 +281,18 @@ async def run_eval_experiment(
             response_text = _collect_response_text(resp.body)
             judge_score: float | None = None
             try:
-                judge_result = await judge_fn(case.user_input, case.expected_behavior, response_text)
+                async with judge_semaphore:
+                    judge_result = await judge_fn(
+                        case.user_input,
+                        case.expected_behavior,
+                        response_text,
+                    )
                 if judge_result.score is not None:
                     judge_score = judge_result.score
                     if client and trace_id:
                         try:
-                            client.score(
+                            await asyncio.to_thread(
+                                client.score,
                                 trace_id=trace_id,
                                 name="response_quality",
                                 value=judge_result.score,
