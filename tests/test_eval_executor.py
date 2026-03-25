@@ -85,6 +85,15 @@ def test_score_case_matches_nested_tool_calls():
     assert result.tool_match is True
 
 
+def test_score_case_name_outside_tool_context_no_match():
+    """顶层 'name' 字段（非工具上下文）不应被当做工具名。"""
+    case = make_case("EMP-04", "get_salary_info")
+    response = {"name": "get_salary_info", "reply": "普通文本"}
+    result = score_case(case, 200, response)
+    assert result.ok is False
+    assert result.tool_match is False
+
+
 def test_requester_auto_mode_for_team_runs():
     requester = HttpEvalRequester(
         base_url="http://localhost:8000",

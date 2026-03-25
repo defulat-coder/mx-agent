@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import functools
+from collections import OrderedDict
 from datetime import datetime
+from urllib.parse import urlparse
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.config import settings
 from app.core.tracing import setup_tracing
@@ -16,7 +18,12 @@ from app.evals.langfuse_eval import EvalRunSummary, run_eval_experiment
 router = APIRouter(prefix="/evals", tags=["evals"])
 
 # 内存中存储后台任务结果（服务重启后丢失，当前阶段不持久化）
-_run_results: dict[str, EvalRunSummary | str] = {}
+# 使用 OrderedDict 限制最大条目数，防止内存泄漏
+_MAX_RUN_RESULTS = 100
+_run_results: OrderedDict[str, EvalRunSummary | str] = OrderedDict()
+
+
+_ALLOWED_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0"}
 
 
 class EvalRunRequest(BaseModel):
@@ -30,6 +37,15 @@ class EvalRunRequest(BaseModel):
     endpoint: str = Field(default="/teams/router-team/runs", description="接口路径")
     auth_token: str = Field(default="", description="Bearer Token")
     timeout: float = Field(default=30.0, description="接口超时秒数")
+
+    @field_validator("base_url")
+    @classmethod
+    def validate_base_url(cls, v: str) -> str:
+        parsed = urlparse(v)
+        host = (parsed.hostname or "").lower()
+        if host not in _ALLOWED_HOSTS:
+            raise ValueError(f"base_url 仅允许本地地址 ({', '.join(_ALLOWED_HOSTS)})，收到: {host}")
+        return v
 
 
 class EvalRunStarted(BaseModel):
@@ -71,17 +87,21 @@ async def _run_background(run_name: str, req: EvalRunRequest) -> None:
     try:
         summary = await run_eval_experiment(
             dataset_name=req.dataset_name,
-            run_name=req.run_name or None,
+            run_name=run_name,
             requester=requester,
             judge_fn=judge_fn,
             id_prefix=req.id_prefix,
             limit=req.limit,
         )
         _run_results[run_name] = summary
+        # 淘汰最旧条目
+        while len(_run_results) > _MAX_RUN_RESULTS:
+            _run_results.popitem(last=False)
     except Exception as e:
         _run_results[run_name] = f"failed: {e}"
     finally:
-        await requester.close()
+        if requester is not None:
+            await requester.close()
 
 
 @router.post("/runs", response_model=EvalRunStarted, status_code=202)

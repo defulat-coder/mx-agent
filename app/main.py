@@ -105,7 +105,6 @@ app.add_middleware(
         "/databases/*",
         "/eval-runs",
         "/eval-runs/*",
-        "/v1/evals/*",
         "/optimize-memories",
         "/user_memory_stats",
         "/trace_session_stats",

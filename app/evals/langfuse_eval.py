@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import asyncio
-import re
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -74,22 +73,32 @@ def _collect_response_text(body: dict) -> str:
 
 
 def _collect_tool_names(body: dict) -> set[str]:
-    """从响应体结构化字段收集完整工具名。"""
+    """从响应体结构化字段收集完整工具名。
+
+    只从明确的工具调用字段中提取名称，``"name"`` 仅在作为
+    ``"function"`` / ``"tool_call"`` dict 的子键时才被采集，
+    避免将用户名、模型名等无关值误判为工具名。
+    """
     names: set[str] = set()
 
-    def walk(node: object) -> None:
+    def walk(node: object, *, inside_tool: bool = False) -> None:
         if isinstance(node, list):
             for item in node:
-                walk(item)
+                walk(item, inside_tool=inside_tool)
         elif isinstance(node, dict):
             for key, value in node.items():
-                if key in {"tool", "tool_name", "name", "function", "tool_call", "tool_calls"}:
+                if key in {"tool", "tool_name"}:
                     if isinstance(value, str):
                         names.add(value.strip().lower())
                     else:
-                        walk(value)
+                        walk(value, inside_tool=True)
+                elif key in {"function", "tool_call", "tool_calls"}:
+                    walk(value, inside_tool=True)
+                elif key == "name" and inside_tool:
+                    if isinstance(value, str):
+                        names.add(value.strip().lower())
                 elif key in {"member_responses", "messages", "choices", "delta"}:
-                    walk(value)
+                    walk(value, inside_tool=False)
 
     walk(body)
     return names
@@ -146,7 +155,7 @@ async def run_eval_experiment(
     Returns:
         EvalRunSummary 汇总结果
     """
-    actual_run_name = _make_run_name(run_name)
+    actual_run_name = run_name if run_name else _make_run_name(None)
     client = get_langfuse_client()
     judge_limit = max(1, min(concurrency, judge_concurrency or concurrency))
 
@@ -239,11 +248,14 @@ async def run_eval_experiment(
             # 关联 trace 到当前 run
             if client and trace_id:
                 try:
-                    await asyncio.to_thread(
-                        client.create_dataset_run_item,
-                        run_name=actual_run_name,
-                        dataset_item_id=item.id,
-                        trace_id=trace_id,
+                    await asyncio.wait_for(
+                        asyncio.to_thread(
+                            client.create_dataset_run_item,
+                            run_name=actual_run_name,
+                            dataset_item_id=item.id,
+                            trace_id=trace_id,
+                        ),
+                        timeout=15,
                     )
                 except Exception as e:
                     logger.debug(f"关联 trace 失败 case={case.case_id}: {e}")
@@ -260,12 +272,15 @@ async def run_eval_experiment(
             # 上报 tool_match score
             if client and trace_id and tool_match is not None:
                 try:
-                    await asyncio.to_thread(
-                        client.score,
-                        trace_id=trace_id,
-                        name="tool_match",
-                        value=1.0 if tool_match else 0.0,
-                        data_type="NUMERIC",
+                    await asyncio.wait_for(
+                        asyncio.to_thread(
+                            client.score,
+                            trace_id=trace_id,
+                            name="tool_match",
+                            value=1.0 if tool_match else 0.0,
+                            data_type="NUMERIC",
+                        ),
+                        timeout=15,
                     )
                 except Exception as e:
                     logger.debug(f"上报 tool_match score 失败: {e}")
@@ -284,13 +299,16 @@ async def run_eval_experiment(
                     judge_score = judge_result.score
                     if client and trace_id:
                         try:
-                            await asyncio.to_thread(
-                                client.score,
-                                trace_id=trace_id,
-                                name="response_quality",
-                                value=judge_result.score,
-                                comment=judge_result.reason,
-                                data_type="NUMERIC",
+                            await asyncio.wait_for(
+                                asyncio.to_thread(
+                                    client.score,
+                                    trace_id=trace_id,
+                                    name="response_quality",
+                                    value=judge_result.score,
+                                    comment=judge_result.reason,
+                                    data_type="NUMERIC",
+                                ),
+                                timeout=15,
                             )
                         except Exception as e:
                             logger.debug(f"上报 response_quality score 失败: {e}")
@@ -317,9 +335,10 @@ async def run_eval_experiment(
                             response_preview=response_text[:160],
                         )
                     )
+                current = completed
 
             status = "PASS" if case_ok else f"FAIL({fail_reason})"
-            logger.info(f"[{completed}/{len(items)}] 完成: {case.case_id} - {status}")
+            logger.info(f"[{current}/{len(items)}] 完成: {case.case_id} - {status}")
 
     # 并发执行所有用例
     tasks = [_eval_one(i, item) for i, item in enumerate(items)]
@@ -330,11 +349,10 @@ async def run_eval_experiment(
     )
     avg_quality = sum(quality_scores) / len(quality_scores) if quality_scores else None
 
-    logger.info(
-        f"评测完成: {total} 条, 通过 {passed}, "
-        f"工具匹配率 {tool_match_rate:.1%}, "
-        f"平均质量 {avg_quality:.2f}" if avg_quality is not None else f"评测完成: {total} 条, 通过 {passed}, 工具匹配率 {tool_match_rate:.1%}"
-    )
+    msg = f"评测完成: {total} 条, 通过 {passed}, 工具匹配率 {tool_match_rate:.1%}"
+    if avg_quality is not None:
+        msg += f", 平均质量 {avg_quality:.2f}"
+    logger.info(msg)
 
     return EvalRunSummary(
         run_name=actual_run_name,

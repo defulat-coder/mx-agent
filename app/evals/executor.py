@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from typing import Any, Callable, Iterable
-import re
 
 from app.evals.runner import EvalCase
 
@@ -52,22 +51,31 @@ def _collect_response_text(response_json: dict[str, Any]) -> str:
 
 
 def _collect_tool_names(response_json: dict[str, Any]) -> set[str]:
+    """从响应体结构化字段收集完整工具名。
+
+    ``"name"`` 仅在 ``"function"`` / ``"tool_call"`` 内部时才被采集。
+    """
     names: set[str] = set()
 
-    def walk(node: Any) -> None:
+    def walk(node: Any, *, inside_tool: bool = False) -> None:
         if isinstance(node, list):
             for item in node:
-                walk(item)
+                walk(item, inside_tool=inside_tool)
             return
         if isinstance(node, dict):
             for key, value in node.items():
-                if key in {"tool", "tool_name", "name", "function", "tool_call", "tool_calls"}:
+                if key in {"tool", "tool_name"}:
                     if isinstance(value, str):
                         names.add(value.strip().lower())
                     else:
-                        walk(value)
+                        walk(value, inside_tool=True)
+                elif key in {"function", "tool_call", "tool_calls"}:
+                    walk(value, inside_tool=True)
+                elif key == "name" and inside_tool:
+                    if isinstance(value, str):
+                        names.add(value.strip().lower())
                 elif key in {"member_responses", "messages", "choices", "delta"}:
-                    walk(value)
+                    walk(value, inside_tool=False)
 
     walk(response_json)
     return names

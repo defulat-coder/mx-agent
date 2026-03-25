@@ -3,7 +3,15 @@
 import pytest
 from unittest.mock import AsyncMock, patch
 
-from app.evals.judge import llm_judge
+from app.evals.judge import _judge_clients, llm_judge
+
+
+@pytest.fixture(autouse=True)
+def clear_judge_client_cache():
+    """每个测试前清理 judge 客户端缓存，确保 mock 生效。"""
+    _judge_clients.clear()
+    yield
+    _judge_clients.clear()
 
 
 @pytest.mark.asyncio
