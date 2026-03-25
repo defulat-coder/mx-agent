@@ -26,6 +26,7 @@ from app.core.exceptions import (
 )
 from app.core.logging import setup_logging
 from app.core.middleware import RequestIDMiddleware, RequestLoggingMiddleware
+from app.api.v1.router import v1_router
 
 
 @asynccontextmanager
@@ -52,6 +53,8 @@ base_app.add_exception_handler(AppException, app_exception_handler)  # type: ign
 base_app.add_exception_handler(RequestValidationError, validation_exception_handler)  # type: ignore[arg-type]
 base_app.add_exception_handler(StarletteHTTPException, http_exception_handler)  # type: ignore[arg-type]
 base_app.add_exception_handler(Exception, unhandled_exception_handler)  # type: ignore[arg-type]
+
+base_app.include_router(v1_router, prefix="/v1")
 
 # AgentOS
 agent_os = AgentOS(
@@ -102,6 +105,7 @@ app.add_middleware(
         "/databases/*",
         "/eval-runs",
         "/eval-runs/*",
+        "/v1/evals/*",
         "/optimize-memories",
         "/user_memory_stats",
         "/trace_session_stats",
