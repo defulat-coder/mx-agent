@@ -26,7 +26,7 @@ class EvalResult:
 def _extract_expected_tool_candidates(expected_tool: str) -> list[str]:
     if not expected_tool or expected_tool.strip() in {"—", "-"}:
         return []
-    return [token.lower() for token in re.findall(r"[a-zA-Z_]{3,}", expected_tool)]
+    return [expected_tool.strip().lower()]
 
 
 def _collect_response_text(response_json: dict[str, Any]) -> str:
@@ -51,12 +51,8 @@ def _collect_response_text(response_json: dict[str, Any]) -> str:
     return " ".join(values).strip()
 
 
-def _collect_tool_hints(response_json: dict[str, Any]) -> set[str]:
-    hints: set[str] = set()
-
-    def add_tokens(value: str) -> None:
-        for token in re.findall(r"[a-zA-Z_]{3,}", value):
-            hints.add(token.lower())
+def _collect_tool_names(response_json: dict[str, Any]) -> set[str]:
+    names: set[str] = set()
 
     def walk(node: Any) -> None:
         if isinstance(node, list):
@@ -67,14 +63,14 @@ def _collect_tool_hints(response_json: dict[str, Any]) -> set[str]:
             for key, value in node.items():
                 if key in {"tool", "tool_name", "name", "function", "tool_call", "tool_calls"}:
                     if isinstance(value, str):
-                        add_tokens(value)
+                        names.add(value.strip().lower())
                     else:
                         walk(value)
                 elif key in {"member_responses", "messages", "choices", "delta"}:
                     walk(value)
 
     walk(response_json)
-    return hints
+    return names
 
 
 def _map_http_status_reason(status_code: int) -> str:
@@ -105,14 +101,10 @@ def _map_exception_reason(exc: Exception) -> str:
 def score_case(case: EvalCase, status_code: int, response_json: dict[str, Any]) -> EvalResult:
     response_text = _collect_response_text(response_json)
     candidates = _extract_expected_tool_candidates(case.expected_tool)
-    observed_tools = _collect_tool_hints(response_json)
+    observed_tools = _collect_tool_names(response_json)
     tool_match: bool | None = None
     if candidates:
-        lower_text = response_text.lower()
-        tool_match = any(
-            candidate in lower_text or candidate in observed_tools
-            for candidate in candidates
-        )
+        tool_match = any(c in observed_tools for c in candidates)
     ok = status_code == 200 and (tool_match is None or tool_match)
     fail_reason: str | None = None
     if not ok:

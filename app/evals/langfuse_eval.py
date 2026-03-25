@@ -73,13 +73,9 @@ def _collect_response_text(body: dict) -> str:
     return " ".join(values).strip()
 
 
-def _collect_tool_hints(body: dict) -> set[str]:
-    """从响应体结构化字段收集工具名 token。"""
-    hints: set[str] = set()
-
-    def add_tokens(value: str) -> None:
-        for token in re.findall(r"[a-zA-Z_]{3,}", value):
-            hints.add(token.lower())
+def _collect_tool_names(body: dict) -> set[str]:
+    """从响应体结构化字段收集完整工具名。"""
+    names: set[str] = set()
 
     def walk(node: object) -> None:
         if isinstance(node, list):
@@ -89,18 +85,18 @@ def _collect_tool_hints(body: dict) -> set[str]:
             for key, value in node.items():
                 if key in {"tool", "tool_name", "name", "function", "tool_call", "tool_calls"}:
                     if isinstance(value, str):
-                        add_tokens(value)
+                        names.add(value.strip().lower())
                     else:
                         walk(value)
                 elif key in {"member_responses", "messages", "choices", "delta"}:
                     walk(value)
 
     walk(body)
-    return hints
+    return names
 
 
 def _compute_tool_match(case: EvalCase, resp: HttpEvalResponse) -> bool | None:
-    """计算工具匹配分（规则）。
+    """计算工具匹配分（精确匹配）。
 
     Args:
         case: 评测用例
@@ -112,12 +108,9 @@ def _compute_tool_match(case: EvalCase, resp: HttpEvalResponse) -> bool | None:
     expected = case.expected_tool.strip() if case.expected_tool else ""
     if not expected or expected in {"—", "-"}:
         return None
-    candidates = [t.lower() for t in re.findall(r"[a-zA-Z_]{3,}", expected)]
-    if not candidates:
-        return None
-    response_text = _collect_response_text(resp.body).lower()
-    observed = _collect_tool_hints(resp.body)
-    return any(c in response_text or c in observed for c in candidates)
+    expected_lower = expected.lower()
+    observed = _collect_tool_names(resp.body)
+    return expected_lower in observed
 
 
 def _make_run_name(base: str | None) -> str:

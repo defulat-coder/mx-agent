@@ -49,7 +49,7 @@ def test_compute_tool_match_hit():
     case = make_case(expected_tool="get_salary_info")
     resp = HttpEvalResponse(
         status_code=200,
-        body={"reply": "将调用 get_salary_info"},
+        body={"tool_calls": [{"function": {"name": "get_salary_info"}}]},
         headers={},
     )
     assert _compute_tool_match(case, resp) is True

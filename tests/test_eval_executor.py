@@ -17,7 +17,11 @@ def make_case(case_id: str, expected_tool: str) -> EvalCase:
 
 def test_score_case_tool_match():
     case = make_case("EMP-01", "get_salary_info")
-    result = score_case(case, 200, {"reply": "将调用 get_salary_info 获取数据"})
+    response = {
+        "content": "已处理",
+        "tool_calls": [{"function": {"name": "get_salary_info"}}],
+    }
+    result = score_case(case, 200, response)
     assert result.ok is True
     assert result.tool_match is True
     assert result.fail_reason is None
