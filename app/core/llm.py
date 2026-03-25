@@ -15,4 +15,6 @@ def get_model() -> OpenAILike:
         id=settings.LLM_MODEL,
         api_key=settings.LLM_API_KEY,
         base_url=settings.LLM_BASE_URL,
+        extra_body={"enable_thinking": False},
+        timeout=120.0,
     )
