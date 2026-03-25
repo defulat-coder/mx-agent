@@ -101,4 +101,3 @@ def test_requester_auto_mode_for_team_runs():
         request_mode="auto",
     )
     assert requester._resolved_mode() == "form"
-    requester.close()

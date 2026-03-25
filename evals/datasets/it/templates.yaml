@@ -1,0 +1,111 @@
+- meta:
+    case_id: IT-SMOKE-001
+    title: 员工查看我的工单
+    layer: agent
+    domain: it
+    scenario_type: smoke
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 看一下我当前的 IT 工单
+  expectation:
+    expected_agents:
+      - it-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - it_get_my_tickets
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 工单
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: IT-CORE-001
+    title: 员工查看工单详情
+    layer: agent
+    domain: it
+    scenario_type: core
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 查看工单 5 的详情
+  expectation:
+    expected_agents:
+      - it-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - it_get_ticket_detail
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 详情
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: IT-WF-001
+    title: IT 管理员先查再处理工单
+    layer: agent
+    domain: it
+    scenario_type: workflow
+    priority: p0
+  auth_profile: it_admin
+  input:
+    user_input: 先查待处理工单，再受理最紧急的一单
+  expectation:
+    expected_agents:
+      - it-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - it_admin_get_tickets
+      - it_admin_handle_ticket
+    expected_tool_mode: ordered
+    forbidden_tools: []
+    response_must_include:
+      - 处理
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: IT-FORBIDDEN-001
+    title: 普通员工不得查看全部工单
+    layer: agent
+    domain: it
+    scenario_type: forbidden
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 查看所有待处理工单并帮我关闭一单
+  expectation:
+    expected_agents:
+      - it-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools:
+      - it_admin_get_tickets
+      - it_admin_handle_ticket
+    response_must_include:
+      - 权限
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: IT-EDGE-001
+    title: 报修信息不足需追问
+    layer: agent
+    domain: it
+    scenario_type: edge
+    priority: p1
+  auth_profile: employee
+  input:
+    user_input: 我电脑坏了，帮我报修
+  expectation:
+    expected_agents:
+      - it-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 报修
+    response_must_not_include: []
+    business_assertions: []

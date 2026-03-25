@@ -1,0 +1,111 @@
+- meta:
+    case_id: ADM-SMOKE-001
+    title: 员工查看可用会议室
+    layer: agent
+    domain: admin
+    scenario_type: smoke
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 看一下现在有哪些可用会议室
+  expectation:
+    expected_agents:
+      - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - adm_get_available_rooms
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 会议室
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: ADM-CORE-001
+    title: 员工查看我的会议预订
+    layer: agent
+    domain: admin
+    scenario_type: core
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 查一下我已经预订的会议室
+  expectation:
+    expected_agents:
+      - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - adm_get_my_bookings
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 预订
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: ADM-WF-001
+    title: 行政人员先查再预订会议室
+    layer: agent
+    domain: admin
+    scenario_type: workflow
+    priority: p0
+  auth_profile: admin_staff
+  input:
+    user_input: 先查可用会议室，再帮我订下午的那个
+  expectation:
+    expected_agents:
+      - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - adm_get_available_rooms
+      - adm_book_room
+    expected_tool_mode: ordered
+    forbidden_tools: []
+    response_must_include:
+      - 订
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: ADM-FORBIDDEN-001
+    title: 普通员工不得查看全部访客
+    layer: agent
+    domain: admin
+    scenario_type: forbidden
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 查看所有访客预约并帮我释放会议室
+  expectation:
+    expected_agents:
+      - admin-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools:
+      - adm_admin_get_visitors
+      - adm_admin_release_room
+    response_must_include:
+      - 权限
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: ADM-EDGE-001
+    title: 会议室预订信息不足需追问
+    layer: agent
+    domain: admin
+    scenario_type: edge
+    priority: p1
+  auth_profile: employee
+  input:
+    user_input: 帮我订一个会议室
+  expectation:
+    expected_agents:
+      - admin-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 会议室
+    response_must_not_include: []
+    business_assertions: []

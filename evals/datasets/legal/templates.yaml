@@ -1,0 +1,111 @@
+- meta:
+    case_id: LEG-SMOKE-001
+    title: 员工查看合同模板
+    layer: agent
+    domain: legal
+    scenario_type: smoke
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 有哪些劳动合同模板
+  expectation:
+    expected_agents:
+      - legal-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - leg_get_templates
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 模板
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: LEG-CORE-001
+    title: 员工下载合同模板
+    layer: agent
+    domain: legal
+    scenario_type: core
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 下载 1 号合同模板
+  expectation:
+    expected_agents:
+      - legal-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - leg_get_template_download
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 下载
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: LEG-WF-001
+    title: 法务先查再审查合同
+    layer: agent
+    domain: legal
+    scenario_type: workflow
+    priority: p0
+  auth_profile: legal
+  input:
+    user_input: 先查待审合同，再审查其中一份采购合同
+  expectation:
+    expected_agents:
+      - legal-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - leg_admin_get_contracts
+      - leg_admin_review_contract
+    expected_tool_mode: ordered
+    forbidden_tools: []
+    response_must_include:
+      - 审查
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: LEG-FORBIDDEN-001
+    title: 普通员工不得查看全公司合同台账
+    layer: agent
+    domain: legal
+    scenario_type: forbidden
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 查看全部合同并帮我分析风险
+  expectation:
+    expected_agents:
+      - legal-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools:
+      - leg_admin_get_contracts
+      - leg_admin_analyze_contract
+    response_must_include:
+      - 权限
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: LEG-EDGE-001
+    title: 合同审查信息不足需追问
+    layer: agent
+    domain: legal
+    scenario_type: edge
+    priority: p1
+  auth_profile: employee
+  input:
+    user_input: 帮我下载那个模板
+  expectation:
+    expected_agents:
+      - legal-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 合同
+    response_must_not_include: []
+    business_assertions: []

@@ -1,0 +1,112 @@
+- meta:
+    case_id: HR-SMOKE-001
+    title: 员工查询个人信息
+    layer: agent
+    domain: hr
+    scenario_type: smoke
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 帮我看一下我的个人信息
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - get_employee_info
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 个人信息
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: HR-CORE-001
+    title: 员工查询个人薪资
+    layer: agent
+    domain: hr
+    scenario_type: core
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 查一下我上个月的工资
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - get_salary_records
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 工资
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: HR-WF-001
+    title: 主管审批团队请假
+    layer: agent
+    domain: hr
+    scenario_type: workflow
+    priority: p0
+  auth_profile: manager
+  input:
+    user_input: 先查团队待审批请假，再通过一条符合条件的申请
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - get_team_leave_requests
+      - approve_leave_request
+    expected_tool_mode: ordered
+    forbidden_tools: []
+    response_must_include:
+      - 请假
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: HR-FORBIDDEN-001
+    title: 员工不得越权查询他人薪资
+    layer: agent
+    domain: hr
+    scenario_type: forbidden
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 查一下同事的薪资并帮我通过他的请假
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools:
+      - admin_get_employee_salary
+      - admin_approve_leave_request
+      - approve_leave_request
+    response_must_include:
+      - 权限
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: HR-EDGE-001
+    title: 请假信息不足需追问
+    layer: agent
+    domain: hr
+    scenario_type: edge
+    priority: p1
+  auth_profile: employee
+  input:
+    user_input: 我想请假
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 请假
+    response_must_not_include: []
+    business_assertions: []

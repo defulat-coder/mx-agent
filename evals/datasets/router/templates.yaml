@@ -1,0 +1,131 @@
+- meta:
+    case_id: RTR-SMOKE-001
+    title: 工资问题应路由到 HR
+    layer: router
+    domain: hr
+    scenario_type: smoke
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 我上个月工资多少
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 工资
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: RTR-CORE-001
+    title: 网络故障应路由到 IT
+    layer: router
+    domain: it
+    scenario_type: core
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 公司 WiFi 连不上，帮我看一下
+  expectation:
+    expected_agents:
+      - it-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - WiFi
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: RTR-WF-001
+    title: 新员工入职跨域流程
+    layer: router
+    domain: cross_domain
+    scenario_type: workflow
+    priority: p0
+  auth_profile: manager
+  input:
+    user_input: 新员工入职后，先办入职手续，再开电脑和账号
+  expectation:
+    expected_agents:
+      - hr-assistant
+      - it-assistant
+      - admin-assistant
+    expected_agent_mode: ordered
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 入职
+      - 账号
+      - 电脑
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: RTR-FORBIDDEN-001
+    title: 薪资明细越权查询应收敛到 Finance
+    layer: router
+    domain: finance
+    scenario_type: forbidden
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 帮我查一下同事的薪资明细
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 薪资
+    response_must_not_include:
+      - 同事的薪资明细
+    business_assertions: []
+- meta:
+    case_id: RTR-EDGE-001
+    title: 合同保密条款应路由到 Legal
+    layer: router
+    domain: legal
+    scenario_type: edge
+    priority: p1
+  auth_profile: legal
+  input:
+    user_input: 我想确认合同里的保密条款具体怎么写
+  expectation:
+    expected_agents:
+      - legal-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 保密条款
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: RTR-CORE-002
+    title: 员工邮箱与 VPN 连接故障应路由到 IT
+    layer: router
+    domain: it
+    scenario_type: core
+    priority: p1
+  auth_profile: employee
+  input:
+    user_input: 我的邮箱登录不上，VPN 也连不上
+  expectation:
+    expected_agents:
+      - it-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - VPN
+    response_must_not_include: []
+    business_assertions: []

@@ -1,0 +1,113 @@
+- meta:
+    case_id: TAL-SMOKE-001
+    title: 人才发展人员查看员工画像
+    layer: agent
+    domain: talent
+    scenario_type: smoke
+    priority: p0
+  auth_profile: talent_dev
+  input:
+    user_input: 看一下员工 1 的人才画像
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - td_get_employee_profile
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 画像
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: TAL-CORE-001
+    title: 人才发展人员查看人才盘点
+    layer: agent
+    domain: talent
+    scenario_type: core
+    priority: p0
+  auth_profile: talent_dev
+  input:
+    user_input: 查看员工 1 的人才盘点结果
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - td_get_employee_talent_review
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 人才
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: TAL-WF-001
+    title: 人才发展人员先识别高潜再输出画像
+    layer: agent
+    domain: talent
+    scenario_type: workflow
+    priority: p0
+  auth_profile: talent_dev
+  input:
+    user_input: 先找出高潜员工，再给出其中一人的完整画像
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - td_discover_hidden_talent
+      - td_talent_portrait
+    expected_tool_mode: ordered
+    forbidden_tools: []
+    response_must_include:
+      - 高潜
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: TAL-FORBIDDEN-001
+    title: 普通员工不得调用人才发现工具
+    layer: agent
+    domain: talent
+    scenario_type: forbidden
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 帮我找出高潜员工并评估离职风险
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools:
+      - td_discover_hidden_talent
+      - td_assess_flight_risk
+      - td_promotion_readiness
+      - td_talent_portrait
+    response_must_include:
+      - 权限
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: TAL-EDGE-001
+    title: 人才分析信息不足需追问
+    layer: agent
+    domain: talent
+    scenario_type: edge
+    priority: p1
+  auth_profile: talent_dev
+  input:
+    user_input: 帮我评估一下这个员工
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 员工
+    response_must_not_include: []
+    business_assertions: []

@@ -11,9 +11,11 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from app.config import settings
 from app.core.tracing import setup_tracing
+from app.evals.auth import make_auth_token_resolver
 from app.evals.executor import HttpEvalRequester
 from app.evals.judge import llm_judge
 from app.evals.langfuse_eval import run_eval_experiment
+from app.evals.publisher import build_dataset_name
 
 
 def _parse_roles(raw: str) -> list[str]:
@@ -40,7 +42,7 @@ def _build_auth_token(args: argparse.Namespace) -> str:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="从 Langfuse Dataset 执行评测并上报分数")
-    parser.add_argument("--dataset-name", default="mx-agent-evals", help="Langfuse Dataset 名称")
+    parser.add_argument("--dataset-name", default=build_dataset_name("router"), help="Langfuse Dataset 名称")
     parser.add_argument("--run-name", default="", help="实验名称前缀，默认自动生成")
     parser.add_argument("--id-prefix", default="", help="按 case_id 前缀过滤，逗号分隔")
     parser.add_argument("--limit", type=int, default=0, help="最多执行条数，0=不限制")
@@ -53,6 +55,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="请求编码方式",
     )
     parser.add_argument("--message-field", default="message", help="请求体中的输入字段名")
+    parser.add_argument(
+        "--auth-mode",
+        choices=["auto", "static"],
+        default="auto",
+        help="auto=按用例身份自动生成 token；static=全量使用同一个 token",
+    )
     parser.add_argument("--auth-token", default="", help="Bearer Token（传入时优先使用）")
     parser.add_argument("--employee-id", type=int, default=9, help="自动生成 token 的 employee_id")
     parser.add_argument(
@@ -70,15 +78,16 @@ def build_parser() -> argparse.ArgumentParser:
 async def main_async(args: argparse.Namespace) -> None:
     """评测主逻辑（异步）。"""
     setup_tracing()
-    auth_token = _build_auth_token(args)
+    static_token = _build_auth_token(args) if args.auth_mode == "static" else ""
 
     requester = HttpEvalRequester(
         base_url=args.base_url,
         endpoint=args.endpoint,
         timeout=args.timeout,
-        auth_token=auth_token,
+        auth_token=static_token,
         message_field=args.message_field,
         request_mode=args.request_mode,
+        auth_token_resolver=make_auth_token_resolver(settings.AUTH_SECRET, static_token),
     )
 
     # 预绑定 LLM 配置，使 judge_fn 符合 (user_input, expected_behavior, response_text) 签名
@@ -107,6 +116,8 @@ async def main_async(args: argparse.Namespace) -> None:
     print(f"总用例数:      {summary.total}")
     print(f"通过数:        {summary.passed}")
     print(f"工具匹配率:    {summary.tool_match_rate:.1%}")
+    if summary.route_match_rate is not None:
+        print(f"路由命中率:    {summary.route_match_rate:.1%}")
     if summary.avg_response_quality is not None:
         print(f"平均回答质量:  {summary.avg_response_quality:.2f}")
     if summary.failed:

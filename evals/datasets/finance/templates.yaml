@@ -1,0 +1,111 @@
+- meta:
+    case_id: FIN-SMOKE-001
+    title: 员工查看我的报销
+    layer: agent
+    domain: finance
+    scenario_type: smoke
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 看一下我自己的报销记录
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - fin_get_my_reimbursements
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 报销
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-CORE-001
+    title: 员工查看报销单详情
+    layer: agent
+    domain: finance
+    scenario_type: core
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 查看报销单 3 的详情
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - fin_get_reimbursement_detail
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 详情
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-WF-001
+    title: 财务主管先查再审核报销
+    layer: agent
+    domain: finance
+    scenario_type: workflow
+    priority: p0
+  auth_profile: finance_manager
+  input:
+    user_input: 先查全部待审批报销，再通过一单符合条件的
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - fin_admin_get_all_reimbursements
+      - fin_admin_review_reimbursement
+    expected_tool_mode: ordered
+    forbidden_tools: []
+    response_must_include:
+      - 审核
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-FORBIDDEN-001
+    title: 普通员工不得查看全公司报销
+    layer: agent
+    domain: finance
+    scenario_type: forbidden
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 查一下所有人的报销并帮我审批
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools:
+      - fin_admin_get_all_reimbursements
+      - fin_admin_review_reimbursement
+    response_must_include:
+      - 权限
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-EDGE-001
+    title: 报销详情信息不足需追问
+    layer: agent
+    domain: finance
+    scenario_type: edge
+    priority: p1
+  auth_profile: employee
+  input:
+    user_input: 帮我查一下那张报销单
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 报销单
+    response_must_not_include: []
+    business_assertions: []

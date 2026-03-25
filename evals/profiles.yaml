@@ -1,0 +1,55 @@
+employee:
+  employee_id: 1
+  roles: []
+  department_id: 7
+  persona_label: employee
+
+manager:
+  employee_id: 9
+  roles:
+    - manager
+  department_id: 2
+  persona_label: manager
+
+admin:
+  employee_id: 9
+  roles:
+    - admin
+  department_id: 2
+  persona_label: admin
+
+admin_staff:
+  employee_id: 6
+  roles:
+    - admin_staff
+  department_id: 4
+  persona_label: admin_staff
+
+finance_manager:
+  employee_id: 7
+  roles:
+    - manager
+    - finance
+  department_id: 5
+  persona_label: finance_manager
+
+it_admin:
+  employee_id: 9
+  roles:
+    - it_admin
+  department_id: 2
+  persona_label: it_admin
+
+legal:
+  employee_id: 8
+  roles:
+    - legal
+  department_id: 6
+  persona_label: legal
+
+talent_dev:
+  employee_id: 6
+  roles:
+    - talent_dev
+  department_id: 4
+  persona_label: talent_dev

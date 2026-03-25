@@ -4,6 +4,7 @@ from __future__ import annotations
 import functools
 from collections import OrderedDict
 from datetime import datetime
+from typing import Literal
 from urllib.parse import urlparse
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException
@@ -11,6 +12,7 @@ from pydantic import BaseModel, Field, field_validator
 
 from app.config import settings
 from app.core.tracing import setup_tracing
+from app.evals.auth import make_auth_token_resolver
 from app.evals.executor import HttpEvalRequester
 from app.evals.judge import llm_judge
 from app.evals.langfuse_eval import EvalRunSummary, run_eval_experiment
@@ -35,6 +37,10 @@ class EvalRunRequest(BaseModel):
     run_name: str = Field(default="", description="实验名称前缀，为空则自动生成")
     base_url: str = Field(default="http://localhost:8000", description="Agent 接口地址")
     endpoint: str = Field(default="/teams/router-team/runs", description="接口路径")
+    auth_mode: Literal["auto", "static"] = Field(
+        default="auto",
+        description="auto=按用例身份自动生成 token；static=使用传入 token",
+    )
     auth_token: str = Field(default="", description="Bearer Token")
     timeout: float = Field(default=30.0, description="接口超时秒数")
 
@@ -64,6 +70,7 @@ class EvalRunStatus(BaseModel):
     total: int | None = None
     passed: int | None = None
     tool_match_rate: float | None = None
+    route_match_rate: float | None = None
     avg_response_quality: float | None = None
     failed: list[dict] | None = None
 
@@ -71,12 +78,14 @@ class EvalRunStatus(BaseModel):
 async def _run_background(run_name: str, req: EvalRunRequest) -> None:
     """后台执行评测实验。"""
     setup_tracing()
+    static_token = req.auth_token if req.auth_mode == "static" else ""
     requester = HttpEvalRequester(
         base_url=req.base_url,
         endpoint=req.endpoint,
         timeout=req.timeout,
-        auth_token=req.auth_token,
+        auth_token=static_token,
         request_mode="auto",
+        auth_token_resolver=make_auth_token_resolver(settings.AUTH_SECRET, static_token),
     )
     judge_fn = functools.partial(
         llm_judge,
@@ -146,6 +155,7 @@ async def get_eval_run_status(run_name: str) -> EvalRunStatus:
         total=summary.total,
         passed=summary.passed,
         tool_match_rate=summary.tool_match_rate,
+        route_match_rate=summary.route_match_rate,
         avg_response_quality=summary.avg_response_quality,
         failed=[
             {

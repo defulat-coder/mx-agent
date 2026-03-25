@@ -8,9 +8,15 @@ from datetime import datetime
 
 from app.core.logging import logger
 from app.core.tracing import get_langfuse_client
-from app.evals.executor import HttpEvalRequester, HttpEvalResponse
+from app.evals.executor import HttpEvalRequester, HttpEvalResponse, analyze_response, score_case
 from app.evals.judge import JudgeResult
-from app.evals.runner import EvalCase
+from app.evals.runner import (
+    EvalAuthProfile,
+    EvalCase,
+    _parse_agent_expectation,
+    _parse_forbidden_tools,
+    _parse_tool_expectation,
+)
 
 # 默认并发数
 DEFAULT_CONCURRENCY = 5
@@ -29,7 +35,8 @@ class EvalRunSummary:
     total: int
     passed: int
     tool_match_rate: float
-    avg_response_quality: float | None
+    route_match_rate: float | None = None
+    avg_response_quality: float | None = None
     failed: list[FailedItem] = field(default_factory=list)
 
 
@@ -50,84 +57,85 @@ def _extract_trace_id(resp: HttpEvalResponse) -> str | None:
     return None
 
 
-def _collect_response_text(body: dict) -> str:
-    """从响应体递归收集文本内容。"""
-    values: list[str] = []
-
-    def walk(node: object) -> None:
-        if isinstance(node, str):
-            values.append(node)
-        elif isinstance(node, list):
-            for item in node:
-                walk(item)
-        elif isinstance(node, dict):
-            for key, value in node.items():
-                if key in {
-                    "reply", "content", "message", "result", "response",
-                    "output", "text", "member_responses", "messages", "choices", "delta",
-                }:
-                    walk(value)
-
-    walk(body)
-    return " ".join(values).strip()
-
-
-def _collect_tool_names(body: dict) -> set[str]:
-    """从响应体结构化字段收集完整工具名。
-
-    只从明确的工具调用字段中提取名称，``"name"`` 仅在作为
-    ``"function"`` / ``"tool_call"`` dict 的子键时才被采集，
-    避免将用户名、模型名等无关值误判为工具名。
-    """
-    names: set[str] = set()
-
-    def walk(node: object, *, inside_tool: bool = False) -> None:
-        if isinstance(node, list):
-            for item in node:
-                walk(item, inside_tool=inside_tool)
-        elif isinstance(node, dict):
-            for key, value in node.items():
-                if key in {"tool", "tool_name"}:
-                    if isinstance(value, str):
-                        names.add(value.strip().lower())
-                    else:
-                        walk(value, inside_tool=True)
-                elif key in {"function", "tool_call", "tool_calls"}:
-                    walk(value, inside_tool=True)
-                elif key == "name" and inside_tool:
-                    if isinstance(value, str):
-                        names.add(value.strip().lower())
-                elif key in {"member_responses", "messages", "choices", "delta"}:
-                    walk(value, inside_tool=False)
-
-    walk(body)
-    return names
-
-
-def _compute_tool_match(case: EvalCase, resp: HttpEvalResponse) -> bool | None:
-    """计算工具匹配分（精确匹配）。
-
-    Args:
-        case: 评测用例
-        resp: HTTP 评测响应
-
-    Returns:
-        True/False 表示匹配/不匹配；None 表示用例无需检查工具
-    """
-    expected = case.expected_tool.strip() if case.expected_tool else ""
-    if not expected or expected in {"—", "-"}:
-        return None
-    expected_lower = expected.lower()
-    observed = _collect_tool_names(resp.body)
-    return expected_lower in observed
-
-
 def _make_run_name(base: str | None) -> str:
     """生成唯一 run_name，追加时间戳后缀。"""
     ts = datetime.now().strftime("%Y%m%d-%H%M%S")
     if base:
         return f"{base}-{ts}"
     return f"eval-run-{ts}"
+
+
+def _get_item_field(item: object, field: str, default: object = None) -> object:
+    if isinstance(item, dict):
+        return item.get(field, default)
+    return getattr(item, field, default)
+
+
+def _coerce_mapping(value: object) -> dict:
+    if isinstance(value, dict):
+        return value
+    if hasattr(value, "model_dump"):
+        dumped = value.model_dump()
+        if isinstance(dumped, dict):
+            return dumped
+    if hasattr(value, "__dict__"):
+        return dict(vars(value))
+    return {}
+
+
+def _extract_case_prefix(item: object) -> str:
+    inp = _coerce_mapping(_get_item_field(item, "input", {}))
+    case_id = inp.get("original_case_id") or inp.get("case_id") or ""
+    return str(case_id).split("-", 1)[0].upper()
+
+
+def _build_case_from_dataset_item(item: object) -> EvalCase:
+    inp = _coerce_mapping(_get_item_field(item, "input", {}))
+    exp = _coerce_mapping(_get_item_field(item, "expected_output", {}))
+    metadata = _coerce_mapping(_get_item_field(item, "metadata", {}))
+    auth_profile = _coerce_mapping(inp.get("auth_profile") or exp.get("auth_profile"))
+    expected_tool = exp.get("expected_tool", "")
+    expected_tools = list(exp.get("expected_tools", []))
+    expected_tool_mode = exp.get("expected_tool_mode", "none")
+    expected_tool_counts = dict(exp.get("expected_tool_counts", {}))
+    if not expected_tools and expected_tool:
+        expected_tools, expected_tool_mode, expected_tool_counts = _parse_tool_expectation(
+            expected_tool
+        )
+
+    forbidden_tools = list(exp.get("forbidden_tools", []))
+    if not forbidden_tools and exp.get("forbidden_tool"):
+        forbidden_tools = _parse_forbidden_tools(exp.get("forbidden_tool", ""))
+
+    expected_agents = list(exp.get("expected_agents", []))
+    expected_agent_mode = exp.get("expected_agent_mode", "none")
+    route_text = exp.get("expected_route", "")
+    if not expected_agents and route_text:
+        expected_agents, expected_agent_mode = _parse_agent_expectation(route_text, "预期路由")
+
+    return EvalCase(
+        case_id=inp.get("original_case_id") or inp.get("case_id") or metadata.get("case_id", ""),
+        file_path=inp.get("source_file", "langfuse"),
+        section=inp.get("section", ""),
+        subsection=inp.get("subsection", ""),
+        user_input=inp.get("user_input", ""),
+        expected_tool=expected_tool,
+        expected_behavior=exp.get("expected_behavior", ""),
+        raw={},
+        domain=inp.get("domain", ""),
+        auth_profile=EvalAuthProfile(
+            employee_id=auth_profile.get("employee_id", 1),
+            roles=list(auth_profile.get("roles", [])),
+            department_id=auth_profile.get("department_id"),
+            label=auth_profile.get("label") or auth_profile.get("persona_label", ""),
+        ),
+        expected_tools=expected_tools,
+        expected_tool_mode=expected_tool_mode,
+        expected_tool_counts=expected_tool_counts,
+        forbidden_tools=forbidden_tools,
+        expected_agents=expected_agents,
+        expected_agent_mode=expected_agent_mode,
+    )
 
 
 async def run_eval_experiment(
@@ -155,7 +163,7 @@ async def run_eval_experiment(
     Returns:
         EvalRunSummary 汇总结果
     """
-    actual_run_name = run_name if run_name else _make_run_name(None)
+    actual_run_name = _make_run_name(run_name)
     client = get_langfuse_client()
     judge_limit = max(1, min(concurrency, judge_concurrency or concurrency))
 
@@ -175,8 +183,7 @@ async def run_eval_experiment(
             prefixes = {p.strip().upper() for p in id_prefix.split(",") if p.strip()}
             items = [
                 it for it in items
-                if (it.input.get("original_case_id") or it.input.get("case_id", ""))
-                .split("-", 1)[0].upper() in prefixes
+                if _extract_case_prefix(it) in prefixes
             ]
             logger.info(f"按前缀 {id_prefix} 过滤后剩余 {len(items)} 条")
         if limit > 0:
@@ -192,6 +199,7 @@ async def run_eval_experiment(
             total=0,
             passed=0,
             tool_match_rate=0.0,
+            route_match_rate=None,
             avg_response_quality=None,
         )
 
@@ -206,24 +214,14 @@ async def run_eval_experiment(
     total = 0
     passed = 0
     tool_matches: list[bool] = []
+    route_matches: list[bool] = []
     quality_scores: list[float] = []
     failed_items: list[FailedItem] = []
     completed = 0
 
     async def _eval_one(idx: int, item: object) -> None:
         nonlocal total, passed, completed
-        inp = item.input or {}
-        exp = item.expected_output or {}
-        case = EvalCase(
-            case_id=inp.get("case_id", ""),
-            file_path="langfuse",
-            section=inp.get("section", ""),
-            subsection=inp.get("subsection", ""),
-            user_input=inp.get("user_input", ""),
-            expected_tool=exp.get("expected_tool", ""),
-            expected_behavior=exp.get("expected_behavior", ""),
-            raw={},
-        )
+        case = _build_case_from_dataset_item(item)
 
         async with semaphore:
             logger.info(f"[{idx + 1}/{len(items)}] 开始: {case.case_id} - {case.user_input[:40]}")
@@ -260,14 +258,10 @@ async def run_eval_experiment(
                 except Exception as e:
                     logger.debug(f"关联 trace 失败 case={case.case_id}: {e}")
 
-            # 规则打分: tool_match
-            tool_match = _compute_tool_match(case, resp)
-
-            # HTTP 状态检查
-            if resp.status_code != 200:
-                fail_reason = f"http_{resp.status_code}"
-            elif tool_match is False:
-                fail_reason = "tool_mismatch"
+            rule_result = score_case(case, resp.status_code, resp.body)
+            tool_match = rule_result.tool_match
+            route_match = rule_result.route_match
+            fail_reason = rule_result.fail_reason
 
             # 上报 tool_match score
             if client and trace_id and tool_match is not None:
@@ -285,8 +279,23 @@ async def run_eval_experiment(
                 except Exception as e:
                     logger.debug(f"上报 tool_match score 失败: {e}")
 
+            if client and trace_id and route_match is not None:
+                try:
+                    await asyncio.wait_for(
+                        asyncio.to_thread(
+                            client.score,
+                            trace_id=trace_id,
+                            name="route_match",
+                            value=1.0 if route_match else 0.0,
+                            data_type="NUMERIC",
+                        ),
+                        timeout=15,
+                    )
+                except Exception as e:
+                    logger.debug(f"上报 route_match score 失败: {e}")
+
             # LLM judge: response_quality
-            response_text = _collect_response_text(resp.body)
+            response_text = analyze_response(resp.body).response_text
             judge_score: float | None = None
             try:
                 async with judge_semaphore:
@@ -315,14 +324,15 @@ async def run_eval_experiment(
             except Exception as e:
                 logger.debug(f"LLM judge 失败 case={case.case_id}: {e}")
 
-            # 综合判断是否通过
-            case_ok = resp.status_code == 200 and tool_match is not False
+            case_ok = rule_result.ok
 
             async with lock:
                 total += 1
                 completed += 1
                 if tool_match is not None:
                     tool_matches.append(tool_match)
+                if route_match is not None:
+                    route_matches.append(route_match)
                 if judge_score is not None:
                     quality_scores.append(judge_score)
                 if case_ok:
@@ -332,7 +342,7 @@ async def run_eval_experiment(
                         FailedItem(
                             case_id=case.case_id,
                             fail_reason=fail_reason,
-                            response_preview=response_text[:160],
+                            response_preview=rule_result.response_preview,
                         )
                     )
                 current = completed
@@ -347,9 +357,14 @@ async def run_eval_experiment(
     tool_match_rate = (
         sum(1 for m in tool_matches if m) / len(tool_matches) if tool_matches else 0.0
     )
+    route_match_rate = (
+        sum(1 for m in route_matches if m) / len(route_matches) if route_matches else None
+    )
     avg_quality = sum(quality_scores) / len(quality_scores) if quality_scores else None
 
     msg = f"评测完成: {total} 条, 通过 {passed}, 工具匹配率 {tool_match_rate:.1%}"
+    if route_match_rate is not None:
+        msg += f", 路由命中率 {route_match_rate:.1%}"
     if avg_quality is not None:
         msg += f", 平均质量 {avg_quality:.2f}"
     logger.info(msg)
@@ -359,6 +374,7 @@ async def run_eval_experiment(
         total=total,
         passed=passed,
         tool_match_rate=tool_match_rate,
+        route_match_rate=route_match_rate,
         avg_response_quality=avg_quality,
         failed=failed_items,
     )
