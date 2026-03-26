@@ -109,3 +109,225 @@
       - 报销单
     response_must_not_include: []
     business_assertions: []
+- meta:
+    case_id: FIN-SMOKE-002
+    title: 员工查询个税
+    layer: agent
+    domain: finance
+    scenario_type: smoke
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 帮我看下我上个月的个税扣了多少
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - fin_get_my_tax
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 个税
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-SMOKE-003
+    title: 员工查询部门预算
+    layer: agent
+    domain: finance
+    scenario_type: smoke
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 我们部门今年预算还剩多少
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - fin_get_department_budget
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 预算
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-CORE-002
+    title: 财务主管查看预算概览
+    layer: agent
+    domain: finance
+    scenario_type: core
+    priority: p0
+  auth_profile: finance_manager
+  input:
+    user_input: 给我看一下整体预算概览
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - fin_mgr_get_budget_overview
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 预算
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-CORE-003
+    title: 财务主管查看预算预警
+    layer: agent
+    domain: finance
+    scenario_type: core
+    priority: p0
+  auth_profile: finance_manager
+  input:
+    user_input: 有没有超预算的部门，看下预算预警
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - fin_mgr_get_budget_alert
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 预警
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-WF-002
+    title: 财务主管查费用后看预警
+    layer: agent
+    domain: finance
+    scenario_type: workflow
+    priority: p0
+  auth_profile: finance_manager
+  input:
+    user_input: 先看下各部门费用明细，再查有没有预算预警
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - fin_mgr_get_expense_detail
+      - fin_mgr_get_budget_alert
+    expected_tool_mode: ordered
+    forbidden_tools: []
+    response_must_include:
+      - 费用
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-WF-003
+    title: 财务人员查应付后开票
+    layer: agent
+    domain: finance
+    scenario_type: workflow
+    priority: p0
+  auth_profile: finance_manager
+  input:
+    user_input: 先查下应付账款，再帮我处理一张开票申请
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools:
+      - fin_admin_get_payables
+      - fin_admin_process_invoice_request
+    expected_tool_mode: ordered
+    forbidden_tools: []
+    response_must_include:
+      - 开票
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-FORBIDDEN-002
+    title: 普通员工不得查看管理预算
+    layer: agent
+    domain: finance
+    scenario_type: forbidden
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 帮我看下全公司的预算概览和费用明细
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools:
+      - fin_mgr_get_budget_overview
+      - fin_mgr_get_expense_detail
+    response_must_include:
+      - 权限
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-FORBIDDEN-003
+    title: 普通主管不得使用财务管理工具
+    layer: agent
+    domain: finance
+    scenario_type: forbidden
+    priority: p0
+  auth_profile: manager
+  input:
+    user_input: 帮我查下全公司报销汇总和费用分析
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools:
+      - fin_admin_get_all_reimbursements
+      - fin_admin_get_expense_summary
+    response_must_include:
+      - 权限
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-EDGE-002
+    title: 个税查询月份模糊
+    layer: agent
+    domain: finance
+    scenario_type: edge
+    priority: p1
+  auth_profile: employee
+  input:
+    user_input: 我上个月扣了多少税
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 税
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: FIN-EDGE-003
+    title: 报销发票知识库问答
+    layer: agent
+    domain: finance
+    scenario_type: edge
+    priority: p1
+  auth_profile: employee
+  input:
+    user_input: 报销需要哪些发票
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 发票
+    response_must_not_include: []
+    business_assertions: []

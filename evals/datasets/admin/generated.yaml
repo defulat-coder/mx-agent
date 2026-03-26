@@ -1,0 +1,457 @@
+- meta:
+    case_id: ADM-CORE-001
+    title: 员工查看我的会议预订
+    layer: agent
+    domain: admin
+    scenario_type: core
+    priority: p0
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 查一下我已经预订的会议室
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+    - adm_get_my_bookings
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+    - 预订
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-CORE-002
+    title: 员工取消会议室预订
+    layer: agent
+    domain: admin
+    scenario_type: core
+    priority: p0
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 帮我取消明天下午的会议室预订
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+    - adm_cancel_booking
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+    - 取消
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-CORE-003
+    title: 员工申请差旅
+    layer: agent
+    domain: admin
+    scenario_type: core
+    priority: p0
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 我要出差去北京，4月1日到4月3日，帮我提交差旅申请
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+    - adm_apply_travel
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+    - 差旅
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-EDGE-001
+    title: 会议室预订信息不足需追问
+    layer: agent
+    domain: admin
+    scenario_type: edge
+    priority: p1
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 帮我订一个会议室
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+    - 会议室
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-EDGE-002
+    title: 快递信息不足需追问
+    layer: agent
+    domain: admin
+    scenario_type: edge
+    priority: p1
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 帮我寄个快递
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+    - 快递
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-EDGE-003
+    title: 出差报销标准知识库问答
+    layer: agent
+    domain: admin
+    scenario_type: edge
+    priority: p1
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 出差报销标准是多少
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+    - 标准
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-FORBIDDEN-001
+    title: 普通员工不得查看全部访客
+    layer: agent
+    domain: admin
+    scenario_type: forbidden
+    priority: p0
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 查看所有访客预约并帮我释放会议室
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools:
+    - adm_admin_get_visitors
+    - adm_admin_release_room
+    response_must_include:
+    - 权限
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-FORBIDDEN-002
+    title: 普通员工不得查看全部预订和统计
+    layer: agent
+    domain: admin
+    scenario_type: forbidden
+    priority: p0
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 帮我看下全公司的会议室使用情况和预订记录
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools:
+    - adm_admin_get_all_bookings
+    - adm_admin_usage_stats
+    response_must_include:
+    - 权限
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-FORBIDDEN-003
+    title: 普通员工不得行政审批
+    layer: agent
+    domain: admin
+    scenario_type: forbidden
+    priority: p0
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 帮我登记一个快递并审批办公用品申请
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools:
+    - adm_admin_register_express
+    - adm_admin_approve_supply
+    response_must_include:
+    - 权限
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-SMOKE-001
+    title: 员工查看可用会议室
+    layer: agent
+    domain: admin
+    scenario_type: smoke
+    priority: p0
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 看一下现在有哪些可用会议室
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+    - adm_get_available_rooms
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+    - 会议室
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-SMOKE-002
+    title: 员工查看我的快递
+    layer: agent
+    domain: admin
+    scenario_type: smoke
+    priority: p0
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 看一下我有没有快递到了
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+    - adm_get_my_express
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+    - 快递
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-SMOKE-003
+    title: 员工查看我的访客
+    layer: agent
+    domain: admin
+    scenario_type: smoke
+    priority: p0
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 我预约的访客什么时候来
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+    - adm_get_my_visitors
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+    - 访客
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-WF-001
+    title: 行政人员先查再预订会议室
+    layer: agent
+    domain: admin
+    scenario_type: workflow
+    priority: p0
+  auth:
+    employee_id: 6
+    roles:
+    - admin_staff
+    department_id: 4
+    persona_label: admin_staff
+  input:
+    user_input: 先查可用会议室，再帮我订下午的那个
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+    - adm_get_available_rooms
+    - adm_book_room
+    expected_tool_mode: ordered
+    forbidden_tools: []
+    response_must_include:
+    - 订
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-WF-002
+    title: 员工订会议室并登记访客
+    layer: agent
+    domain: admin
+    scenario_type: workflow
+    priority: p0
+  auth:
+    employee_id: 1
+    roles: []
+    department_id: 7
+    persona_label: employee
+  input:
+    user_input: 先查可用会议室，然后订一个，再帮我登记一位访客
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+    - adm_get_available_rooms
+    - adm_book_room
+    - adm_book_visitor
+    expected_tool_mode: ordered
+    forbidden_tools: []
+    response_must_include:
+    - 会议室
+    - 访客
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''
+- meta:
+    case_id: ADM-WF-003
+    title: 行政人员查办公用品申请并审批
+    layer: agent
+    domain: admin
+    scenario_type: workflow
+    priority: p0
+  auth:
+    employee_id: 6
+    roles:
+    - admin_staff
+    department_id: 4
+    persona_label: admin_staff
+  input:
+    user_input: 先查待审批的办公用品申请，再通过一单
+  expectation:
+    expected_agents:
+    - admin-assistant
+    expected_agent_mode: all
+    expected_tools:
+    - adm_admin_get_supply_requests
+    - adm_admin_approve_supply
+    expected_tool_mode: ordered
+    forbidden_tools: []
+    response_must_include:
+    - 审批
+    response_must_not_include: []
+    business_assertions: []
+  seed:
+    depends_on_entities: []
+    seed_version: current
+    notes: ''

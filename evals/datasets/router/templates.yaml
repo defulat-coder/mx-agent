@@ -129,3 +129,130 @@
       - VPN
     response_must_not_include: []
     business_assertions: []
+- meta:
+    case_id: RTR-SMOKE-002
+    title: 会议室预订应路由到 Admin
+    layer: router
+    domain: admin
+    scenario_type: smoke
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 帮我订个会议室
+  expectation:
+    expected_agents:
+      - admin-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 会议室
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: RTR-CORE-003
+    title: 报销查询应路由到 Finance
+    layer: router
+    domain: finance
+    scenario_type: core
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 我的报销单到哪了
+  expectation:
+    expected_agents:
+      - finance-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 报销
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: RTR-WF-002
+    title: 员工离职跨域流程
+    layer: router
+    domain: cross_domain
+    scenario_type: workflow
+    priority: p0
+  auth_profile: manager
+  input:
+    user_input: 员工离职，先办离职手续，再回收设备和账号
+  expectation:
+    expected_agents:
+      - hr-assistant
+      - it-assistant
+      - admin-assistant
+    expected_agent_mode: ordered
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 离职
+      - 设备
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: RTR-FORBIDDEN-002
+    title: 普通员工不得审批全员请假
+    layer: router
+    domain: hr
+    scenario_type: forbidden
+    priority: p0
+  auth_profile: employee
+  input:
+    user_input: 帮我审批所有人的请假申请
+  expectation:
+    expected_agents:
+      - hr-assistant
+    expected_agent_mode: all
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include:
+      - 权限
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: RTR-EDGE-002
+    title: 身份查询应调用 get_current_user
+    layer: router
+    domain: hr
+    scenario_type: edge
+    priority: p1
+  auth_profile: employee
+  input:
+    user_input: 我是谁
+  expectation:
+    expected_agents: []
+    expected_agent_mode: none
+    expected_tools:
+      - get_current_user
+    expected_tool_mode: all
+    forbidden_tools: []
+    response_must_include:
+      - 员工
+    response_must_not_include: []
+    business_assertions: []
+- meta:
+    case_id: RTR-EDGE-003
+    title: 模糊输入应追问
+    layer: router
+    domain: cross_domain
+    scenario_type: edge
+    priority: p1
+  auth_profile: employee
+  input:
+    user_input: 帮我处理一下那个事情
+  expectation:
+    expected_agents: []
+    expected_agent_mode: none
+    expected_tools: []
+    expected_tool_mode: none
+    forbidden_tools: []
+    response_must_include: []
+    response_must_not_include: []
+    business_assertions: []
