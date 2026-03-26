@@ -254,7 +254,7 @@ async def run_eval_experiment(
                 try:
                     await asyncio.wait_for(
                         asyncio.to_thread(
-                            client.create_dataset_run_item,
+                            client.api.dataset_run_items.create,
                             run_name=actual_run_name,
                             dataset_item_id=item.id,
                             trace_id=trace_id,
@@ -274,7 +274,7 @@ async def run_eval_experiment(
                 try:
                     await asyncio.wait_for(
                         asyncio.to_thread(
-                            client.score,
+                            client.create_score,
                             trace_id=trace_id,
                             name="tool_match",
                             value=1.0 if tool_match else 0.0,
@@ -289,7 +289,7 @@ async def run_eval_experiment(
                 try:
                     await asyncio.wait_for(
                         asyncio.to_thread(
-                            client.score,
+                            client.create_score,
                             trace_id=trace_id,
                             name="route_match",
                             value=1.0 if route_match else 0.0,
@@ -316,7 +316,7 @@ async def run_eval_experiment(
                         try:
                             await asyncio.wait_for(
                                 asyncio.to_thread(
-                                    client.score,
+                                    client.create_score,
                                     trace_id=trace_id,
                                     name="response_quality",
                                     value=judge_result.score,

@@ -1,11 +1,13 @@
-"""HTTP 中间件 — 请求日志 & request_id 生成/透传。"""
+"""HTTP 中间件 — 请求日志 & request_id 生成/透传 & trace_id 注入。"""
 
 import time
 import uuid
+from typing import Any
 
 from fastapi import Request, Response
 from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from app.core.context import set_request_id
 
@@ -48,3 +50,45 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             duration=duration_ms,
         )
         return response
+
+
+class TraceIDMiddleware:
+    """纯 ASGI 中间件 — 创建请求级 OTel span 并注入 X-Trace-Id 响应头。
+
+    在请求开始时创建一个父 span，所有 Agent 内部 span 自动成为其子 span，
+    共享同一个 trace_id。这样评测系统可以通过 X-Trace-Id 将 score 关联到 Langfuse trace。
+    """
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        try:
+            from opentelemetry import trace as otel_trace
+
+            tracer = otel_trace.get_tracer("mx-agent.http")
+        except ImportError:
+            await self.app(scope, receive, send)
+            return
+
+        method = scope.get("method", "UNKNOWN")
+        path = scope.get("path", "/")
+
+        with tracer.start_as_current_span(f"{method} {path}") as span:
+            ctx = span.get_span_context()
+            trace_id_hex = ""
+            if ctx and ctx.trace_id != otel_trace.INVALID_TRACE_ID:
+                trace_id_hex = otel_trace.format_trace_id(ctx.trace_id)
+
+            async def send_wrapper(message: Message) -> None:
+                if message["type"] == "http.response.start" and trace_id_hex:
+                    headers: list[tuple[bytes, bytes]] = list(message.get("headers", []))
+                    headers.append((b"x-trace-id", trace_id_hex.encode()))
+                    message["headers"] = headers
+                await send(message)
+
+            await self.app(scope, receive, send_wrapper)

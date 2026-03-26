@@ -25,7 +25,7 @@ from app.core.exceptions import (
     validation_exception_handler,
 )
 from app.core.logging import setup_logging
-from app.core.middleware import RequestIDMiddleware, RequestLoggingMiddleware
+from app.core.middleware import RequestIDMiddleware, RequestLoggingMiddleware, TraceIDMiddleware
 from app.api.v1.router import v1_router
 
 
@@ -129,6 +129,11 @@ async def cors_middleware(request: Request, call_next):
         response.headers["access-control-max-age"] = "600"
 
     return response
+
+
+# TraceIDMiddleware：最外层，创建请求级 OTel span 并注入 X-Trace-Id 响应头
+# 必须在所有其他中间件之后 add（Starlette 中后 add 的中间件在最外层）
+app.add_middleware(TraceIDMiddleware)
 
 
 if __name__ == "__main__":
