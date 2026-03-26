@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from app.core.logging import logger
-from app.core.tracing import get_langfuse_client
+from app.core.tracing import flush_traces, get_langfuse_client
 from app.evals.executor import HttpEvalRequester, HttpEvalResponse, analyze_response, score_case
 from app.evals.judge import JudgeResult
 from app.evals.runner import (
@@ -243,6 +243,12 @@ async def run_eval_experiment(
                 logger.warning(f"[{idx + 1}/{len(items)}] 失败: {case.case_id} - {fail_reason}")
                 return
 
+            if client and not trace_id:
+                logger.warning(
+                    f"[{idx + 1}/{len(items)}] trace_id 缺失: {case.case_id} — "
+                    "Langfuse 评分上报将跳过（请确认 Agent 响应包含 X-Trace-Id 头或 trace_id 字段）"
+                )
+
             # 关联 trace 到当前 run
             if client and trace_id:
                 try:
@@ -361,6 +367,14 @@ async def run_eval_experiment(
         sum(1 for m in route_matches if m) / len(route_matches) if route_matches else None
     )
     avg_quality = sum(quality_scores) / len(quality_scores) if quality_scores else None
+
+    # 刷新 Langfuse 缓冲区，确保所有 score / run-item 发送到服务端
+    if client:
+        try:
+            await asyncio.to_thread(flush_traces)
+            logger.info("Langfuse 缓冲区已刷新")
+        except Exception as e:
+            logger.warning(f"刷新 Langfuse 缓冲区失败: {e}")
 
     msg = f"评测完成: {total} 条, 通过 {passed}, 工具匹配率 {tool_match_rate:.1%}"
     if route_match_rate is not None:

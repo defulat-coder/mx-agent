@@ -10,7 +10,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.config import settings
-from app.core.tracing import setup_tracing
+from app.core.tracing import flush_traces, setup_tracing
 from app.evals.auth import make_auth_token_resolver
 from app.evals.executor import HttpEvalRequester
 from app.evals.judge import llm_judge
@@ -111,6 +111,7 @@ async def main_async(args: argparse.Namespace) -> None:
         )
     finally:
         await requester.close()
+        flush_traces()
 
     print(f"run_name:      {summary.run_name}")
     print(f"总用例数:      {summary.total}")

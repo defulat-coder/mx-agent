@@ -36,6 +36,7 @@ def run(*, dataset_prefix: str, dry_run: bool) -> None:
         sys.exit(1)
 
     published_counts = publish_eval_datasets(client, datasets, dataset_prefix=dataset_prefix)
+    client.flush()
     for domain, published in sorted(published_counts.items()):
         print(f"{build_dataset_name(domain, dataset_prefix)}: {published}")
 

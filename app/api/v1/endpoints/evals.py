@@ -11,7 +11,7 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel, Field, field_validator
 
 from app.config import settings
-from app.core.tracing import setup_tracing
+from app.core.tracing import flush_traces, setup_tracing
 from app.evals.auth import make_auth_token_resolver
 from app.evals.executor import HttpEvalRequester
 from app.evals.judge import llm_judge
@@ -111,6 +111,7 @@ async def _run_background(run_name: str, req: EvalRunRequest) -> None:
     finally:
         if requester is not None:
             await requester.close()
+        flush_traces()
 
 
 @router.post("/runs", response_model=EvalRunStarted, status_code=202)
