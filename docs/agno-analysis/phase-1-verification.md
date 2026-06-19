@@ -875,3 +875,79 @@ Local screenshots:
 Target reference screenshots:
 
 - `docs/agno-analysis/next-reference-screenshots/metrics-reference.png`
+
+## Studio Builder Interaction Iteration
+
+Chrome/CDP interaction analysis added a deeper Studio builder pass for:
+
+`https://os.agno.com/try-demo/studio/agents`
+
+Observed Agno behavior:
+
+- `NEW AGENT` navigates to `/try-demo/studio/agents/create` and renders a full
+  builder page with `Agents` breadcrumb text and `New Agent` title.
+- Basics contains Agent Name, Model, Instructions optional, Tools optional, and
+  Database optional. Demo OS fixes the database to `demo-os-db`.
+- Model opens a listbox with Anthropic, Google, and OpenAI options including
+  `gpt-5.5 (OpenAI)`.
+- Tools opens a checkbox listbox named `Suggestions`; selecting `calculator`
+  updates the selector and the right-side Tools summary.
+- Context Management, Session State, Knowledge, Memory, and Advanced are
+  accordion sections that can remain expanded together.
+- Context Management exposes Number of History Runs, Session Summary Manager,
+  and three switches.
+- Session State and Advanced include JSON textareas plus disabled `Format`
+  actions.
+- Knowledge and Memory include selectors plus switch rows. Memory includes an
+  `OR` separator between agentic memory and run-update controls.
+- The right-side summary stays on Basics and updates name, instructions, tools,
+  and database as the form changes.
+- `PUBLISH` becomes enabled after a name is entered, even before a model is
+  selected.
+
+Local implementation now mirrors this state:
+
+- `/studio/agents` list and New Agent builder remain under the production
+  standalone build.
+- Builder includes the observed section fields, switches, disabled Format
+  buttons, Demo OS database label, multi-select tool popover, live Basics
+  summary, Reset, Save Draft, and Publish/Published states.
+
+Local Chrome assertions passed for:
+
+- `/studio/agents` opens the New Agent builder.
+- Filling `Router Agent` and instructions updates the right-side summary.
+- Opening Tools exposes the listbox and selecting `calculator` updates the
+  selector and summary.
+- Opening Context Management exposes switches and `Add History to Context`
+  toggles on.
+- Opening Advanced exposes Agent ID, Metadata, Format, and Config JSON controls.
+- Publish is enabled after the agent name is entered.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/studio-builder-list-local.png`
+- `docs/agno-analysis/local-screenshots/studio-builder-basics-local.png`
+- `docs/agno-analysis/local-screenshots/studio-builder-tool-selected-local.png`
+- `docs/agno-analysis/local-screenshots/studio-builder-context-local.png`
+- `docs/agno-analysis/local-screenshots/studio-builder-context-toggled-local.png`
+- `docs/agno-analysis/local-screenshots/studio-builder-advanced-local.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/studio-agents-list-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/studio-builder-basics-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/studio-builder-tools-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/studio-builder-tool-selected-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/studio-builder-context-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/studio-builder-session-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/studio-builder-knowledge-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/studio-builder-memory-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/studio-builder-advanced-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/studio-builder-publish-ready-reference.png`
+
+2026-06-19 Studio builder follow-up verification:
+
+- `pnpm lint`: passed.
+- `pnpm build`: passed.
+- Production preview used `HOSTNAME=0.0.0.0 PORT=3003 node .next/standalone/server.js`.

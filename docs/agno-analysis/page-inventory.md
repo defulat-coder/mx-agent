@@ -16,6 +16,10 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 | Sessions | `https://os.agno.com/try-demo/sessions?sort_by=updated_at_desc&type=all&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/sessions.png` |
 | Traces | `https://os.agno.com/try-demo/traces?group_by=sessions&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/traces.png` |
 | Studio | `https://os.agno.com/try-demo/studio/agents` | `docs/agno-analysis/next-reference-screenshots/studio-list-reference.png` |
+| Studio builder basics | `https://os.agno.com/try-demo/studio/agents/create` | `docs/agno-analysis/next-reference-screenshots/studio-builder-basics-reference.png` |
+| Studio builder tools | `https://os.agno.com/try-demo/studio/agents/create` | `docs/agno-analysis/next-reference-screenshots/studio-builder-tools-reference.png` |
+| Studio builder context | `https://os.agno.com/try-demo/studio/agents/create` | `docs/agno-analysis/next-reference-screenshots/studio-builder-context-reference.png` |
+| Studio builder advanced | `https://os.agno.com/try-demo/studio/agents/create` | `docs/agno-analysis/next-reference-screenshots/studio-builder-advanced-reference.png` |
 | Learning User Memories | `https://os.agno.com/learning/user_memory?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/next-reference-screenshots/learning-user-memory-reference.png` |
 | Learning User Profiles | `https://os.agno.com/learning/user_profile?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/next-reference-screenshots/learning-user-profile-reference.png` |
 | Learning Entity Memories | `https://os.agno.com/learning/entity_memory?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/next-reference-screenshots/learning-entity-memory-reference.png` |
@@ -74,16 +78,36 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   `New Agent` and the top breadcrumb/action reads `Agents`.
 - Builder form fields: Agent Name, Model select, Instructions optional, Tools
   optional selector, and Database optional selector. Demo OS auto-selects the
-  database.
-- Builder sections: Basics, Context Management, Session State, Knowledge,
-  Memory, and Advanced.
-- Right side shows a live configuration summary headed by `Name of agent` and a
-  section summary such as Basics.
-- Footer actions are `RESET`, `SAVE DRAFT`, and `PUBLISH`; Publish is disabled
-  until required data is present.
-- Local implementation now adds `/studio/agents`, sidebar Studio sub-navigation,
-  agent cards, New Agent/Edit builder states, form preview, draft save state,
-  and disabled Publish parity.
+  database as `demo-os-db`.
+- Model selector opens a listbox with Anthropic, Google, and OpenAI options such
+  as `claude-haiku-4-5-20251001 (Anthropic)`, `gemini-3.1-pro-preview
+  (Google)`, and `gpt-5.5 (OpenAI)`.
+- Tools opens a popover listbox named `Suggestions` with checkbox options. The
+  observed options include repeated `MCPTools` rows plus concrete tools such as
+  `add_task`, `agenda`, `arxiv_tools`, `book_flight`, `calculator`,
+  `charge_payment`, and `check_formulary`. Selecting `calculator` updates both
+  the selector and the right-side Tools summary.
+- Builder sections are accordion rows and can remain expanded at the same time:
+  Basics, Context Management, Session State, Knowledge, Memory, and Advanced.
+- Context Management fields: Number of History Runs, Session Summary Manager,
+  Add History to Context, Enable Session Summaries, and Add Session Summary to
+  Context.
+- Session State fields: Session State JSON editor with disabled Format action,
+  Add Session State to Context, and Enable Agentic State.
+- Knowledge fields: Knowledge selector, Add Knowledge to Context, and Search
+  Knowledge.
+- Memory fields: Memory Manager selector, Enable Agentic Memory, an `OR`
+  separator, Update Memory on Run, and Add Memories to Context.
+- Advanced fields: Agent ID, Metadata JSON editor with disabled Format action,
+  and Config JSON with placeholder example.
+- Right side shows a live Basics summary headed by `Name of agent` until a name
+  is entered, then by the agent name. The summary remains Basics while other
+  sections are expanded.
+- Footer actions are `RESET`, `SAVE DRAFT`, and `PUBLISH`; Publish becomes
+  enabled after the agent name is entered even when the model is still empty.
+- Local implementation now mirrors the observed `/studio/agents` list, builder
+  accordion sections, tool multi-select popover, section fields/switches, live
+  Basics summary, reset/draft/publish button states, and Demo OS database label.
 
 ### Learning
 
