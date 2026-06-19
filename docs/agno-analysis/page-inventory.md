@@ -61,9 +61,25 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 
 ### Traces
 
-- Default demo detail view includes trace metadata, trace tree, input, output, spans, and timing.
-- List/table mode uses columns: Name, Status, Duration, Spans, Agent/Team/Workflow, Input, Created At.
-- Interaction pattern: grouped-by sessions query param, trace tree expansion, span detail selection.
+- Public demo state can show a `No traces logged` overlay while preserving a
+  blurred trace-detail surface behind it.
+- Authenticated/account state can show an inactive-AgentOS overlay over the
+  traces table when the connected AgentOS is unreachable.
+- List/table mode uses columns: Name, Trace ID, Status, Duration, Spans,
+  Agent ID, Input, Created At.
+- Detail mode includes trace metadata, trace tree, selected span summary,
+  Info/Metadata segment, Input Text/Formatted segment, Output Text/Formatted
+  segment, copy action, and an All Traces back action.
+- Interaction pattern: grouped-by sessions query param, trace row selection,
+  trace tree span selection, and segmented content switching.
+- Interaction pass on 2026-06-19:
+  - `https://os.agno.com/try-demo/traces?group_by=sessions&page=1&limit=25`
+    exposes the demo empty-state overlay plus underlying tree/detail layout.
+  - `https://os.agno.com/traces?group_by=sessions&page=1&limit=25` exposes
+    account trace rows and an AgentOS-not-active overlay when the OS endpoint is
+    down.
+  - Local implementation keeps the list operational, uses the observed trace
+    columns, and opens a functional trace detail explorer on row click.
 
 ### Memory
 

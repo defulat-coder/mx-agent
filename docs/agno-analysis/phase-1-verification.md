@@ -139,3 +139,38 @@ Target reference screenshots:
 - `docs/agno-analysis/next-reference-screenshots/settings-os-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/settings-roles-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/settings-billing-reference.png`
+
+## Traces Explorer Iteration
+
+Chrome/CDP interaction analysis added a Traces verification pass:
+
+- Public demo reference shows `No traces logged` over a blurred trace tree and
+  span detail workspace.
+- Authenticated reference shows a trace table with Name, Trace ID, Status,
+  Duration, Spans, Agent ID, Input, and Created At, plus an AgentOS-not-active
+  overlay when the connected OS is down.
+- Local `/traces` now renders the observed table columns, a Group by sessions
+  filter, Export command, OK/Error status badges, and row click navigation into
+  a trace detail explorer.
+- Local trace detail includes metadata, Trace Tree, selected span summary,
+  Info/Metadata segmented control, Input Text/Formatted segmented control,
+  Output Text/Formatted segmented control, copy action, and All Traces back
+  action.
+
+Local Chrome assertions passed for:
+
+- `/traces` list includes Trace ID, Agent ID, group-by filter, and local trace
+  rows.
+- Clicking the first trace row opens detail mode.
+- Detail mode includes Trace Tree, Metadata, Input, Output, and All Traces.
+- The app shell breadcrumb includes `MX AgentOS / Traces`.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/traces-list.png`
+- `docs/agno-analysis/local-screenshots/traces-detail.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/traces-list-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/traces-authenticated-reference.png`

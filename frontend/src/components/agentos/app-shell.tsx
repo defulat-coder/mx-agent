@@ -76,6 +76,7 @@ export function AppShell({
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
   const settingsLabel = settingsSubNav.find(([, href]) => pathname === href)?.[0];
+  const pageLabel = !settingsLabel && pathname !== "/" ? navigation.find((item) => isActive(item.href))?.label : null;
 
   return (
     <div className="min-h-svh bg-[#f4f4f5] text-neutral-950">
@@ -167,6 +168,12 @@ export function AppShell({
                 </span>
                 <span className="text-sm font-medium">{workspaceName}</span>
                 <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.16)]" />
+                {pageLabel ? (
+                  <>
+                    <span className="text-neutral-300">/</span>
+                    <span className="text-sm">{pageLabel}</span>
+                  </>
+                ) : null}
                 {settingsLabel ? (
                   <>
                     <span className="text-neutral-300">/</span>
