@@ -41,6 +41,14 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Empty state: entity selector, See Config, Sessions, New Session, starter prompt suggestions.
 - Active session state: centered conversation column, assistant step accordion, markdown response, copy action, bottom sticky composer.
 - Composer: textarea, attachment/settings icon buttons, entity selector, send button. Disabled when no runnable entity or OS inactive.
+- Interaction pass on 2026-06-19:
+  - Breadcrumb type selector opens a compact popover with `Agents`, `Teams`, `Workflows`.
+  - Breadcrumb entity selector opens a 200px popover with runnable entity names such as `Sage`, `Voyager`, `Ledger`.
+  - `SEE CONFIG` opens a right-side inspector around 500px wide; the chat canvas shrinks left rather than opening a modal.
+  - The configuration inspector title is `{Entity}'s Configuration` and uses accordion rows: Agent Details, Model, Database, Tools, Sessions, Default Tools, System Message.
+  - When any inspector is open, text controls collapse to icon buttons for config/session history plus `NEW SESSION`.
+  - `SESSIONS` opens the same right-side inspector area with `Sessions`, close control, and an empty state: `No session found` plus `No session records yet. Start a conversation to create one.`
+  - Starter prompt pills fill the composer, while `NEW SESSION` resets the conversation state.
 
 ### Sessions
 

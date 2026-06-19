@@ -52,3 +52,25 @@ Chrome verified `/chat` on the production build:
 - Verified the composer placeholder changes to `Ask a follow-up...`.
 
 Screenshot: `docs/agno-analysis/local-screenshots/chat-interaction.png`.
+
+## Chat Inspector Iteration
+
+Chrome/CDP interaction analysis added a second local verification pass for Chat:
+
+- Entity type popover: `Agents`, `Teams`, `Workflows`.
+- Entity selector popover: local runnable entities from the selected type.
+- Config inspector: right-side panel with Agent Details, Model, Database, Tools, Sessions, Default Tools, and System Message accordions.
+- Sessions inspector: right-side panel with `No session found` empty state.
+- Prompt pill interaction: clicking `Tell me about Learning Machines` fills the composer.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/chat-entity-menu.png`
+- `docs/agno-analysis/local-screenshots/chat-config-panel.png`
+- `docs/agno-analysis/local-screenshots/chat-sessions-panel.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/chat-shell-state.png`
+- `docs/agno-analysis/next-reference-screenshots/chat-config-panel.png`
+- `docs/agno-analysis/next-reference-screenshots/chat-sessions-panel.png`
