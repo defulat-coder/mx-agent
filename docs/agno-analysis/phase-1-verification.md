@@ -997,6 +997,16 @@ repeatable measurement path for subsequent page-by-page iterations.
 - Removed the gray fill from the right-side Basics summary area.
 - Rebuilt the standalone preview and recaptured
   `docs/agno-analysis/local-screenshots/studio-builder-advanced-local.png`.
-- `pnpm visual:diff` now reports `studio-builder-advanced` at different ratio
-  `0.082532` against max `0.08`; this is still a tracked visual failure, not a
-  completed 1:1 match.
+- First reduction pass brought `studio-builder-advanced` from `0.134473` to
+  `0.082532`, still above the `0.08` threshold.
+
+2026-06-19 Studio visual diff pass:
+
+- Changed Studio builder sections from bordered cards to Agno-style left-rail
+  accordion sections.
+- Recaptured `docs/agno-analysis/local-screenshots/studio-builder-advanced-local.png`
+  from the standalone build.
+- `pnpm visual:diff` now reports `2/2 passed`.
+- `studio-builder-advanced`: passed, different ratio `0.079296` against max
+  `0.08`.
+- `settings-os-shell`: passed, different ratio `0.065668` against max `0.12`.

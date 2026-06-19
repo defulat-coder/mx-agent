@@ -509,15 +509,15 @@ function BuilderSection({
   title: string;
 }) {
   return (
-    <section className={cn("rounded-lg border border-neutral-200 bg-white", active && "bg-neutral-50")}>
-      <button className="flex w-full items-center justify-between px-4 py-4 text-left" onClick={onOpen} type="button">
+    <section className={cn("border-l border-neutral-200 bg-white pl-4", active && "border-neutral-300")}>
+      <button className="flex w-full items-center justify-between py-4 pr-4 text-left" onClick={onOpen} type="button">
         <span>
           <span className="block text-sm font-semibold">{title}</span>
           <span className="mt-1 block text-xs text-neutral-500">{description}</span>
         </span>
         <ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")} />
       </button>
-      {open ? <div className="space-y-5 border-t border-neutral-100 px-4 py-5">{children}</div> : null}
+      {open ? <div className="space-y-5 pr-4 pb-5">{children}</div> : null}
     </section>
   );
 }

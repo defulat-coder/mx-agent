@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T08:36:39.436Z",
+  "generatedAt": "2026-06-19T08:41:05.239Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -10,13 +10,13 @@
   ],
   "totals": {
     "pairs": 2,
-    "passed": 1,
-    "failed": 1
+    "passed": 2,
+    "failed": 0
   },
   "results": [
     {
       "name": "studio-builder-advanced",
-      "status": "fail",
+      "status": "pass",
       "viewport": "desktop",
       "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-advanced-reference.png",
       "local": "docs/agno-analysis/local-screenshots/studio-builder-advanced-local.png",
@@ -31,11 +31,11 @@
         "maxDifferentRatio": 0.08
       },
       "metrics": {
-        "differentPixels": 96337,
+        "differentPixels": 92559,
         "totalPixels": 1167264,
-        "differentRatio": 0.082532,
-        "meanAbsDelta": 23.093,
-        "rmseDelta": 90.471
+        "differentRatio": 0.079296,
+        "meanAbsDelta": 19.372,
+        "rmseDelta": 80.822
       },
       "sizeMismatch": false
     },
