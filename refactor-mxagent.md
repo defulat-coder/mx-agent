@@ -123,3 +123,40 @@ Autoreview:
   facade request, auth claims adapter, and router team call.
 - The auth module still intentionally covers only product API auth needs; it
   does not replace AgentOS middleware validation for built-in AgentOS routes.
+
+### Step 3 - Split HR employee self-service queries
+
+Status: completed
+
+Architecture change:
+
+- Converted `app.services.hr` from one large module into a package while keeping
+  the public import path `from app.services import hr as hr_service` unchanged.
+- Moved employee self-service query functions into
+  `app.services.hr.employee`:
+  - `get_employee_info`
+  - `get_salary_records`
+  - `get_social_insurance`
+  - `get_attendance`
+  - `get_leave_balance`
+  - `get_leave_requests`
+  - `get_overtime_records`
+- Re-exported those functions from `app.services.hr` so existing HR tools remain
+  untouched.
+
+Verification:
+
+- Import compatibility check: `from app.services import hr as hr_service` and
+  required function presence -> passed.
+- Focused tests: `uv run pytest tests/test_auth.py tests/test_api.py`
+  -> 13 passed.
+- Full backend suite: `uv run pytest` -> 103 passed.
+- Live HTTP check on port 8001:
+  - `GET /health` -> 200.
+  - `POST /v1/chat` without token -> 401 with `code=40101`.
+
+Autoreview:
+
+- This is a pure structure split; no query logic or tool call sites changed.
+- `app.services.hr.__init__` remains large, but the package structure now gives
+  the next HR slices a stable place to move into without changing callers.
