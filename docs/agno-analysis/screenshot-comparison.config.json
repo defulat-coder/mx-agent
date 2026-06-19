@@ -131,6 +131,27 @@
       "maxDifferentRatio": 0.14
     },
     {
+      "name": "studio-builder-knowledge",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-knowledge-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-builder-knowledge-local.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.14
+    },
+    {
+      "name": "studio-builder-memory",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-memory-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-builder-memory-local.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.14
+    },
+    {
+      "name": "studio-builder-publish-ready",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-publish-ready-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-builder-publish-ready-local.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.14
+    },
+    {
       "name": "sessions-view-menu",
       "reference": "docs/agno-analysis/next-reference-screenshots/sessions-filter-reference.png",
       "local": "docs/agno-analysis/local-screenshots/sessions-filter-current-772.png",

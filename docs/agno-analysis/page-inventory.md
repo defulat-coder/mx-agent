@@ -115,7 +115,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   Basics summary, reset/draft/publish button states, and Demo OS database label.
 - Studio is now covered by desktop screenshot diff gates for the agents list,
   new-agent entry surface, Advanced builder state, selected-tool state,
-  Context Management expansion, and Session State expansion.
+  Context Management expansion, Session State expansion, Knowledge expansion,
+  Memory expansion, and publish-ready Basics state.
 
 ### Learning
 

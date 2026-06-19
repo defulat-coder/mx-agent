@@ -1,10 +1,10 @@
 # Visual Diff Report
 
-Generated: 2026-06-19T13:28:42.964Z
+Generated: 2026-06-19T13:37:16.110Z
 
 Config: `docs/agno-analysis/screenshot-comparison.config.json`
 
-Totals: 45/45 passed, 0 failed.
+Totals: 48/48 passed, 0 failed.
 
 | Status | Pair | Viewport | Reference | Local | Different ratio | Max ratio | Diff |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -24,6 +24,9 @@ pass | studio-builder-advanced | desktop | 1512x772 | 1512x772 | 0.079296 | 0.08
 pass | studio-builder-tool-selected | desktop-compact | 1512x772 | 1512x772 | 0.137246 | 0.14 | docs/agno-analysis/visual-diffs/diffs/studio-builder-tool-selected.diff.png
 pass | studio-builder-context | desktop-compact | 1512x772 | 1512x772 | 0.135223 | 0.14 | docs/agno-analysis/visual-diffs/diffs/studio-builder-context.diff.png
 pass | studio-builder-session | desktop-compact | 1512x772 | 1512x772 | 0.136262 | 0.14 | docs/agno-analysis/visual-diffs/diffs/studio-builder-session.diff.png
+pass | studio-builder-knowledge | desktop-compact | 1512x772 | 1512x772 | 0.085018 | 0.14 | docs/agno-analysis/visual-diffs/diffs/studio-builder-knowledge.diff.png
+pass | studio-builder-memory | desktop-compact | 1512x772 | 1512x772 | 0.090184 | 0.14 | docs/agno-analysis/visual-diffs/diffs/studio-builder-memory.diff.png
+pass | studio-builder-publish-ready | desktop-compact | 1512x772 | 1512x772 | 0.084486 | 0.14 | docs/agno-analysis/visual-diffs/diffs/studio-builder-publish-ready.diff.png
 pass | sessions-view-menu | desktop-compact | 1512x772 | 1512x772 | 0.063632 | 0.08 | docs/agno-analysis/visual-diffs/diffs/sessions-view-menu.diff.png
 pass | sessions-team-filter | desktop-compact | 1512x772 | 1512x772 | 0.058782 | 0.08 | docs/agno-analysis/visual-diffs/diffs/sessions-team-filter.diff.png
 pass | sessions-row-click | desktop-compact | 1512x772 | 1512x772 | 0.107023 | 0.14 | docs/agno-analysis/visual-diffs/diffs/sessions-row-click.diff.png

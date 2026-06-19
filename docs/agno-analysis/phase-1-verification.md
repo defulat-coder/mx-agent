@@ -1518,3 +1518,30 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `pnpm visual:diff` now reports `45/45 passed`.
 - `traces-list`: passed, different ratio `0.074854` against max `0.14`.
 - `pnpm lint` passed for the frontend component change.
+
+2026-06-19 Studio Builder secondary-state visual diff matrix expansion:
+
+- Rechecked `https://os.agno.com/try-demo/studio/agents/create` with
+  Chrome/CDP. In the current anonymous Chrome session the route redirects to
+  `https://os.agno.com/signin?callbackUrl=%2Ftry-demo%2Fstudio%2Fagents%2Fcreate`
+  and renders the Agno sign-in page.
+- Preserved the previously captured Agno Studio Builder references and
+  re-captured the matching local desktop states at 1512 x 772.
+- Re-captured `studio-builder-publish-ready-local.png`, verifying the Basics
+  state with `Router Agent`, instructions
+  `Route employee requests to the best specialist.`, selected `calculator`, and
+  enabled `Publish`.
+- Re-captured `studio-builder-knowledge-local.png`, verifying Session State and
+  Knowledge expansion plus `ADD KNOWLEDGE TO CONTEXT` and `SEARCH KNOWLEDGE`.
+- Re-captured `studio-builder-memory-local.png`, verifying Knowledge and Memory
+  expansion plus `MEMORY MANAGER`, `ENABLE AGENTIC MEMORY`,
+  `UPDATE MEMORY ON RUN`, and `ADD MEMORIES TO CONTEXT`.
+- Added `studio-builder-knowledge`, `studio-builder-memory`, and
+  `studio-builder-publish-ready` to the official screenshot comparison matrix.
+- `pnpm visual:diff` now reports `48/48 passed`.
+- `studio-builder-knowledge`: passed, different ratio `0.085018` against max
+  `0.14`.
+- `studio-builder-memory`: passed, different ratio `0.090184` against max
+  `0.14`.
+- `studio-builder-publish-ready`: passed, different ratio `0.084486` against
+  max `0.14`.
