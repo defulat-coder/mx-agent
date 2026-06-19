@@ -649,6 +649,13 @@ function SessionsInspector({
   messages: ChatMessage[];
   onClose: () => void;
 }) {
+  const currentTitle = sessionTitle(messages);
+  const recentSessions = [
+    currentTitle,
+    "Summarize Agno in one concise sentence.",
+    "write insights on ai trends in 200 words",
+  ].filter((title, index, sessions): title is string => Boolean(title) && sessions.indexOf(title) === index);
+
   return (
     <aside className="w-[500px] shrink-0 border-l border-neutral-200 bg-white px-4 py-5">
       <div className="mb-8 flex items-center justify-between">
@@ -679,10 +686,21 @@ function SessionsInspector({
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
-          <button className="w-full rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-left" type="button">
-            <p className="text-sm font-medium">{messages[0]?.content}</p>
-            <p className="mt-2 font-mono text-[11px] text-neutral-500">Active session</p>
+        <div className="space-y-3">
+          {recentSessions.map((title, index) => (
+            <button
+              className={cn(
+                "min-h-14 w-full rounded-lg px-3 text-left text-sm transition-colors hover:bg-neutral-50",
+                index === 0 ? "bg-neutral-100 font-medium" : "bg-white",
+              )}
+              key={title}
+              type="button"
+            >
+              {title}
+            </button>
+          ))}
+          <button className="mt-2 text-left font-mono text-[11px] uppercase text-neutral-400" type="button">
+            Load more sessions
           </button>
         </div>
       )}

@@ -138,9 +138,14 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
     renders the user message with a compact `NN` avatar, renders an assistant
     run row such as `Worked for 2 s`, keeps the composer placeholder as `Ask
     anything...`, and shows copy/metrics actions below the assistant answer.
+  - Opening `SESSIONS` after a completed run shrinks the chat canvas and renders
+    a right inspector around 500px wide with title `Sessions`, a close icon, the
+    active prompt title as a highlighted row, and previous session titles below
+    it.
   - Local implementation now mirrors this completed-run structure for preview
     and backend chat responses: textarea composer, Enter-to-send, URL session
-    sync, first-prompt breadcrumb, run duration row, and copy/metrics actions.
+    sync, first-prompt breadcrumb, run duration row, copy/metrics actions, and a
+    completed-session inspector list.
 
 ### Sessions
 
@@ -372,7 +377,5 @@ The page also connects to a local AgentOS endpoint configured on the OS record. 
 
 ## Open Verification Items
 
-- Exact request/response bodies for chat runs and streaming behavior.
 - Whether local AgentOS routes provide enough data for traces, memories, knowledge, metrics, evals, approvals, and scheduler, or whether MX-specific facade endpoints are needed.
-- Mobile responsive behavior for sidebar, composer, data tables, and detail panels.
 - Pixel-diff tolerance and viewport matrix for final 1:1 screenshot verification.

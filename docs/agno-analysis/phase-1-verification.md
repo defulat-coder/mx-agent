@@ -209,6 +209,51 @@ Target reference screenshots:
 - `pnpm build`: passed.
 - Production preview used `HOSTNAME=0.0.0.0 PORT=3003 node .next/standalone/server.js`.
 
+## Chat Sessions Inspector Iteration
+
+Chrome/CDP analysis added the completed-run Sessions inspector state for:
+
+`https://os.agno.com/try-demo/chat?type=agent&id=sage&session={uuid}`
+
+Observed Agno behavior:
+
+- Clicking `SESSIONS` after a completed run keeps the current Chat canvas on
+  the left and opens a right inspector around 500px wide.
+- The inspector header is `Sessions` with a compact close icon.
+- The first row is the active session title, highlighted with a light gray
+  background.
+- Previous session titles render as plain rows underneath. In the captured
+  state, the panel listed `What is Agno?` and `Summarize Agno in one concise
+  sentence.`
+
+Local implementation now mirrors this state:
+
+- Active prompt title is rendered as the highlighted first session row.
+- Recent preview sessions render underneath in the same right-side inspector.
+- Empty-state behavior remains unchanged for a chat with no messages.
+
+Local Chrome assertions passed for:
+
+- Sending `What is Agno?` on `/chat?type=agent&id=hr-agent` updates the URL with
+  `session=preview-session`.
+- Opening `Sessions` renders `What is Agno?`, `Summarize Agno in one concise
+  sentence.`, and `write insights on ai trends in 200 words` in the right
+  inspector.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/chat-sessions-run-local.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/chat-sessions-run-reference.png`
+
+2026-06-19 Chat Sessions inspector follow-up verification:
+
+- `pnpm lint`: passed.
+- `pnpm build`: passed.
+- Production preview used `HOSTNAME=0.0.0.0 PORT=3003 node .next/standalone/server.js`.
+
 ## Production Deployment Iteration
 
 The standalone deployment gap was closed with production container artifacts:
