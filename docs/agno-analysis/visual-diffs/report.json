@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T09:34:56.732Z",
+  "generatedAt": "2026-06-19T09:45:44.655Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 14,
-    "passed": 14,
+    "pairs": 16,
+    "passed": 16,
     "failed": 0
   },
   "results": [
@@ -341,6 +341,56 @@
         "differentRatio": 0.057759,
         "meanAbsDelta": 16.475,
         "rmseDelta": 74.424
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "evaluation-list",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/evaluation-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/evaluation-current.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/evaluation-list.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.12
+      },
+      "metrics": {
+        "differentPixels": 83997,
+        "totalPixels": 1251936,
+        "differentRatio": 0.067094,
+        "meanAbsDelta": 16.864,
+        "rmseDelta": 74.663
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "evaluation-detail",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/evaluation-row-click-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/evaluation-detail-current.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/evaluation-detail.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.12
+      },
+      "metrics": {
+        "differentPixels": 134161,
+        "totalPixels": 1251936,
+        "differentRatio": 0.107163,
+        "meanAbsDelta": 29.066,
+        "rmseDelta": 94.578
       },
       "sizeMismatch": false
     },

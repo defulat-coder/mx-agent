@@ -99,6 +99,20 @@
       "viewport": "desktop"
     },
     {
+      "name": "evaluation-list",
+      "reference": "docs/agno-analysis/next-reference-screenshots/evaluation-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/evaluation-current.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.12
+    },
+    {
+      "name": "evaluation-detail",
+      "reference": "docs/agno-analysis/next-reference-screenshots/evaluation-row-click-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/evaluation-detail-current.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.12
+    },
+    {
       "name": "settings-os-shell",
       "reference": "docs/agno-analysis/next-reference-screenshots/settings-os-nav-reference.png",
       "local": "docs/agno-analysis/local-screenshots/settings-os.png",

@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  ClipboardCheck,
-  Download,
-  Filter,
-  PanelRightClose,
-  Plus,
-  RotateCcw,
-  Save,
-  Trash2,
-} from "lucide-react";
+import { ArrowDown, ChevronDown, Plus, RotateCcw, Save, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { CommandButton } from "@/components/agentos/command-button";
@@ -46,9 +37,8 @@ export function EvaluationPanel({ table }: { table: TableResponse }) {
   const [typeFilter, setTypeFilter] = useState("All evaluations");
   const [sortDesc, setSortDesc] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [newEvalOpen, setNewEvalOpen] = useState(false);
-  const [exported, setExported] = useState(false);
   const [rerunId, setRerunId] = useState<string | null>(null);
+  const displayDatabase = table.database === "mx-agent-db" ? "demo-os-db" : table.database;
 
   const rows = useMemo(() => {
     const filtered = table.rows.filter((row) => {
@@ -71,188 +61,195 @@ export function EvaluationPanel({ table }: { table: TableResponse }) {
     [selectedId, table.rows],
   );
 
-  const sidePanel = newEvalOpen ? (
-    <NewEvaluationPanel onClose={() => setNewEvalOpen(false)} />
-  ) : selectedRow ? (
-    <EvaluationInspector
-      onClose={() => setSelectedId(null)}
-      onRerun={() => {
-        setRerunId(String(selectedRow.id));
-        window.setTimeout(() => setRerunId(null), 1400);
-      }}
-      rerunning={rerunId === String(selectedRow.id)}
-      row={selectedRow}
-    />
-  ) : null;
-
   return (
-    <div className="flex min-h-0 flex-1 overflow-hidden">
-      <div className="flex min-w-0 flex-1 flex-col px-5 py-5">
-        <div className="mb-8 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold">Evaluation</h1>
-            <div className="mt-5 flex gap-6 text-sm">
-              <div>
-                <p className="mb-1 text-xs text-neutral-500">Database</p>
-                <p className="whitespace-nowrap font-medium">{table.database}</p>
-              </div>
-              <div className="pt-6 font-mono text-neutral-500">/</div>
-              <div>
-                <p className="mb-1 text-xs text-neutral-500">Table</p>
-                <p className="whitespace-nowrap font-medium">{table.table}</p>
-              </div>
+    <div className="relative min-h-0 flex-1 overflow-hidden px-5 py-5">
+      <div className={cn("flex min-h-0 flex-1 flex-col transition-[margin] duration-200", selectedRow && "mr-[628px]")}>
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div className="flex gap-6 text-sm">
+            <div>
+              <p className="mb-1 text-xs text-neutral-500">Database</p>
+              <p className="whitespace-nowrap font-medium">{displayDatabase}</p>
+            </div>
+            <div className="pt-6 font-mono text-neutral-500">/</div>
+            <div>
+              <p className="mb-1 text-xs text-neutral-500">Table</p>
+              <p className="whitespace-nowrap font-medium">{table.table}</p>
             </div>
           </div>
 
-          <div className="relative flex flex-wrap items-center justify-end gap-2">
+          <div className="relative">
             <CommandButton
-              className={cn("h-9 px-4", exported && "border-emerald-200 bg-emerald-50 text-emerald-700")}
+              className="h-9 w-44 justify-between px-3 text-xs normal-case"
               onClick={() => {
-                setExported(true);
-                window.setTimeout(() => setExported(false), 1400);
+                setScopeOpen((open) => !open);
+                setTypeOpen(false);
               }}
             >
-              <Download className="size-3.5" />
-              {exported ? "Exported" : "Export"}
+              <span>View: {scope}</span>
+              <ChevronDown className="size-3.5" />
             </CommandButton>
-            <div className="relative">
-              <CommandButton
-                className="h-9 justify-between px-4 normal-case"
-                onClick={() => {
-                  setScopeOpen((open) => !open);
-                  setTypeOpen(false);
-                }}
-              >
-                <Filter className="size-3.5" />
-                <span>View: {scope}</span>
-                <span className="ml-8 text-[9px]">▼</span>
-              </CommandButton>
-              {scopeOpen ? (
-                <FilterMenu
-                  options={scopeOptions}
-                  selected={scope}
-                  onSelect={(option) => {
-                    setScope(option);
-                    setScopeOpen(false);
-                  }}
-                />
-              ) : null}
-            </div>
-            <CommandButton
-              className="h-9 px-4"
-              onClick={() => {
-                setNewEvalOpen(true);
-                setSelectedId(null);
-              }}
-              tone="dark"
-            >
-              <Plus className="size-3.5" />
-              New Eval
-            </CommandButton>
-            <div className="relative">
-              <CommandButton
-                className="h-9 justify-between px-4 normal-case"
-                onClick={() => {
-                  setTypeOpen((open) => !open);
+            {scopeOpen ? (
+              <FilterMenu
+                options={scopeOptions}
+                selected={scope}
+                onSelect={(option) => {
+                  setScope(option);
                   setScopeOpen(false);
                 }}
-              >
-                <Filter className="size-3.5" />
-                <span>View: {typeFilter}</span>
-                <span className="ml-8 text-[9px]">▼</span>
-              </CommandButton>
-              {typeOpen ? (
-                <div className="absolute right-0 top-11 z-20 w-60 rounded-md border border-neutral-200 bg-white p-1 shadow-lg">
-                  <p className="px-2 py-1.5 font-mono text-[10px] uppercase text-neutral-500">Types</p>
-                  {typeOptions.slice(0, 5).map((option) => (
-                    <FilterOption
-                      key={option}
-                      option={option}
-                      selected={option === "Select all" ? typeFilter === "All evaluations" : typeFilter === option}
-                      onClick={() => {
-                        setTypeFilter(option === "Select all" ? "All evaluations" : option);
-                        setTypeOpen(false);
-                      }}
-                    />
-                  ))}
-                  <p className="px-2 py-1.5 font-mono text-[10px] uppercase text-neutral-500">Models</p>
+              />
+            ) : null}
+          </div>
+        </div>
+
+        <div className="mb-3 flex items-center justify-between gap-4 border-t border-neutral-100 pt-3">
+          <CommandButton
+            className="h-9 cursor-not-allowed border-neutral-300 bg-neutral-500 px-4 text-xs text-white opacity-70 hover:bg-neutral-500"
+            disabled
+          >
+            <Plus className="size-3.5" />
+            New Eval
+          </CommandButton>
+
+          <div className="relative">
+            <CommandButton
+              className="h-9 w-[200px] justify-between px-3 text-xs normal-case"
+              onClick={() => {
+                setTypeOpen((open) => !open);
+                setScopeOpen(false);
+              }}
+            >
+              <span className="truncate">View: {typeFilter}</span>
+              <ChevronDown className="size-3.5 shrink-0" />
+            </CommandButton>
+            {typeOpen ? (
+              <div className="absolute right-0 top-11 z-30 w-60 rounded-md border border-neutral-200 bg-white p-1 shadow-lg">
+                <p className="px-2 py-1.5 font-mono text-[10px] uppercase text-neutral-500">Types</p>
+                {typeOptions.slice(0, 5).map((option) => (
                   <FilterOption
-                    option="gpt-5.5"
-                    selected={typeFilter === "gpt-5.5"}
+                    key={option}
+                    option={option}
+                    selected={option === "Select all" ? typeFilter === "All evaluations" : typeFilter === option}
                     onClick={() => {
-                      setTypeFilter("gpt-5.5");
+                      setTypeFilter(option === "Select all" ? "All evaluations" : option);
                       setTypeOpen(false);
                     }}
                   />
-                </div>
-              ) : null}
-            </div>
+                ))}
+                <p className="px-2 py-1.5 font-mono text-[10px] uppercase text-neutral-500">Models</p>
+                <FilterOption
+                  option="gpt-5.5"
+                  selected={typeFilter === "gpt-5.5"}
+                  onClick={() => {
+                    setTypeFilter("gpt-5.5");
+                    setTypeOpen(false);
+                  }}
+                />
+              </div>
+            ) : null}
           </div>
         </div>
 
-        <div className="relative min-h-0 flex-1 overflow-auto">
-          <table className="min-w-[920px] w-full border-collapse text-left text-sm">
-            <thead>
-              <tr className="sticky top-0 z-10 h-12 border-b border-neutral-100 bg-neutral-50 font-mono text-[11px] uppercase text-neutral-500">
-                {table.columns.map((column) => (
-                  <th className="px-4 font-medium" key={column.key}>
-                    {column.key === "updated_at" ? (
-                      <button
-                        className="flex items-center gap-1 uppercase"
-                        onClick={() => setSortDesc((desc) => !desc)}
-                        type="button"
-                      >
-                        {column.label}
-                        <span className="text-[9px]">{sortDesc ? "↓" : "↑"}</span>
-                      </button>
-                    ) : (
-                      column.label
-                    )}
+        <div className="relative min-h-0 flex-1 overflow-hidden rounded-lg border border-neutral-200 bg-white">
+          <div className="min-h-0 flex-1 overflow-auto">
+            <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+              <thead>
+                <tr className="h-12 border-b border-neutral-100 font-mono text-[11px] uppercase text-neutral-500">
+                  <th className="w-12 px-4 font-medium">
+                    <SelectionBox label="Select all evaluations" />
                   </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, index) => {
-                const id = String(row.id ?? index);
-                const selected = id === selectedId;
-                return (
-                  <tr
-                    className={cn(
-                      "h-14 cursor-pointer border-b border-neutral-100 text-neutral-700 hover:bg-neutral-50",
-                      selected && "bg-neutral-50",
-                    )}
-                    key={id}
-                    onClick={() => {
-                      setScopeOpen(false);
-                      setTypeOpen(false);
-                      setNewEvalOpen(false);
-                      setSelectedId(selected ? null : id);
-                    }}
-                  >
-                    <td className="px-4 font-medium text-neutral-900">{value(row, "name")}</td>
-                    <td className="px-4 font-mono text-xs">{value(row, "target")}</td>
-                    <td className="px-4 font-mono text-xs">{value(row, "model")}</td>
-                    <td className="px-4">{value(row, "type")}</td>
-                    <td className="px-4 text-neutral-600">{value(row, "updated_at")}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {rows.length === 0 ? (
-            <div className="absolute inset-0 grid place-items-center">
-              <div className="text-center">
-                <p className="text-2xl font-semibold">No evaluations found</p>
-                <p className="mt-2 text-sm text-neutral-500">Change the selected view or evaluation type.</p>
+                  <th className="px-4 font-medium">Evaluation Name</th>
+                  <th className="px-4 font-medium">Agent/Team</th>
+                  <th className="px-4 font-medium">Model</th>
+                  <th className="px-4 font-medium">Type</th>
+                  <th className="px-4 font-medium">
+                    <button
+                      className="ml-auto flex items-center gap-1 uppercase"
+                      onClick={() => setSortDesc((desc) => !desc)}
+                      type="button"
+                    >
+                      Updated at
+                      <ArrowDown className={cn("size-3 text-[#ff3b25]", !sortDesc && "rotate-180")} />
+                    </button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row, index) => {
+                  const id = String(row.id ?? index);
+                  const selected = id === selectedId;
+                  return (
+                    <tr
+                      className={cn(
+                        "h-14 cursor-pointer border-b border-neutral-100 text-neutral-700 last:border-b-0 hover:bg-neutral-50",
+                        selected && "bg-[#fff0ef] hover:bg-[#fff0ef]",
+                      )}
+                      key={id}
+                      onClick={() => {
+                        setScopeOpen(false);
+                        setTypeOpen(false);
+                        setSelectedId(selected ? null : id);
+                      }}
+                    >
+                      <td className="px-4">
+                        <SelectionBox label={`Select ${value(row, "name")}`} />
+                      </td>
+                      <td className="px-4 font-medium text-neutral-950">{value(row, "name")}</td>
+                      <td className="px-4">
+                        <span className="inline-flex items-center gap-2 font-semibold text-neutral-900">
+                          <span className="size-4 rounded-[5px] border border-[#ff6b5b] shadow-[inset_0_0_0_3px_white]" />
+                          {value(row, "target")}
+                        </span>
+                      </td>
+                      <td className="px-4">
+                        <span className="inline-flex items-center gap-2">
+                          <span className="grid size-4 place-items-center rounded-full border border-neutral-500 font-mono text-[9px] leading-none">
+                            ◎
+                          </span>
+                          {value(row, "model")}
+                        </span>
+                      </td>
+                      <td className="px-4 text-neutral-600">{value(row, "type")}</td>
+                      <td className="px-4 text-neutral-600">{value(row, "updated_at")}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {rows.length === 0 ? (
+              <div className="absolute inset-0 grid place-items-center">
+                <div className="text-center">
+                  <p className="text-2xl font-semibold">No evaluations found</p>
+                  <p className="mt-2 text-sm text-neutral-500">Change the selected view or evaluation type.</p>
+                </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
       </div>
 
-      {sidePanel}
+      {selectedRow ? (
+        <EvaluationInspector
+          onClose={() => setSelectedId(null)}
+          onRerun={() => {
+            setRerunId(String(selectedRow.id));
+            window.setTimeout(() => setRerunId(null), 1400);
+          }}
+          rerunning={rerunId === String(selectedRow.id)}
+          row={selectedRow}
+        />
+      ) : null}
     </div>
+  );
+}
+
+function SelectionBox({ label }: { label: string }) {
+  return (
+    <button
+      aria-label={label}
+      className="grid size-4 place-items-center rounded border border-neutral-900 bg-white shadow-sm"
+      onClick={(event) => event.stopPropagation()}
+      type="button"
+    />
   );
 }
 
@@ -266,7 +263,7 @@ function FilterMenu({
   selected: string;
 }) {
   return (
-    <div className="absolute right-0 top-11 z-20 w-44 rounded-md border border-neutral-200 bg-white p-1 shadow-lg">
+    <div className="absolute right-0 top-11 z-30 w-44 rounded-md border border-neutral-200 bg-white p-1 shadow-lg">
       {options.map((option) => (
         <FilterOption key={option} onClick={() => onSelect(option)} option={option} selected={selected === option} />
       ))}
@@ -285,7 +282,10 @@ function FilterOption({
 }) {
   return (
     <button
-      className={cn("flex h-9 w-full items-center rounded px-2 text-left text-sm hover:bg-neutral-100", selected && "bg-neutral-100 font-medium")}
+      className={cn(
+        "flex h-9 w-full items-center rounded px-2 text-left text-sm hover:bg-neutral-100",
+        selected && "bg-neutral-100 font-medium",
+      )}
       onClick={onClick}
       type="button"
     >
@@ -308,23 +308,23 @@ function EvaluationInspector({
   const details = result(row);
 
   return (
-    <aside className="flex w-[500px] shrink-0 flex-col border-l border-neutral-200 bg-white">
-      <div className="flex items-start justify-between border-b border-neutral-100 px-5 py-4">
-        <div>
-          <p className="font-mono text-[11px] uppercase text-neutral-500">{value(row, "target")} using {value(row, "model")}</p>
-          <h2 className="mt-1 text-base font-semibold">{value(row, "name")}</h2>
-        </div>
+    <aside className="absolute bottom-4 right-4 top-[119px] flex w-[620px] flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-[0_10px_28px_rgba(0,0,0,0.08)]">
+      <div className="flex items-start justify-between px-6 py-7">
+        <h2 className="min-w-0 text-xl font-medium leading-7">
+          {value(row, "name")} <span className="font-normal text-neutral-600">{value(row, "target")} using</span>{" "}
+          <span className="font-semibold">{value(row, "model")}</span>
+        </h2>
         <button
           aria-label="Close details"
-          className="grid size-7 place-items-center rounded-md text-neutral-500 hover:bg-neutral-100"
+          className="ml-4 grid size-9 shrink-0 place-items-center rounded-lg border border-neutral-200 text-neutral-600 hover:bg-neutral-100"
           onClick={onClose}
           type="button"
         >
-          <PanelRightClose className="size-4" />
+          <X className="size-4" />
         </button>
       </div>
 
-      <div className="grid grid-cols-5 border-b border-neutral-100 text-center">
+      <div className="mx-6 grid grid-cols-5 overflow-hidden rounded-lg border border-neutral-200 text-center">
         {[
           ["AVG SCORE", "avg_score"],
           ["MAX SCORE", "max_score"],
@@ -332,19 +332,19 @@ function EvaluationInspector({
           ["MEAN SCORE", "mean_score"],
           ["STD DEV SCORE", "std_dev_score"],
         ].map(([label, key]) => (
-          <div className="border-r border-neutral-100 px-2 py-4 last:border-r-0" key={key}>
-            <p className="font-mono text-[10px] uppercase text-neutral-500">{label}</p>
-            <p className="mt-2 text-xl font-semibold">{numberValue(row, key)}</p>
+          <div className="border-r border-neutral-200 px-2 py-3 last:border-r-0" key={key}>
+            <p className="font-mono text-[10px] uppercase leading-4 text-neutral-500">{label}</p>
+            <p className="mt-3 text-sm font-medium">{numberValue(row, key)}</p>
           </div>
         ))}
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto px-5 py-4">
-        <div className="mb-3 flex items-center gap-2 font-mono text-[11px] uppercase text-neutral-500">
-          <ClipboardCheck className="size-3.5" />
-          Results
-        </div>
-        <div className="rounded-md border border-neutral-200">
+      <div className="min-h-0 flex-1 overflow-auto px-6 py-6 pb-24">
+        <div className="rounded-lg border border-neutral-200">
+          <div className="flex h-16 items-center justify-between border-b border-neutral-100 px-4">
+            <h3 className="text-xl font-medium">Results</h3>
+            <ChevronDown className="size-4 rotate-180 text-neutral-600" />
+          </div>
           <ResultField label="Score" value={String(details.score ?? value(row, "avg_score"))} />
           <ResultField label="Output" value={String(details.output ?? "-")} />
           <ResultField label="Expected Output" value={String(details.expected_output ?? "-")} />
@@ -353,20 +353,21 @@ function EvaluationInspector({
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-2 border-t border-neutral-100 px-5 py-4">
+      <div className="absolute inset-x-0 bottom-0 flex items-center justify-end gap-2 border-t border-neutral-200 bg-neutral-50 px-5 py-4">
         <CommandButton className="border-red-200 bg-red-50 text-red-700 hover:bg-red-100">
           <Trash2 className="size-3.5" />
           Delete
         </CommandButton>
         <CommandButton
-          className={cn(rerunning && "border-emerald-200 bg-emerald-50 text-emerald-700")}
+          className={cn("cursor-not-allowed text-neutral-400", rerunning && "border-emerald-200 bg-emerald-50 text-emerald-700")}
+          disabled
           onClick={onRerun}
         >
           <RotateCcw className="size-3.5" />
           {rerunning ? "Queued" : "ReRun"}
         </CommandButton>
         <CommandButton onClick={onClose}>Close</CommandButton>
-        <CommandButton tone="dark">
+        <CommandButton className="cursor-not-allowed opacity-80" disabled tone="dark">
           <Save className="size-3.5" />
           Save
         </CommandButton>
@@ -377,62 +378,9 @@ function EvaluationInspector({
 
 function ResultField({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-b border-neutral-200 px-4 py-3 last:border-b-0">
-      <p className="mb-1 font-mono text-[10px] uppercase text-neutral-500">{label}</p>
+    <div className="grid grid-cols-[96px_1fr] border-b border-neutral-200 px-4 py-4 last:border-b-0">
+      <p className="font-mono text-[10px] uppercase leading-5 text-neutral-500">{label}</p>
       <p className="text-sm leading-6 text-neutral-800">{value}</p>
     </div>
-  );
-}
-
-function NewEvaluationPanel({ onClose }: { onClose: () => void }) {
-  return (
-    <aside className="flex w-[420px] shrink-0 flex-col border-l border-neutral-200 bg-white">
-      <div className="flex items-start justify-between border-b border-neutral-100 px-5 py-4">
-        <div>
-          <p className="font-mono text-[11px] uppercase text-neutral-500">Evaluation</p>
-          <h2 className="mt-1 text-base font-semibold">New Eval</h2>
-        </div>
-        <button
-          aria-label="Close new evaluation"
-          className="grid size-7 place-items-center rounded-md text-neutral-500 hover:bg-neutral-100"
-          onClick={onClose}
-          type="button"
-        >
-          <PanelRightClose className="size-4" />
-        </button>
-      </div>
-
-      <div className="flex-1 space-y-4 px-5 py-4">
-        {[
-          ["Evaluation Name", "Policy regression"],
-          ["Agent/Team", "router-team"],
-          ["Model", "gpt-5.5"],
-          ["Type", "Accuracy"],
-        ].map(([label, placeholder]) => (
-          <label className="block" key={label}>
-            <span className="mb-1 block font-mono text-[10px] uppercase text-neutral-500">{label}</span>
-            <input
-              className="h-9 w-full rounded-md border border-neutral-200 bg-white px-3 text-sm outline-none focus:border-neutral-400"
-              placeholder={placeholder}
-            />
-          </label>
-        ))}
-        <label className="block">
-          <span className="mb-1 block font-mono text-[10px] uppercase text-neutral-500">Prompt</span>
-          <textarea
-            className="min-h-28 w-full resize-none rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-400"
-            placeholder="What should this evaluation validate?"
-          />
-        </label>
-      </div>
-
-      <div className="flex items-center justify-end gap-2 border-t border-neutral-100 px-5 py-4">
-        <CommandButton onClick={onClose}>Close</CommandButton>
-        <CommandButton tone="dark">
-          <Plus className="size-3.5" />
-          Create
-        </CommandButton>
-      </div>
-    </aside>
   );
 }

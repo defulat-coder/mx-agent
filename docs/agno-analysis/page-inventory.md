@@ -341,9 +341,11 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - Row click opens a right-side evaluation details panel with aggregate score
     tiles, result fields (`Score`, `Output`, `Expected Output`, `Input`,
     `Reason`), and `Delete`, `ReRun`, `Close`, `Save` actions.
-  - Local implementation preserves the table controls, implements type/scope
-    filtering, makes `NEW EVAL` open a creation inspector, and adds a functional
-    run-detail inspector.
+  - Local implementation now mirrors the public Demo OS list state with the
+    disabled `NEW EVAL` control, checkbox-first table, rounded table container,
+    scope/type filter controls, and selected-row detail panel.
+  - Evaluation is covered by the desktop screenshot diff gate for both the list
+    state and first-row detail state.
 
 ### Approvals
 

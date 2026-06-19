@@ -1138,3 +1138,31 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `pnpm visual:diff` now reports `14/14 passed`.
 - `scheduler-gated-overlay`: passed, different ratio `0.057759` against max
   `0.08`.
+
+2026-06-19 Evaluation visual diff matrix expansion:
+
+- Rechecked the Agno public Demo OS Evaluation route with Chrome/CDP at 1512 x
+  828. The list state renders the Demo OS database/table header, a scope
+  `View: All` control, disabled `NEW EVAL`, type/model `View: All evaluations`,
+  a checkbox-first table, and the five seeded evaluation runs.
+- Observed startup traffic includes `POST /api/v1/auth/authenticate`,
+  `POST /api/v1/auth/demo-sdk-token`, `GET /api/v1/users/me`,
+  `GET /api/v1/operating-systems/`, Demo OS `GET /health`, Demo OS
+  `GET /config`, Demo OS `GET /models`, and Demo OS
+  `GET /eval-runs?db_id=demo-os-db&table=agno_eval_runs&page=1&limit=25&sort_by=updated_at&sort_order=desc`.
+- Rechecked the first-row click state. The route expands to an evaluation-run
+  detail URL, highlights `Agno docs lookup`, and opens the rounded right-side
+  details panel with score tiles, `Results`, and disabled `ReRun`/`Save`
+  actions.
+- Aligned the local Evaluation page with the observed public Demo OS state:
+  removed the non-reference export/title/new-eval inspector behavior, matched
+  the two-row control layout, added the checkbox column and selected row
+  treatment, and rebuilt the details panel geometry.
+- Recaptured `docs/agno-analysis/local-screenshots/evaluation-current.png` and
+  `docs/agno-analysis/local-screenshots/evaluation-detail-current.png` from the
+  standalone build.
+- Added `evaluation-list` and `evaluation-detail` to the screenshot comparison
+  matrix.
+- `pnpm visual:diff` now reports `16/16 passed`.
+- `evaluation-list`: passed, different ratio `0.067094` against max `0.12`.
+- `evaluation-detail`: passed, different ratio `0.107163` against max `0.12`.
