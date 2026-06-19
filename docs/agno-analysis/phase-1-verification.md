@@ -1545,3 +1545,24 @@ repeatable measurement path for subsequent page-by-page iterations.
   `0.14`.
 - `studio-builder-publish-ready`: passed, different ratio `0.084486` against
   max `0.14`.
+
+2026-06-19 Studio Builder basics/tools visual diff matrix expansion:
+
+- Rechecked `https://os.agno.com/try-demo/studio/agents/create` with Chrome.
+  The current anonymous Chrome session still resolves to the Agno sign-in page
+  at
+  `https://os.agno.com/signin?callbackUrl=%2Ftry-demo%2Fstudio%2Fagents%2Fcreate`.
+- `studio-builder-model-reference.png` is byte-identical to
+  `studio-builder-publish-ready-reference.png`, so this pass avoids adding a
+  duplicate matrix entry for the same reference state.
+- Added `studio-builder-basics` using the previously captured local empty
+  Builder Basics screenshot at 1512 x 772.
+- Re-captured `studio-builder-tools-local.png` from the local standalone Builder
+  after opening the Tools selector, verifying `NO TOOLS SELECTED`, `MCPTools`,
+  `calculator`, and `Loading more...` are present.
+- Added `studio-builder-tools` to the official screenshot comparison matrix.
+- `pnpm visual:diff` now reports `50/50 passed`.
+- `studio-builder-basics`: passed, different ratio `0.123387` against max
+  `0.14`.
+- `studio-builder-tools`: passed, different ratio `0.071896` against max
+  `0.14`.

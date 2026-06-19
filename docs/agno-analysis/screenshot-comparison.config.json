@@ -104,6 +104,20 @@
       "maxDifferentRatio": 0.12
     },
     {
+      "name": "studio-builder-basics",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-basics-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-builder-basics-local.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.14
+    },
+    {
+      "name": "studio-builder-tools",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-tools-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-builder-tools-local.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.14
+    },
+    {
       "name": "studio-builder-advanced",
       "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-advanced-reference.png",
       "local": "docs/agno-analysis/local-screenshots/studio-builder-advanced-local.png",

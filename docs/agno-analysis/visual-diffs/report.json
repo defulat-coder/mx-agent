@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T13:37:16.110Z",
+  "generatedAt": "2026-06-19T13:42:20.890Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -19,8 +19,8 @@
     }
   ],
   "totals": {
-    "pairs": 48,
-    "passed": 48,
+    "pairs": 50,
+    "passed": 50,
     "failed": 0
   },
   "results": [
@@ -321,6 +321,56 @@
         "differentRatio": 0.1185,
         "meanAbsDelta": 35.747,
         "rmseDelta": 111.51
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "studio-builder-basics",
+      "status": "pass",
+      "viewport": "desktop-compact",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-basics-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-builder-basics-local.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/studio-builder-basics.diff.png",
+      "dimensions": {
+        "reference": "1512x772",
+        "local": "1512x772",
+        "compared": "1512x772"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 144025,
+        "totalPixels": 1167264,
+        "differentRatio": 0.123387,
+        "meanAbsDelta": 39.687,
+        "rmseDelta": 113.171
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "studio-builder-tools",
+      "status": "pass",
+      "viewport": "desktop-compact",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-tools-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-builder-tools-local.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/studio-builder-tools.diff.png",
+      "dimensions": {
+        "reference": "1512x772",
+        "local": "1512x772",
+        "compared": "1512x772"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 83922,
+        "totalPixels": 1167264,
+        "differentRatio": 0.071896,
+        "meanAbsDelta": 17.64,
+        "rmseDelta": 74.077
       },
       "sizeMismatch": false
     },
