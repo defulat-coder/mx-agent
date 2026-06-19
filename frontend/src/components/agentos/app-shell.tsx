@@ -54,6 +54,16 @@ const settingsSubNav = [
   ["Billing", "/settings/billing"],
 ] as const;
 
+const studioSubNav = [["Agents", "/studio/agents"]] as const;
+
+const learningSubNav = [
+  ["User Memories", "/learning/user_memory"],
+  ["User Profiles", "/learning/user_profile"],
+  ["Entity Memories", "/learning/entity_memory"],
+  ["Session Context", "/learning/session_context"],
+  ["Decision Logs", "/learning/decision_log"],
+] as const;
+
 type ShellItem = {
   label: string;
   href: string;
@@ -76,6 +86,8 @@ export function AppShell({
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
   const settingsLabel = settingsSubNav.find(([, href]) => pathname === href)?.[0];
+  const studioLabel = studioSubNav.find(([, href]) => pathname === href)?.[0];
+  const learningLabel = learningSubNav.find(([, href]) => pathname === href)?.[0];
   const pageLabel = !settingsLabel && pathname !== "/" ? navigation.find((item) => isActive(item.href))?.label : null;
 
   return (
@@ -138,6 +150,40 @@ export function AppShell({
                       ))}
                     </div>
                   ) : null}
+                  {item.label === "Studio" && pathname.startsWith("/studio") ? (
+                    <div className="ml-6 mt-1 space-y-0.5 border-l border-neutral-200 pl-3">
+                      {studioSubNav.map(([label, href]) => (
+                        <Link
+                          className={cn(
+                            "block rounded-md px-2 py-1.5 text-sm text-neutral-600 transition-colors",
+                            pathname === href && "text-[#ff3b25]",
+                            pathname !== href && "hover:bg-neutral-200/70 hover:text-neutral-900",
+                          )}
+                          href={href}
+                          key={href}
+                        >
+                          {label}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
+                  {item.label === "Learning" && pathname.startsWith("/learning") ? (
+                    <div className="ml-6 mt-1 space-y-0.5 border-l border-neutral-200 pl-3">
+                      {learningSubNav.map(([label, href]) => (
+                        <Link
+                          className={cn(
+                            "block rounded-md px-2 py-1.5 text-sm text-neutral-600 transition-colors",
+                            pathname === href && "text-[#ff3b25]",
+                            pathname !== href && "hover:bg-neutral-200/70 hover:text-neutral-900",
+                          )}
+                          href={href}
+                          key={href}
+                        >
+                          {label}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               );
             })}
@@ -171,7 +217,13 @@ export function AppShell({
                 {pageLabel ? (
                   <>
                     <span className="text-neutral-300">/</span>
-                    <span className="text-sm">{pageLabel}</span>
+                    <span className="text-sm">
+                      {pageLabel === "Studio" && studioLabel
+                        ? studioLabel
+                        : pageLabel === "Learning" && learningLabel
+                          ? learningLabel
+                          : pageLabel}
+                    </span>
                   </>
                 ) : null}
                 {settingsLabel ? (

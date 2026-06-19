@@ -75,6 +75,50 @@ Target reference screenshots:
 - `docs/agno-analysis/next-reference-screenshots/chat-config-panel.png`
 - `docs/agno-analysis/next-reference-screenshots/chat-sessions-panel.png`
 
+## Studio And Learning Iteration
+
+Chrome/CDP interaction analysis added Studio and Learning verification passes:
+
+- Studio default route lands on `/try-demo/studio/agents`, showing an Agents
+  list with `NEW AGENT`, agent cards, `Current Version 1`, `CHAT`, and `EDIT`.
+- `NEW AGENT` opens a full-page builder with Agent Name, Model, Instructions,
+  Tools, Database, Basics/Context/Session/Knowledge/Memory/Advanced sections,
+  a live right-side summary, and Reset/Save Draft/Publish actions.
+- Publish is disabled until required fields are present.
+- Learning expands second-level sidebar navigation for User Memories, User
+  Profiles, Entity Memories, Session Context, and Decision Logs.
+- Learning section pages render a blank/loading workspace with a centered
+  three-dot indicator when data is unavailable.
+- Local `/studio/agents` now implements the list and builder states.
+- Local `/learning/[section]` now implements the observed sidebar subnav and
+  loading workspace.
+
+Local Chrome assertions passed for:
+
+- `/studio/agents` includes Agents, New Agent, Current Version 1, Chat, and
+  Edit controls.
+- Clicking `New Agent` opens the builder with Agent Name, Context Management,
+  Save Draft, and a disabled Publish button.
+- `/learning/user_memory` includes the expanded Learning subnav and three-dot
+  loading state.
+- `/learning/decision_log` switches the breadcrumb/active section and keeps the
+  three-dot loading state.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/studio-list.png`
+- `docs/agno-analysis/local-screenshots/studio-new-agent.png`
+- `docs/agno-analysis/local-screenshots/learning-user-memory.png`
+- `docs/agno-analysis/local-screenshots/learning-decision-log.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/studio-list-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/studio-new-agent-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/learning-user-memory-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/learning-user-profile-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/learning-entity-memory-reference.png`
+
 ## Data Page Interaction Iteration
 
 Chrome/CDP interaction analysis added a data-page verification pass:

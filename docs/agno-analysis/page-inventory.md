@@ -12,6 +12,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 | Chat | `https://os.agno.com/try-demo/chat?type=agent` | `docs/agno-analysis/reference-screenshots/chat.png` |
 | Sessions | `https://os.agno.com/try-demo/sessions?sort_by=updated_at_desc&type=all&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/sessions.png` |
 | Traces | `https://os.agno.com/try-demo/traces?group_by=sessions&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/traces.png` |
+| Studio | `https://os.agno.com/try-demo/studio/agents` | `docs/agno-analysis/next-reference-screenshots/studio-list-reference.png` |
+| Learning | `https://os.agno.com/learning/user_memory?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/next-reference-screenshots/learning-user-memory-reference.png` |
 | Memory | `https://os.agno.com/try-demo/memory?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/memory.png` |
 | Knowledge | `https://os.agno.com/try-demo/knowledge?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/knowledge.png` |
 | Metrics | `https://os.agno.com/try-demo/metrics` | `docs/agno-analysis/reference-screenshots/metrics.png` |
@@ -35,6 +37,37 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Groups: Agents, Teams, Workflows, Interfaces, All OSes.
 - Main interactions: accordion collapse/expand, Chat buttons, Config buttons, Show More controls, OS switch/edit/delete controls.
 - Card pattern: red square icon, title, description, mono tag chips, command buttons in footer.
+
+### Studio
+
+- Default route redirects to `/try-demo/studio/agents`.
+- Agents list shows an uppercase count such as `1 AGENTS`, a `NEW AGENT`
+  command, and agent cards with name, `Current Version 1`, `CHAT`, and `EDIT`.
+- `NEW AGENT` opens a full-page builder rather than a modal. The page title is
+  `New Agent` and the top breadcrumb/action reads `Agents`.
+- Builder form fields: Agent Name, Model select, Instructions optional, Tools
+  optional selector, and Database optional selector. Demo OS auto-selects the
+  database.
+- Builder sections: Basics, Context Management, Session State, Knowledge,
+  Memory, and Advanced.
+- Right side shows a live configuration summary headed by `Name of agent` and a
+  section summary such as Basics.
+- Footer actions are `RESET`, `SAVE DRAFT`, and `PUBLISH`; Publish is disabled
+  until required data is present.
+- Local implementation now adds `/studio/agents`, sidebar Studio sub-navigation,
+  agent cards, New Agent/Edit builder states, form preview, draft save state,
+  and disabled Publish parity.
+
+### Learning
+
+- Default route redirects to `/learning/user_memory`.
+- Learning expands the sidebar with second-level navigation: User Memories, User
+  Profiles, Entity Memories, Session Context, and Decision Logs.
+- The main header breadcrumb shows the active section, while the content area is
+  an empty/loading workspace with a centered three-dot indicator when the data
+  surface is unavailable.
+- Local implementation now adds `/learning/[section]`, the sidebar subnav, and
+  reference-style blank/loading states for User Memories and Decision Logs.
 
 ### Chat
 
