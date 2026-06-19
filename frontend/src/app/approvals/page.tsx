@@ -1,7 +1,5 @@
-import { DataTable } from "@/components/agentos/data-table";
-import { getTable } from "@/lib/agentos-api";
+import { ApprovalsList } from "@/components/agentos/approvals-list";
 
-export default async function ApprovalsPage() {
-  const table = await getTable("approvals");
-  return <DataTable table={table} />;
+export default function ApprovalsPage() {
+  return <ApprovalsList />;
 }

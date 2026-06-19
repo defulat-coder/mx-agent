@@ -74,3 +74,25 @@ Target reference screenshots:
 - `docs/agno-analysis/next-reference-screenshots/chat-shell-state.png`
 - `docs/agno-analysis/next-reference-screenshots/chat-config-panel.png`
 - `docs/agno-analysis/next-reference-screenshots/chat-sessions-panel.png`
+
+## Data Page Interaction Iteration
+
+Chrome/CDP interaction analysis added a data-page verification pass:
+
+- Table filter popover on `/sessions`.
+- Row click selection and right-side details inspector on `/sessions`.
+- Dedicated vertical approvals list on `/approvals`.
+- `Admin access required` overlay matching the public Demo OS gated approvals state.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/sessions-filter-menu.png`
+- `docs/agno-analysis/local-screenshots/sessions-row-detail.png`
+- `docs/agno-analysis/local-screenshots/approvals-gated-list.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/sessions-table-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/sessions-filter-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/knowledge-table-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/approvals-table-reference.png`

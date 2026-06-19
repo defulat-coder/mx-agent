@@ -56,6 +56,7 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Controls: View filter, export, sort by Updated At.
 - Table columns: Session Name, Updated At.
 - Row click likely navigates to session detail/chat.
+- Local parity iteration on 2026-06-19 added a row inspector pattern for table pages: clicking a row selects it, checks the row box, and opens a right-side details panel while preserving the table workspace.
 
 ### Traces
 
@@ -76,6 +77,7 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Controls: Add Content, sort by Updated At.
 - Table columns: Name, Content Type, Metadata, Status, Updated At.
 - Metadata uses key/value chips; statuses include Completed/Processing.
+- Public demo shows skeleton/empty table rows when knowledge content is not available; local implementation keeps rows visible for MX data and uses the same compact table geometry.
 
 ### Metrics
 
@@ -95,6 +97,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Header: Approvals with View filter.
 - Content: approval cards/list items with tool/action name, requester agent/team/workflow, date, parameters, Deny and Approve actions.
 - Demo state overlays admin access required messaging for management.
+- Public demo renders approvals as a vertical list rather than a database table: action name on the left, agent/team target and date on the right, params below, and Deny/Approve controls on pending items.
+- Local implementation follows that vertical approval list and keeps an `Admin access required` overlay on top, matching the demo's gated management state.
 
 ### Scheduler
 
