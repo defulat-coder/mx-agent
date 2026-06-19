@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Download, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, Gauge, TriangleAlert, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { CommandButton } from "@/components/agentos/command-button";
@@ -46,8 +46,8 @@ function MetricChart({
   return (
     <button
       className={cn(
-        "group min-h-[260px] rounded-md border border-transparent bg-white p-4 text-left transition-colors hover:border-neutral-200",
-        selected && "border-neutral-300 bg-neutral-50",
+        "group min-h-[306px] rounded-md border border-transparent bg-white p-4 text-left transition-colors hover:border-neutral-200",
+        selected && "bg-white",
       )}
       onClick={onSelect}
       type="button"
@@ -61,7 +61,7 @@ function MetricChart({
           <Download className="size-3.5" />
         </span>
       </div>
-      <svg aria-label={`${series.label} chart`} className="h-[180px] w-full" role="img" viewBox="0 0 440 180">
+      <svg aria-label={`${series.label} chart`} className="h-[220px] w-full" role="img" viewBox="0 0 440 180">
         <defs>
           <pattern height="12" id={`metrics-dot-${series.label.replace(/\s+/g, "-")}`} patternUnits="userSpaceOnUse" width="12">
             <circle cx="1" cy="1" fill="#e5e5e5" r="0.8" />
@@ -107,11 +107,11 @@ export function MetricsGrid({ data }: { data: MetricsResponse }) {
 
   return (
     <div className="min-h-0 flex-1 overflow-auto px-5 py-5">
-      <div className="mb-8 flex items-start justify-between gap-4">
+      <div className="mb-4 flex items-start justify-between gap-4">
         <div className="flex gap-6 text-sm">
           <div>
             <p className="mb-1 text-xs text-neutral-500">Database</p>
-            <p className="whitespace-nowrap font-medium">{data.database}</p>
+            <p className="whitespace-nowrap font-medium">demo-os-db</p>
           </div>
           <div className="pt-6 font-mono text-neutral-500">/</div>
           <div>
@@ -127,7 +127,7 @@ export function MetricsGrid({ data }: { data: MetricsResponse }) {
               window.setTimeout(() => setExported(false), 1400);
             }}
           >
-            <Download className="size-3.5" />
+            <Upload className="size-3.5" />
             {exported ? "Exported" : "Export"}
           </CommandButton>
           <div className="inline-flex h-9 items-center gap-1 rounded-md border border-neutral-200 bg-neutral-50 px-2 font-mono text-[11px] uppercase">
@@ -153,67 +153,69 @@ export function MetricsGrid({ data }: { data: MetricsResponse }) {
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        {data.metrics.map((metric) => (
-          <MetricChart
-            key={metric.label}
-            onSelect={() => setSelectedMetric(metric.label)}
-            selected={selected?.label === metric.label}
-            series={metric}
-          />
-        ))}
-      </div>
-
-      <div className="mt-4 grid gap-4 xl:grid-cols-[1.2fr_1fr]">
-        <section className="rounded-md border border-neutral-200 bg-white p-4">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-semibold">Model runs</h2>
-              <p className="mt-1 text-3xl font-semibold">{totalModelRuns || 688}</p>
-            </div>
-            <p className="font-mono text-[11px] uppercase text-neutral-500">Selected: {selected?.label}</p>
+      <div className="relative min-h-[720px] overflow-hidden">
+        <div className="blur-[5px]">
+          <div className="grid gap-4 xl:grid-cols-2">
+            {data.metrics.map((metric) => (
+              <MetricChart
+                key={metric.label}
+                onSelect={() => setSelectedMetric(metric.label)}
+                selected={selected?.label === metric.label}
+                series={metric}
+              />
+            ))}
           </div>
-          <div className="space-y-3">
-            {data.model_runs.map((run) => {
-              const share = Number(String(run.share ?? "0").replace("%", ""));
-              return (
-                <div className="grid grid-cols-[96px_1fr_48px] items-center gap-3" key={String(run.model)}>
-                  <button className="truncate text-left font-mono text-xs" type="button">
-                    {String(run.model)}
-                  </button>
-                  <div className="h-2 rounded-full bg-neutral-100">
-                    <div className="h-2 rounded-full bg-neutral-900" style={{ width: `${Math.max(4, share)}%` }} />
-                  </div>
-                  <span className="text-right text-sm text-neutral-500">{String(run.share)}</span>
+
+          <div className="mt-4 grid gap-4 xl:grid-cols-[1.2fr_1fr]">
+            <section className="rounded-md border border-neutral-200 bg-white p-4">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-semibold">Model runs</h2>
+                  <p className="mt-1 text-3xl font-semibold">{totalModelRuns || 688}</p>
                 </div>
-              );
-            })}
-          </div>
-        </section>
+                <p className="font-mono text-[11px] uppercase text-neutral-500">Selected: {selected?.label}</p>
+              </div>
+              <div className="space-y-3">
+                {data.model_runs.map((run) => {
+                  const share = Number(String(run.share ?? "0").replace("%", ""));
+                  return (
+                    <div className="grid grid-cols-[96px_1fr_48px] items-center gap-3" key={String(run.model)}>
+                      <button className="truncate text-left font-mono text-xs" type="button">
+                        {String(run.model)}
+                      </button>
+                      <div className="h-2 rounded-full bg-neutral-100">
+                        <div className="h-2 rounded-full bg-neutral-900" style={{ width: `${Math.max(4, share)}%` }} />
+                      </div>
+                      <span className="text-right text-sm text-neutral-500">{String(run.share)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
 
-        <section className="relative min-h-[220px] overflow-hidden rounded-md border border-neutral-200 bg-white p-6">
-          <div className="absolute inset-x-8 bottom-8 top-20 opacity-20 blur-[2px]">
-            <div className="flex h-full items-end gap-2">
-              {Array.from({ length: 28 }).map((_, index) => (
-                <span
-                  className="flex-1 rounded-t bg-neutral-300"
-                  key={index}
-                  style={{ height: `${24 + ((index * 17) % 74)}%` }}
-                />
-              ))}
-            </div>
+            <section className="min-h-[220px] rounded-md border border-neutral-200 bg-white p-6" />
           </div>
-          <div className="relative z-10 grid h-full place-items-center text-center">
-            <div>
-              <h2 className="text-2xl font-semibold">Not available for Demo OS</h2>
-              <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-neutral-500">{data.gated_message}</p>
-              <CommandButton className="mt-5">
-                <ExternalLink className="size-3.5" />
-                Learn More
-              </CommandButton>
+        </div>
+
+        <div className="absolute inset-0 flex items-start justify-center bg-white/70 pt-20">
+          <div className="text-center">
+            <div className="relative mx-auto mb-8 h-11 w-20">
+              <div className="absolute left-0 top-2 grid size-8 -rotate-12 place-items-center rounded-full bg-neutral-950 text-white shadow-sm">
+                <Gauge className="size-4" />
+              </div>
+              <div className="absolute right-4 top-0 grid size-8 rotate-12 place-items-center rounded-full bg-red-500 text-white shadow-sm">
+                <TriangleAlert className="size-4" />
+              </div>
             </div>
+            <h2 className="text-[26px] font-medium leading-none tracking-normal">Not available for Demo OS</h2>
+            <p className="mx-auto mt-4 max-w-[352px] text-center text-sm leading-[21px] tracking-normal text-neutral-500">
+              {data.gated_message}
+            </p>
+            <CommandButton className="mt-7 h-9 px-5">
+              Learn More
+            </CommandButton>
           </div>
-        </section>
+        </div>
       </div>
     </div>
   );

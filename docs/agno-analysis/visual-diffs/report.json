@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T09:11:19.062Z",
+  "generatedAt": "2026-06-19T09:21:51.025Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 9,
-    "passed": 9,
+    "pairs": 10,
+    "passed": 10,
     "failed": 0
   },
   "results": [
@@ -216,6 +216,31 @@
         "differentRatio": 0.092857,
         "meanAbsDelta": 16.315,
         "rmseDelta": 56.274
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "metrics-gated-overlay",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/metrics-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/metrics-current.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/metrics-gated-overlay.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.08
+      },
+      "metrics": {
+        "differentPixels": 74292,
+        "totalPixels": 1251936,
+        "differentRatio": 0.059342,
+        "meanAbsDelta": 17.027,
+        "rmseDelta": 67.185
       },
       "sizeMismatch": false
     },

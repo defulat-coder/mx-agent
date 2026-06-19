@@ -318,8 +318,10 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - Demo OS renders a `Not available for Demo OS` gated notice over a blurred
     chart-like background for unavailable analytics.
   - Local implementation now renders the eight-chart grid, month navigation,
-    export state, selectable metric charts, model run distribution, and gated
-    notice.
+    export state, selectable metric charts, model run distribution, and
+    Agno-style full-page gated overlay.
+  - Metrics is covered by the desktop screenshot diff gate for the gated
+    overlay state.
 
 ### Evaluation
 

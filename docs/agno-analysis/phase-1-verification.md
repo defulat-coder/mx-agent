@@ -1074,3 +1074,23 @@ repeatable measurement path for subsequent page-by-page iterations.
   `0.15`.
 - `memory-create-dialog`: passed, different ratio `0.092857` against max
   `0.10`.
+
+2026-06-19 Metrics visual diff matrix expansion:
+
+- Rechecked the Agno public Demo OS Metrics route with Chrome/CDP at 1512 x
+  828. The route keeps the eight SVG metric charts and model distribution in
+  the DOM, but the first viewport is gated by a full-page
+  `Not available for Demo OS` overlay over blurred analytics.
+- Observed Metrics startup traffic includes `POST /api/v1/auth/authenticate`,
+  `POST /api/v1/auth/demo-sdk-token`, `GET /api/v1/users/me`,
+  `GET /api/v1/operating-systems/`, Demo OS `GET /health`, and Demo OS
+  `GET /config`.
+- Aligned the local Metrics page with the observed gated state: `demo-os-db`
+  context, `EXPORT`, `JUN 2026`, blurred chart grid underneath, and centered
+  gated overlay.
+- Recaptured `docs/agno-analysis/local-screenshots/metrics-current.png` from
+  the standalone build.
+- Added `metrics-gated-overlay` to the screenshot comparison matrix.
+- `pnpm visual:diff` now reports `10/10 passed`.
+- `metrics-gated-overlay`: passed, different ratio `0.059342` against max
+  `0.08`.
