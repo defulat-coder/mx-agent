@@ -1,0 +1,65 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    image: mx-agent-backend:local
+    restart: unless-stopped
+    environment:
+      API_PREFIX: /v1
+      APP_NAME: MX AgentOS
+      AGENTOS_ID: mx-agent
+      AGENTOS_NAME: MX AgentOS
+      DATABASE_URL: sqlite+aiosqlite:///data/mx_agent.db
+      AUTH_SECRET: ${AUTH_SECRET:-change-me-in-production}
+      ALLOW_MOCK_IDENTITY: ${ALLOW_MOCK_IDENTITY:-true}
+      LLM_MODEL: ${LLM_MODEL:-glm-4-plus}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://open.bigmodel.cn/api/paas/v4}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-embedding-3}
+      EMBEDDING_API_KEY: ${EMBEDDING_API_KEY:-}
+      EMBEDDING_BASE_URL: ${EMBEDDING_BASE_URL:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_FILE: ${LOG_FILE:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-https://cloud.langfuse.com}
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend-data:/app/data
+      - backend-log:/app/log
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5).read()",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_AGENTOS_API_BASE_URL: ${NEXT_PUBLIC_AGENTOS_API_BASE_URL:-http://localhost:8000}
+        NEXT_PUBLIC_AGENTOS_API_TOKEN: ${NEXT_PUBLIC_AGENTOS_API_TOKEN:-}
+    image: mx-agent-frontend:local
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+      NEXT_PUBLIC_AGENTOS_API_BASE_URL: ${NEXT_PUBLIC_AGENTOS_API_BASE_URL:-http://localhost:8000}
+      NEXT_PUBLIC_AGENTOS_API_TOKEN: ${NEXT_PUBLIC_AGENTOS_API_TOKEN:-}
+    ports:
+      - "3000:3000"
+
+volumes:
+  backend-data:
+  backend-log:

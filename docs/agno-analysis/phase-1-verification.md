@@ -158,6 +158,32 @@ Target reference screenshots:
 - `pnpm build`: passed.
 - Production preview used `pnpm exec next start -p 3003`.
 
+## Production Deployment Iteration
+
+The standalone deployment gap was closed with production container artifacts:
+
+- Root `docker-compose.yml` starts backend FastAPI/AgentOS on port `8000` and
+  frontend Next.js standalone on port `3000`.
+- `backend/Dockerfile` uses the locked `uv` environment, copies runtime app
+  files, exposes `8000`, and starts `uvicorn app.main:app`.
+- `frontend/Dockerfile` builds with `pnpm --frozen-lockfile`, uses Next.js
+  `output: "standalone"`, copies `.next/static` and `public`, and starts
+  `server.js`.
+- Root, backend, and frontend `.dockerignore` files exclude local caches,
+  runtime data, logs, screenshots, dependencies, and generated build output from
+  container contexts.
+- README now documents `docker compose up --build`, runtime ports, key
+  environment variables, and persisted volumes.
+
+Verification:
+
+- `docker compose config`: passed.
+- `pnpm lint`: passed.
+- `pnpm build`: passed and emitted `.next/standalone/server.js`.
+- `uv run pytest tests/test_os_facade.py -q`: 4 passed.
+- `docker compose build`: not executed because the local Docker daemon was not
+  running (`Cannot connect to the Docker daemon at unix:///Users/xbjt/.docker/run/docker.sock`).
+
 ## Studio And Learning Iteration
 
 Chrome/CDP interaction analysis added Studio and Learning verification passes:

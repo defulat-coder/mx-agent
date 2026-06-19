@@ -134,6 +134,35 @@ pnpm dev --hostname 127.0.0.1 --port 3000
 
 阶段一控制台已实现 `/`、`/chat`、`/sessions`、`/traces`、`/memory`、`/knowledge`、`/metrics`、`/evaluation`、`/approvals`、`/scheduler` 和 `/settings/*` 页面，并通过 `/v1/os/*` 后端 facade 提供页面数据。
 
+### 生产容器部署
+
+仓库根目录提供 `docker-compose.yml`，可独立启动后端 FastAPI/AgentOS 与前端 Next.js standalone 服务：
+
+```bash
+docker compose up --build
+```
+
+默认端口：
+
+- 前端控制台：`http://localhost:3000`
+- 后端 AgentOS/API：`http://localhost:8000`
+
+常用生产环境变量可直接传给 compose：
+
+```bash
+AUTH_SECRET=<strong-secret> \
+LLM_API_KEY=<provider-key> \
+NEXT_PUBLIC_AGENTOS_API_BASE_URL=http://localhost:8000 \
+docker compose up --build -d
+```
+
+运行时数据会写入 Docker volumes：
+
+- `backend-data`: SQLite、AgentOS 会话库、知识库向量数据
+- `backend-log`: 后端日志
+
+前端镜像使用 Next.js `output: "standalone"` 构建，后端镜像使用 `uv sync --frozen --no-dev` 安装锁定依赖。后端容器健康检查访问 `/health`，前端会在后端健康后启动。
+
 ## 环境变量
 
 | 变量 | 默认值 | 说明 |
