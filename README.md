@@ -70,7 +70,8 @@
 | **认证** | PyJWT | JWT Token 认证 |
 | **日志** | Loguru | 结构化日志 |
 | **可观测性** | OpenTelemetry + Agno Instrumentation | 链路追踪 |
-| **依赖管理** | uv | Python 包管理 |
+| **依赖管理** | uv / pnpm | Python 与前端包管理 |
+| **前端控制台** | Next.js + React + TypeScript + Tailwind CSS v4 | MX AgentOS Web 控制台 |
 
 ## 项目结构
 
@@ -86,13 +87,18 @@
 │   ├── pyproject.toml       # 后端 Python 依赖
 │   ├── uv.lock              # 后端 Python 锁文件
 │   └── main.py              # 后端启动入口
-├── frontend/                # 前端占位目录
-│   └── README.md
+├── frontend/                # Next.js + React AgentOS 控制台
+│   ├── src/app/             # App Router 页面
+│   ├── src/components/      # shadcn/ui 与 AgentOS 组件
+│   ├── src/lib/             # 控制台 API client 与 fallback 数据
+│   └── package.json         # 前端依赖和脚本
 ├── docs/                    # 项目文档和实施计划
 └── openspec/                # OpenSpec 需求和变更记录
 ```
 
 ## 快速启动
+
+### 后端
 
 ```bash
 # 克隆后进入后端项目
@@ -109,6 +115,24 @@ uv run python main.py
 ```
 
 服务默认运行在 `http://localhost:8000`。
+
+### 前端控制台
+
+```bash
+cd frontend
+pnpm install
+pnpm dev --hostname 127.0.0.1 --port 3000
+```
+
+前端默认可直接使用本地 fallback 数据打开 `http://127.0.0.1:3000`。如需连接后端 facade 和聊天接口：
+
+```bash
+NEXT_PUBLIC_AGENTOS_API_BASE_URL=http://localhost:8000 \
+NEXT_PUBLIC_AGENTOS_API_TOKEN=<jwt-token> \
+pnpm dev --hostname 127.0.0.1 --port 3000
+```
+
+阶段一控制台已实现 `/`、`/chat`、`/sessions`、`/traces`、`/memory`、`/knowledge`、`/metrics`、`/evaluation`、`/approvals`、`/scheduler` 和 `/settings/*` 页面，并通过 `/v1/os/*` 后端 facade 提供页面数据。
 
 ## 环境变量
 

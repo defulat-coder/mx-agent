@@ -98,6 +98,14 @@ def get_entities() -> OSEntitiesResponse:
             tags=["WORKFLOW", "HITL"],
             actions=["chat", "config"],
         ),
+        OSEntityCard(
+            id="clinic-team",
+            name="Employee Clinic",
+            kind="team",
+            description="Answers benefits, wellness, and workplace-service questions with scoped records.",
+            tags=["CONTEXT-PROVIDER", "KNOWLEDGE-FILTER", "FALLBACK"],
+            actions=["chat", "config"],
+        ),
     ]
     workflows = [
         OSEntityCard(
@@ -114,6 +122,14 @@ def get_entities() -> OSEntitiesResponse:
             kind="workflow",
             description="Routes reimbursement checks and finance approvals.",
             tags=["APPROVALS", "AUDIT"],
+            actions=["chat", "config"],
+        ),
+        OSEntityCard(
+            id="daily-briefing",
+            name="Daily Briefing",
+            kind="workflow",
+            description="Scans calendar, tickets, finance updates, and policy changes in parallel.",
+            tags=["PARALLEL", "SCHEDULED", "BRIEFING"],
             actions=["chat", "config"],
         ),
     ]
