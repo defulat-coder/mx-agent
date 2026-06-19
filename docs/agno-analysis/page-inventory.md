@@ -365,6 +365,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Local implementation follows the vertical approval list, status radio menu,
   URL query sync, pending-only Deny/Approve controls, local-safe decision state,
   and the blurred admin-access overlay.
+- Approvals is covered by the desktop screenshot diff gate for the gated list,
+  status menu, and Pending filter states.
 
 ### Scheduler
 

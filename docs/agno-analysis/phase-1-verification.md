@@ -1094,3 +1094,26 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `pnpm visual:diff` now reports `10/10 passed`.
 - `metrics-gated-overlay`: passed, different ratio `0.059342` against max
   `0.08`.
+
+2026-06-19 Approvals visual diff matrix expansion:
+
+- Rechecked the Agno public Demo OS Approvals route with Chrome/CDP at 1512 x
+  828. The page renders the vertical approvals list in the DOM and overlays
+  `Admin access required` for Demo OS users.
+- Observed startup traffic includes `POST /api/v1/auth/authenticate`,
+  `POST /api/v1/auth/demo-sdk-token`, `GET /api/v1/users/me`,
+  `GET /api/v1/operating-systems/`, and Demo OS `GET /health`; no
+  approvals-specific mutation was needed for the public demo states.
+- Recaptured current standalone Approvals states:
+  `docs/agno-analysis/local-screenshots/approvals-current.png`,
+  `docs/agno-analysis/local-screenshots/approvals-filter-current.png`, and
+  `docs/agno-analysis/local-screenshots/approvals-pending-current.png`.
+- Added `approvals-gated-overlay`, `approvals-status-menu`, and
+  `approvals-pending-filter` to the screenshot comparison matrix.
+- `pnpm visual:diff` now reports `13/13 passed`.
+- `approvals-gated-overlay`: passed, different ratio `0.053984` against max
+  `0.08`.
+- `approvals-status-menu`: passed, different ratio `0.059634` against max
+  `0.08`.
+- `approvals-pending-filter`: passed, different ratio `0.054344` against max
+  `0.08`.

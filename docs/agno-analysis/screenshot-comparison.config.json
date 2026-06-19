@@ -75,6 +75,24 @@
       "viewport": "desktop"
     },
     {
+      "name": "approvals-gated-overlay",
+      "reference": "docs/agno-analysis/next-reference-screenshots/approvals-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/approvals-current.png",
+      "viewport": "desktop"
+    },
+    {
+      "name": "approvals-status-menu",
+      "reference": "docs/agno-analysis/next-reference-screenshots/approvals-filter-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/approvals-filter-current.png",
+      "viewport": "desktop"
+    },
+    {
+      "name": "approvals-pending-filter",
+      "reference": "docs/agno-analysis/next-reference-screenshots/approvals-pending-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/approvals-pending-current.png",
+      "viewport": "desktop"
+    },
+    {
       "name": "settings-os-shell",
       "reference": "docs/agno-analysis/next-reference-screenshots/settings-os-nav-reference.png",
       "local": "docs/agno-analysis/local-screenshots/settings-os.png",

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T09:21:51.025Z",
+  "generatedAt": "2026-06-19T09:26:56.747Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 10,
-    "passed": 10,
+    "pairs": 13,
+    "passed": 13,
     "failed": 0
   },
   "results": [
@@ -241,6 +241,81 @@
         "differentRatio": 0.059342,
         "meanAbsDelta": 17.027,
         "rmseDelta": 67.185
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "approvals-gated-overlay",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/approvals-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/approvals-current.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/approvals-gated-overlay.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.08
+      },
+      "metrics": {
+        "differentPixels": 67585,
+        "totalPixels": 1251936,
+        "differentRatio": 0.053984,
+        "meanAbsDelta": 14.982,
+        "rmseDelta": 70.819
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "approvals-status-menu",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/approvals-filter-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/approvals-filter-current.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/approvals-status-menu.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.08
+      },
+      "metrics": {
+        "differentPixels": 74658,
+        "totalPixels": 1251936,
+        "differentRatio": 0.059634,
+        "meanAbsDelta": 16.367,
+        "rmseDelta": 74.194
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "approvals-pending-filter",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/approvals-pending-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/approvals-pending-current.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/approvals-pending-filter.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.08
+      },
+      "metrics": {
+        "differentPixels": 68035,
+        "totalPixels": 1251936,
+        "differentRatio": 0.054344,
+        "meanAbsDelta": 15.167,
+        "rmseDelta": 71.568
       },
       "sizeMismatch": false
     },

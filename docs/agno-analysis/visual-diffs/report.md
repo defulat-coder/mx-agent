@@ -1,10 +1,10 @@
 # Visual Diff Report
 
-Generated: 2026-06-19T09:21:51.025Z
+Generated: 2026-06-19T09:26:56.747Z
 
 Config: `docs/agno-analysis/screenshot-comparison.config.json`
 
-Totals: 10/10 passed, 0 failed.
+Totals: 13/13 passed, 0 failed.
 
 | Status | Pair | Viewport | Reference | Local | Different ratio | Max ratio | Diff |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -17,4 +17,7 @@ pass | knowledge-collection-menu | desktop | 1512x828 | 1512x828 | 0.082309 | 0.
 pass | memory-empty-overlay | desktop | 1512x828 | 1512x828 | 0.145103 | 0.15 | docs/agno-analysis/visual-diffs/diffs/memory-empty-overlay.diff.png
 pass | memory-create-dialog | desktop | 1512x828 | 1512x828 | 0.092857 | 0.1 | docs/agno-analysis/visual-diffs/diffs/memory-create-dialog.diff.png
 pass | metrics-gated-overlay | desktop | 1512x828 | 1512x828 | 0.059342 | 0.08 | docs/agno-analysis/visual-diffs/diffs/metrics-gated-overlay.diff.png
+pass | approvals-gated-overlay | desktop | 1512x828 | 1512x828 | 0.053984 | 0.08 | docs/agno-analysis/visual-diffs/diffs/approvals-gated-overlay.diff.png
+pass | approvals-status-menu | desktop | 1512x828 | 1512x828 | 0.059634 | 0.08 | docs/agno-analysis/visual-diffs/diffs/approvals-status-menu.diff.png
+pass | approvals-pending-filter | desktop | 1512x828 | 1512x828 | 0.054344 | 0.08 | docs/agno-analysis/visual-diffs/diffs/approvals-pending-filter.diff.png
 pass | settings-os-shell | desktop | 1512x828 | 1512x828 | 0.065668 | 0.12 | docs/agno-analysis/visual-diffs/diffs/settings-os-shell.diff.png
