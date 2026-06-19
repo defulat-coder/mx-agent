@@ -4,6 +4,11 @@
       "name": "desktop",
       "width": 1512,
       "height": 828
+    },
+    {
+      "name": "desktop-compact",
+      "width": 1512,
+      "height": 772
     }
   ],
   "defaults": {
@@ -23,6 +28,18 @@
       "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-advanced-reference.png",
       "local": "docs/agno-analysis/local-screenshots/studio-builder-advanced-local.png",
       "viewport": "desktop"
+    },
+    {
+      "name": "sessions-view-menu",
+      "reference": "docs/agno-analysis/next-reference-screenshots/sessions-filter-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/sessions-filter-current-772.png",
+      "viewport": "desktop-compact"
+    },
+    {
+      "name": "sessions-team-filter",
+      "reference": "docs/agno-analysis/next-reference-screenshots/sessions-filter-teams-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/sessions-teams-current-772.png",
+      "viewport": "desktop-compact"
     },
     {
       "name": "settings-os-shell",

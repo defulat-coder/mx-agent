@@ -1,16 +1,21 @@
 {
-  "generatedAt": "2026-06-19T08:45:32.803Z",
+  "generatedAt": "2026-06-19T08:51:23.416Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
       "name": "desktop",
       "width": 1512,
       "height": 828
+    },
+    {
+      "name": "desktop-compact",
+      "width": 1512,
+      "height": 772
     }
   ],
   "totals": {
-    "pairs": 3,
-    "passed": 3,
+    "pairs": 5,
+    "passed": 5,
     "failed": 0
   },
   "results": [
@@ -61,6 +66,56 @@
         "differentRatio": 0.079296,
         "meanAbsDelta": 19.372,
         "rmseDelta": 80.822
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "sessions-view-menu",
+      "status": "pass",
+      "viewport": "desktop-compact",
+      "reference": "docs/agno-analysis/next-reference-screenshots/sessions-filter-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/sessions-filter-current-772.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/sessions-view-menu.diff.png",
+      "dimensions": {
+        "reference": "1512x772",
+        "local": "1512x772",
+        "compared": "1512x772"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.08
+      },
+      "metrics": {
+        "differentPixels": 74275,
+        "totalPixels": 1167264,
+        "differentRatio": 0.063632,
+        "meanAbsDelta": 19.312,
+        "rmseDelta": 84.363
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "sessions-team-filter",
+      "status": "pass",
+      "viewport": "desktop-compact",
+      "reference": "docs/agno-analysis/next-reference-screenshots/sessions-filter-teams-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/sessions-teams-current-772.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/sessions-team-filter.diff.png",
+      "dimensions": {
+        "reference": "1512x772",
+        "local": "1512x772",
+        "compared": "1512x772"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.08
+      },
+      "metrics": {
+        "differentPixels": 68614,
+        "totalPixels": 1167264,
+        "differentRatio": 0.058782,
+        "meanAbsDelta": 18.97,
+        "rmseDelta": 81.982
       },
       "sizeMismatch": false
     },

@@ -1026,3 +1026,18 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `studio-builder-advanced`: passed, different ratio `0.079296` against max
   `0.08`.
 - `settings-os-shell`: passed, different ratio `0.065668` against max `0.12`.
+
+2026-06-19 Sessions visual diff matrix expansion:
+
+- Added a compact desktop viewport at 1512 x 772 to match the captured Agno
+  Sessions interaction references.
+- Recaptured current standalone Sessions states with Chrome/CDP:
+  `docs/agno-analysis/local-screenshots/sessions-filter-current-772.png` and
+  `docs/agno-analysis/local-screenshots/sessions-teams-current-772.png`.
+- Added `sessions-view-menu` and `sessions-team-filter` to the screenshot
+  comparison matrix. These states verify the Agno-style View radio menu, URL
+  filter behavior, shell geometry, and Sessions table layout.
+- `pnpm visual:diff` now reports `5/5 passed`.
+- `sessions-view-menu`: passed, different ratio `0.063632` against max `0.08`.
+- `sessions-team-filter`: passed, different ratio `0.058782` against max
+  `0.08`.
