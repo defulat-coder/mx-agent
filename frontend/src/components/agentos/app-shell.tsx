@@ -83,6 +83,7 @@ export function AppShell({
   userInitials: string;
 }) {
   const pathname = usePathname();
+  const isDemoSurface = !pathname.startsWith("/settings");
   const isActive = (href: string, label?: string) => {
     if (href === "/") {
       return pathname === "/";
@@ -97,10 +98,30 @@ export function AppShell({
   const studioLabel = studioSubNav.find(([, href]) => pathname === href)?.[0];
   const learningLabel = learningSubNav.find(([, href]) => pathname === href)?.[0];
   const pageLabel = !settingsLabel && pathname !== "/" ? navigation.find((item) => isActive(item.href, item.label))?.label : null;
+  const shellWorkspaceName = isDemoSurface ? "Demo OS" : workspaceName;
 
   return (
     <div className="min-h-svh bg-[#f4f4f5] text-neutral-950">
-      <div className="flex h-svh">
+      {isDemoSurface ? (
+        <div className="flex h-10 items-center justify-between bg-[#73737d] px-5 text-sm text-white">
+          <p>You&apos;re currently using the Demo OS, all data is public. Please do not share any confidential information.</p>
+          <div className="flex items-center gap-2">
+            <button
+              className="h-7 rounded-md bg-neutral-950 px-3 font-mono text-[11px] uppercase text-white"
+              type="button"
+            >
+              What is Demo OS?
+            </button>
+            <button
+              className="h-7 rounded-md bg-white px-3 font-mono text-[11px] uppercase text-neutral-900"
+              type="button"
+            >
+              Leave Demo OS
+            </button>
+          </div>
+        </div>
+      ) : null}
+      <div className={cn("flex", isDemoSurface ? "h-[calc(100svh-40px)]" : "h-svh")}>
         <aside className="flex w-52 shrink-0 flex-col border-r border-neutral-200 bg-[#f2f2f3]">
           <div className="flex h-16 items-center justify-between px-4">
             <Link className="flex items-center gap-2 text-sm font-medium" href="/">
@@ -220,7 +241,7 @@ export function AppShell({
                 <span className="grid size-7 place-items-center rounded-full border border-neutral-200 bg-white">
                   <Globe2 className="size-4" />
                 </span>
-                <span className="text-sm font-medium">{workspaceName}</span>
+                <span className="text-sm font-medium">{shellWorkspaceName}</span>
                 <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.16)]" />
                 {pageLabel ? (
                   <>

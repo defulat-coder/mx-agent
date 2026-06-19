@@ -141,7 +141,7 @@ function AgentBuilder({ agent, onBack }: { agent: EntityCardData | null; onBack:
   const [draftSaved, setDraftSaved] = useState(false);
   const [published, setPublished] = useState(false);
 
-  const publishEnabled = name.trim().length > 0;
+  const publishEnabled = name.trim().length > 0 || selectedTools.length > 0;
   const preview = useMemo(
     () => [
       ["Name", name.trim() || "No name given yet"],
@@ -189,13 +189,16 @@ function AgentBuilder({ agent, onBack }: { agent: EntityCardData | null; onBack:
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="border-b border-neutral-100 px-5 py-5">
-        <button className="mb-4 font-mono text-[11px] uppercase text-neutral-500 hover:text-neutral-900" onClick={onBack} type="button">
+      <div className="flex h-14 shrink-0 items-center gap-2 px-5 text-sm font-semibold">
+        <button className="inline-flex items-center gap-2 hover:text-neutral-600" onClick={onBack} type="button">
+          <span aria-hidden className="text-lg leading-none">
+            ‹
+          </span>
           Agents
         </button>
-        <h1 className="text-2xl font-semibold">{agent ? agent.name : "New Agent"}</h1>
+        <span className="text-neutral-300">/</span>
+        <span>{agent ? agent.name : "New Agent"}</span>
       </div>
-
       <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_420px]">
         <div className="agno-scrollbar min-h-0 overflow-auto px-5 py-5">
           <div className="space-y-2">
@@ -445,7 +448,7 @@ function AgentBuilder({ agent, onBack }: { agent: EntityCardData | null; onBack:
             <h2 className="mt-1 text-sm font-semibold">Basics</h2>
           </div>
           <div className="min-h-0 flex-1 overflow-auto px-4 py-4">
-            <div className="rounded-lg bg-neutral-50 p-4">
+            <div className="rounded-lg bg-white p-4">
               <p className="mb-3 font-mono text-[11px] uppercase text-neutral-500">Basics</p>
               {preview.map(([label, value]) => (
                 <div className="border-b border-neutral-200/70 py-3 last:border-b-0" key={label}>

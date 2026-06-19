@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T08:26:34.752Z",
+  "generatedAt": "2026-06-19T08:36:39.436Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -31,11 +31,11 @@
         "maxDifferentRatio": 0.08
       },
       "metrics": {
-        "differentPixels": 156966,
+        "differentPixels": 96337,
         "totalPixels": 1167264,
-        "differentRatio": 0.134473,
-        "meanAbsDelta": 43.592,
-        "rmseDelta": 129.493
+        "differentRatio": 0.082532,
+        "meanAbsDelta": 23.093,
+        "rmseDelta": 90.471
       },
       "sizeMismatch": false
     },

@@ -985,3 +985,18 @@ Result:
 
 This does not claim final 1:1 completion; it gives the remaining visual drift a
 repeatable measurement path for subsequent page-by-page iterations.
+
+2026-06-19 Studio visual drift reduction:
+
+- Added the Demo OS top banner to non-Settings pages, matching public Agno
+  `/try-demo` surfaces while keeping authenticated Settings pages banner-free.
+- Changed Studio builder from a large `New Agent` page header to a compact
+  `Agents / New Agent` builder breadcrumb.
+- Matched Agno's observed publish behavior after tool selection: selecting
+  `calculator` enables `PUBLISH` even when the agent name remains empty.
+- Removed the gray fill from the right-side Basics summary area.
+- Rebuilt the standalone preview and recaptured
+  `docs/agno-analysis/local-screenshots/studio-builder-advanced-local.png`.
+- `pnpm visual:diff` now reports `studio-builder-advanced` at different ratio
+  `0.082532` against max `0.08`; this is still a tracked visual failure, not a
+  completed 1:1 match.
