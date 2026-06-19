@@ -285,14 +285,16 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
     `Clinic Records`, `Dash Knowledge`, `Dash Learnings`,
     `Investment Knowledge`, `Investment Learnings`, and `Coach Learnings`.
     Each entry shows `Db Id` and `Table` metadata.
-  - Metadata renders as uppercase key/value chips, showing the first metadata
-    key and a `+N` overflow chip for hidden metadata.
+  - Metadata renders as uppercase key/value chips, showing visible metadata
+    pairs with compact overflow when needed.
   - Row click opens a right-side edit drawer with Name, Description optional,
     Metadata, Content Type, Updated At, and Delete/Cancel/Save actions. Save is
     disabled until edits.
   - Local implementation now uses a dedicated Knowledge panel with the observed
     collection menu, disabled Add Content state, table geometry, metadata
     overflow chips, sort toggle, and right-side edit drawer.
+  - Knowledge is now covered by the desktop screenshot diff gate for the table
+    state and collection selector menu state.
 
 ### Metrics
 

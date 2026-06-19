@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Plus, RefreshCw, Trash2, X } from "lucide-react";
+import { Check, ChevronDown, ChevronsUpDown, FileText, Plus, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { CommandButton } from "@/components/agentos/command-button";
@@ -20,26 +20,38 @@ const collections: Collection[] = [
   {
     id: "clinic-records",
     name: "Clinic Records",
-    database: "mx-agent-db",
+    database: "demo-os-db",
     table: "clinic_records_contents",
   },
   {
-    id: "hr-knowledge",
-    name: "HR Knowledge",
-    database: "mx-agent-db",
-    table: "hr_knowledge_contents",
+    id: "dash-knowledge",
+    name: "Dash Knowledge",
+    database: "demo-os-db",
+    table: "dash_knowledge_contents",
   },
   {
-    id: "finance-knowledge",
-    name: "Finance Knowledge",
-    database: "mx-agent-db",
-    table: "finance_knowledge_contents",
+    id: "dash-learnings",
+    name: "Dash Learnings",
+    database: "demo-os-db",
+    table: "dash_learnings_contents",
   },
   {
-    id: "it-learnings",
-    name: "IT Learnings",
-    database: "mx-agent-db",
-    table: "it_learnings_contents",
+    id: "investment-knowledge",
+    name: "Investment Knowledge",
+    database: "demo-os-db",
+    table: "investment_knowledge_contents",
+  },
+  {
+    id: "investment-learnings",
+    name: "Investment Learnings",
+    database: "demo-os-db",
+    table: "investment_learnings_contents",
+  },
+  {
+    id: "coach-learnings",
+    name: "Coach Learnings",
+    database: "demo-os-db",
+    table: "coach_learnings_contents",
   },
 ];
 
@@ -58,7 +70,7 @@ function metadataEntries(row: KnowledgeRow) {
 
 function MetadataChips({ row }: { row: KnowledgeRow }) {
   const entries = metadataEntries(row);
-  const visible = entries.slice(0, 1);
+  const visible = entries.slice(0, 2);
   const hidden = entries.length - visible.length;
 
   return (
@@ -82,7 +94,8 @@ function MetadataChips({ row }: { row: KnowledgeRow }) {
 
 function StatusBadge({ status }: { status: string }) {
   return (
-    <span className="font-mono text-[11px] uppercase text-neutral-900">
+    <span className="inline-flex items-center gap-1 rounded-md bg-neutral-100 px-2 py-1 font-mono text-[11px] uppercase text-neutral-900">
+      <Check className="size-3" />
       {status}
     </span>
   );
@@ -93,7 +106,6 @@ export function KnowledgePanel({ table }: { table: TableResponse }) {
   const [selectedCollection, setSelectedCollection] = useState(collections[0]);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [sortDesc, setSortDesc] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
   const rows = useMemo(() => {
     const normalized = table.rows.filter((row) => {
@@ -108,40 +120,32 @@ export function KnowledgePanel({ table }: { table: TableResponse }) {
     [rows, selectedRowId],
   );
 
-  const refresh = () => {
-    setRefreshing(true);
-    window.setTimeout(() => setRefreshing(false), 800);
-  };
-
   return (
     <div className="flex min-h-0 flex-1">
-      <div className="flex min-w-0 flex-1 flex-col px-5 py-5">
-        <div className="mb-8 flex items-start justify-between gap-4">
-          <h1 className="text-2xl font-semibold">Knowledge</h1>
+      <div className="flex min-w-0 flex-1 flex-col px-4 py-5">
+        <div className="mb-5">
+          <p className="font-mono text-[11px] text-neutral-500">Knowledge</p>
+          <div className="relative mt-1 inline-block">
+            <button
+              aria-expanded={collectionOpen}
+              className="inline-flex items-center gap-1 text-sm font-medium text-neutral-950"
+              onClick={() => setCollectionOpen((open) => !open)}
+              type="button"
+            >
+              {selectedCollection.name}
+              <ChevronsUpDown className="size-3.5 text-neutral-500" />
+            </button>
 
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <CommandButton className="h-9 px-4" onClick={refresh}>
-              <RefreshCw className={cn("size-3.5", refreshing && "animate-spin")} />
-              Refresh
-            </CommandButton>
+            {collectionOpen ? (
+              <div className="absolute left-0 top-7 z-30 max-h-[310px] w-60 overflow-y-auto rounded-md border border-neutral-200 bg-white p-1 shadow-lg">
+                {collections.map((collection) => {
+                  const active = collection.id === selectedCollection.id;
 
-            <div className="relative">
-              <CommandButton
-                aria-expanded={collectionOpen}
-                className="h-9 min-w-44 justify-between px-4 normal-case"
-                onClick={() => setCollectionOpen((open) => !open)}
-              >
-                <span>{selectedCollection.name}</span>
-                <ChevronDown className="size-3.5" />
-              </CommandButton>
-
-              {collectionOpen ? (
-                <div className="absolute right-0 top-11 z-30 w-72 rounded-md border border-neutral-200 bg-white p-1 shadow-lg">
-                  {collections.map((collection) => (
+                  return (
                     <button
                       className={cn(
-                        "w-full rounded px-3 py-2 text-left hover:bg-neutral-50",
-                        collection.id === selectedCollection.id && "bg-neutral-50",
+                        "relative w-full rounded px-3 py-2 text-left hover:bg-neutral-50",
+                        active && "bg-red-50",
                       )}
                       key={collection.id}
                       onClick={() => {
@@ -151,44 +155,51 @@ export function KnowledgePanel({ table }: { table: TableResponse }) {
                       }}
                       type="button"
                     >
-                      <span className="block text-sm font-medium text-neutral-900">{collection.name}</span>
-                      <span className="mt-1 block font-mono text-[10px] uppercase text-neutral-500">
+                      <span className="block pr-6 text-sm font-medium text-neutral-900">{collection.name}</span>
+                      <span className="mt-1 block font-mono text-[10px] text-neutral-600">
                         Db Id: {collection.database}
                       </span>
-                      <span className="block font-mono text-[10px] uppercase text-neutral-500">
+                      <span className="block font-mono text-[10px] text-neutral-600">
                         Table: {collection.table}
                       </span>
+                      {active ? (
+                        <Check className="absolute right-3 top-8 size-4 text-red-500" />
+                      ) : null}
                     </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+        </div>
 
-            <CommandButton className="h-9 px-4 opacity-50" disabled>
+        <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-neutral-200 bg-white">
+          <div className="flex h-[60px] items-center border-b border-neutral-200 px-3">
+            <CommandButton className="h-9 rounded-lg border-neutral-400 bg-neutral-500 px-4 text-white opacity-80 hover:bg-neutral-500" disabled>
               <Plus className="size-3.5" />
               Add Content
             </CommandButton>
           </div>
-        </div>
 
-        <div className="relative min-h-0 flex-1 overflow-auto">
-          <table className="min-w-[960px] w-full table-fixed border-collapse text-left text-sm">
+          <div className="relative min-h-0 flex-1 overflow-auto">
+            <table className="min-w-[960px] w-full table-fixed border-collapse text-left text-sm">
             <thead>
               <tr className="sticky top-0 z-10 h-12 border-b border-neutral-100 bg-white font-mono text-[11px] uppercase text-neutral-500">
                 <th className="w-12 px-4 font-medium">
                   <span className="block size-4 rounded border border-neutral-300" />
                 </th>
                 <th className="w-[28%] px-4 font-medium">Name</th>
-                <th className="w-[16%] px-4 font-medium">Content type</th>
-                <th className="w-[26%] px-4 font-medium">Metadata</th>
+                <th className="w-[15%] px-4 font-medium">Content type</th>
+                <th className="w-[28%] px-4 font-medium">Metadata</th>
                 <th className="w-[14%] px-4 font-medium">Status</th>
-                <th className="w-[16%] px-4 text-right font-medium">
+                <th className="w-[15%] px-4 text-right font-medium">
                   <button
-                    className="ml-auto flex items-center gap-1 uppercase"
+                    className="ml-auto flex items-center gap-1 uppercase text-red-500"
                     onClick={() => setSortDesc((desc) => !desc)}
                     type="button"
                   >
                     Updated at
+                    <ChevronDown className={cn("size-3", !sortDesc && "rotate-180")} />
                   </button>
                 </th>
               </tr>
@@ -213,7 +224,12 @@ export function KnowledgePanel({ table }: { table: TableResponse }) {
                       <span className={cn("block size-4 rounded border", selected ? "border-neutral-950 bg-neutral-950" : "border-neutral-300")} />
                     </td>
                     <td className="truncate px-4 align-middle text-neutral-900">{cellText(row, "name")}</td>
-                    <td className="px-4 align-middle">{cellText(row, "content_type")}</td>
+                    <td className="px-4 align-middle">
+                      <span className="inline-flex items-center gap-2">
+                        <FileText className="size-4 text-red-500" />
+                        {cellText(row, "content_type")}
+                      </span>
+                    </td>
                     <td className="px-4 align-middle">
                       <MetadataChips row={row} />
                     </td>
@@ -228,6 +244,7 @@ export function KnowledgePanel({ table }: { table: TableResponse }) {
               })}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 

@@ -1041,3 +1041,19 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `sessions-view-menu`: passed, different ratio `0.063632` against max `0.08`.
 - `sessions-team-filter`: passed, different ratio `0.058782` against max
   `0.08`.
+
+2026-06-19 Knowledge visual diff matrix expansion:
+
+- Aligned the local Knowledge page with the observed Agno layout: compact
+  `Knowledge / Clinic Records` context title, bordered table container,
+  in-table disabled `ADD CONTENT` action, file icons, completed status pills,
+  and the Agno Demo OS collection menu entries.
+- Recaptured current standalone Knowledge states with Chrome/CDP:
+  `docs/agno-analysis/local-screenshots/knowledge-current.png` and
+  `docs/agno-analysis/local-screenshots/knowledge-collection-current.png`.
+- Added `knowledge-table` and `knowledge-collection-menu` to the screenshot
+  comparison matrix.
+- `pnpm visual:diff` now reports `7/7 passed`.
+- `knowledge-table`: passed, different ratio `0.075372` against max `0.08`.
+- `knowledge-collection-menu`: passed, different ratio `0.082309` against max
+  `0.09`.
