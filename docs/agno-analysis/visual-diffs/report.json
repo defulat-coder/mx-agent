@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T10:00:37.939Z",
+  "generatedAt": "2026-06-19T10:11:44.729Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 18,
-    "passed": 18,
+    "pairs": 20,
+    "passed": 20,
     "failed": 0
   },
   "results": [
@@ -41,6 +41,56 @@
         "differentRatio": 0.107337,
         "meanAbsDelta": 26.732,
         "rmseDelta": 90.186
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "chat-config-panel",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-config-panel.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-config-panel.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/chat-config-panel.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.08
+      },
+      "metrics": {
+        "differentPixels": 86374,
+        "totalPixels": 1251936,
+        "differentRatio": 0.068992,
+        "meanAbsDelta": 17.609,
+        "rmseDelta": 74.779
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "chat-sessions-panel",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-sessions-panel.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-sessions-panel.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/chat-sessions-panel.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.08
+      },
+      "metrics": {
+        "differentPixels": 81330,
+        "totalPixels": 1251936,
+        "differentRatio": 0.064963,
+        "meanAbsDelta": 16.437,
+        "rmseDelta": 69.057
       },
       "sizeMismatch": false
     },

@@ -24,6 +24,18 @@
       "maxDifferentRatio": 0.14
     },
     {
+      "name": "chat-config-panel",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-config-panel.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-config-panel.png",
+      "viewport": "desktop"
+    },
+    {
+      "name": "chat-sessions-panel",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-sessions-panel.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-sessions-panel.png",
+      "viewport": "desktop"
+    },
+    {
       "name": "studio-builder-advanced",
       "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-advanced-reference.png",
       "local": "docs/agno-analysis/local-screenshots/studio-builder-advanced-local.png",

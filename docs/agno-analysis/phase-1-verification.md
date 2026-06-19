@@ -100,7 +100,8 @@ Chrome/CDP interaction analysis added a second local verification pass for Chat:
 - Entity type popover: `Agents`, `Teams`, `Workflows`.
 - Entity selector popover: local runnable entities from the selected type.
 - Config inspector: right-side panel with Agent Details, Model, Database, Tools, Sessions, Default Tools, and System Message accordions.
-- Sessions inspector: right-side panel with `No session found` empty state.
+- Sessions inspector: right-side panel with the current Demo OS recent-session
+  list for the empty Chat canvas.
 - Prompt pill interaction: clicking `Tell me about Learning Machines` fills the composer.
 
 Local screenshots:
@@ -1217,3 +1218,30 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `pnpm visual:diff` now reports `18/18 passed`.
 - `learning-user-memory-loading`: passed, different ratio `0.025909` against
   max `0.08`.
+
+2026-06-19 Chat inspector visual diff matrix expansion:
+
+- Rechecked the Agno public Demo OS Chat route with Chrome/CDP at 1512 x 828:
+  `https://os.agno.com/try-demo/chat?type=agent&id=sage`.
+- Observed startup traffic includes `POST /api/v1/auth/authenticate`,
+  `POST /api/v1/auth/demo-sdk-token`, `GET /api/v1/users/me`, Demo OS
+  `GET /health`, and Demo OS runnable metadata calls for `/agents`, `/teams`,
+  and `/workflows`.
+- Reconfirmed `SEE CONFIG` opens a right-side inspector with
+  `Sage's Configuration`, Agent Details, Model, Database, Tools, Sessions,
+  Default Tools, and System Message.
+- Current public Demo OS `SESSIONS` on an empty Chat canvas now renders recent
+  session rows such as `What is Agno?` and `Summarize Agno in one concise
+  sentence.` instead of the older `No session found` empty-state card.
+- Updated the local empty-chat Sessions inspector to mirror the current recent
+  sessions list.
+- Captured current references
+  `docs/agno-analysis/next-reference-screenshots/chat-config-panel.png` and
+  `docs/agno-analysis/next-reference-screenshots/chat-sessions-panel.png`, then
+  recaptured local screenshots from the standalone build.
+- Added `chat-config-panel` and `chat-sessions-panel` to the screenshot
+  comparison matrix.
+- `pnpm visual:diff` now reports `20/20 passed`.
+- `chat-config-panel`: passed, different ratio `0.068992` against max `0.08`.
+- `chat-sessions-panel`: passed, different ratio `0.064963` against max
+  `0.08`.

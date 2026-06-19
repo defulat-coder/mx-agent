@@ -156,7 +156,10 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - `SEE CONFIG` opens a right-side inspector around 500px wide; the chat canvas shrinks left rather than opening a modal.
   - The configuration inspector title is `{Entity}'s Configuration` and uses accordion rows: Agent Details, Model, Database, Tools, Sessions, Default Tools, System Message.
   - When any inspector is open, text controls collapse to icon buttons for config/session history plus `NEW SESSION`.
-  - `SESSIONS` opens the same right-side inspector area with `Sessions`, close control, and an empty state: `No session found` plus `No session records yet. Start a conversation to create one.`
+  - `SESSIONS` opens the same right-side inspector area with `Sessions`, close
+    control, and the current Demo OS recent-session list. The observed empty
+    Chat state includes rows such as `What is Agno?` and `Summarize Agno in one
+    concise sentence.` rather than the older empty-state card.
   - Starter prompt pills fill the composer, while `NEW SESSION` resets the conversation state.
   - The authenticated route
     `/chat?type=team&id=router-team&session=1534cf8b-ec92-40e3-91ed-2fb1e942267c`
@@ -209,6 +212,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - Local implementation now mirrors the observed tool-call run state for Agno
     prompts: `1 TOOL CALLED` appears in the conversation and opens a `Tool
     Calls` inspector containing `SEARCH_AGNO`.
+  - Chat is now covered by the desktop screenshot diff gate for both the
+    configuration inspector and the recent-session inspector states.
 
 ### Sessions
 

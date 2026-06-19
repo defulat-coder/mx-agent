@@ -10,7 +10,6 @@ import {
   History,
   Info,
   Keyboard,
-  MessageSquare,
   PanelRightClose,
   Paperclip,
   RotateCcw,
@@ -53,6 +52,12 @@ const promptSuggestions = [
   "What is Agno?",
   "Tell me about Learning Machines",
   "Summarize the key features of MX AgentOS",
+];
+
+const recentDemoSessionTitles = [
+  "What is Agno?",
+  "What is Agno?",
+  "Summarize Agno in one concise sentence.",
 ];
 
 const configSections = [
@@ -683,11 +688,14 @@ function SessionsInspector({
   onClose: () => void;
 }) {
   const currentTitle = sessionTitle(messages);
-  const recentSessions = [
-    currentTitle,
-    "Summarize Agno in one concise sentence.",
-    "write insights on ai trends in 200 words",
-  ].filter((title, index, sessions): title is string => Boolean(title) && sessions.indexOf(title) === index);
+  const recentSessions =
+    messages.length === 0
+      ? recentDemoSessionTitles
+      : [
+          currentTitle,
+          "Summarize Agno in one concise sentence.",
+          "write insights on ai trends in 200 words",
+        ].filter((title, index, sessions): title is string => Boolean(title) && sessions.indexOf(title) === index);
 
   return (
     <aside className="w-[500px] shrink-0 border-l border-neutral-200 bg-white px-4 py-5">
@@ -703,40 +711,25 @@ function SessionsInspector({
         </button>
       </div>
 
-      {messages.length === 0 ? (
-        <div className="flex h-72 flex-col items-center justify-center rounded-xl bg-neutral-50 text-center">
-          <div className="mb-8 flex -space-x-2">
-            <span className="grid size-9 -rotate-12 place-items-center rounded-xl border border-neutral-200 bg-white shadow-sm">
-              <MessageSquare className="size-5" />
-            </span>
-            <span className="grid size-9 rotate-12 place-items-center rounded-xl border border-red-100 bg-white text-[#ff3b25] shadow-sm">
-              <Database className="size-5" />
-            </span>
-          </div>
-          <p className="font-semibold">No session found</p>
-          <p className="mt-3 max-w-64 text-sm leading-6 text-neutral-500">
-            No session records yet. Start a conversation to create one.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {recentSessions.map((title, index) => (
-            <button
-              className={cn(
-                "min-h-14 w-full rounded-lg px-3 text-left text-sm transition-colors hover:bg-neutral-50",
-                index === 0 ? "bg-neutral-100 font-medium" : "bg-white",
-              )}
-              key={title}
-              type="button"
-            >
-              {title}
-            </button>
-          ))}
+      <div className="space-y-3">
+        {recentSessions.map((title, index) => (
+          <button
+            className={cn(
+              "min-h-14 w-full rounded-lg px-3 text-left text-sm transition-colors hover:bg-neutral-100",
+              index === 0 ? "bg-neutral-100 font-medium" : "bg-neutral-50",
+            )}
+            key={`${title}-${index}`}
+            type="button"
+          >
+            {title}
+          </button>
+        ))}
+        {messages.length > 0 ? (
           <button className="mt-2 text-left font-mono text-[11px] uppercase text-neutral-400" type="button">
             Load more sessions
           </button>
-        </div>
-      )}
+        ) : null}
+      </div>
     </aside>
   );
 }
