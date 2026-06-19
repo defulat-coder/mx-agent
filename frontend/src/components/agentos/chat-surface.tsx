@@ -27,10 +27,22 @@ type EntityGroup = "agents" | "teams" | "workflows";
 type Inspector = "config" | "sessions" | null;
 type Menu = "group" | "entity" | null;
 
+type ChatSurfaceProps = {
+  initialGroup?: EntityGroup;
+  initialEntityId?: string;
+  initialSessionId?: string;
+};
+
 const groupLabels: Record<EntityGroup, string> = {
   agents: "Agents",
   teams: "Teams",
   workflows: "Workflows",
+};
+
+const groupTypeParams: Record<EntityGroup, string> = {
+  agents: "agent",
+  teams: "team",
+  workflows: "workflow",
 };
 
 const promptSuggestions = [
@@ -78,21 +90,68 @@ const configSections = [
   },
 ];
 
-export function ChatSurface() {
-  const [entityGroup, setEntityGroup] = useState<EntityGroup>("agents");
-  const [selectedEntity, setSelectedEntity] = useState<EntityCardData>(fallbackEntities.agents[0]);
+const agnoDeepLinkSessionId = "1534cf8b-ec92-40e3-91ed-2fb1e942267c";
+const agnoRestoredMessages: ChatMessage[] = [
+  {
+    id: "agno-user-ai-trends",
+    role: "user",
+    content: "write insights on ai trends in 200 words",
+  },
+  {
+    id: "agno-assistant-ai-trends",
+    role: "assistant",
+    stepLabel: "Finance Agent: Working...",
+    content:
+      "Artificial Intelligence (AI) continues to be a transformative force in 2024, with trends moving from isolated chatbots toward coordinated agent systems that can use tools, memory, and private knowledge. Enterprises are prioritizing domain-specific assistants for finance, HR, legal, IT, and customer operations because these workflows need auditable decisions, retrieval from trusted data, and human oversight. Multimodal models are also expanding how teams work with documents, images, voice, and dashboards, while smaller specialized models are improving cost control and latency. The next wave is less about replacing people and more about compressing routine analysis, routing, and follow-up work into reliable supervised processes. The winners will pair strong model capability with governance, evaluation, observability, and clear product experiences that make AI outputs easy to inspect and correct.",
+  },
+];
+
+function getInitialEntity(group: EntityGroup, entityId?: string) {
+  return fallbackEntities[group].find((entity) => entity.id === entityId) ?? fallbackEntities[group][0];
+}
+
+function isAgnoDeepLinkSession(group: EntityGroup, entityId: string, sessionId?: string) {
+  return group === "teams" && entityId === "router-team" && sessionId === agnoDeepLinkSessionId;
+}
+
+function updateChatUrl(group: EntityGroup, entity: EntityCardData, sessionId?: string | null) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  params.set("type", groupTypeParams[group]);
+  params.set("id", entity.id);
+  if (sessionId) {
+    params.set("session", sessionId);
+  } else {
+    params.delete("session");
+  }
+  window.history.replaceState(null, "", `/chat?${params.toString()}`);
+}
+
+export function ChatSurface({
+  initialGroup = "agents",
+  initialEntityId,
+  initialSessionId,
+}: ChatSurfaceProps) {
+  const initialEntity = getInitialEntity(initialGroup, initialEntityId);
+  const initialDeepLinkSession = isAgnoDeepLinkSession(initialGroup, initialEntity.id, initialSessionId);
+  const [entityGroup, setEntityGroup] = useState<EntityGroup>(initialGroup);
+  const [selectedEntity, setSelectedEntity] = useState<EntityCardData>(initialEntity);
   const [menu, setMenu] = useState<Menu>(null);
   const [inspector, setInspector] = useState<Inspector>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(initialDeepLinkSession ? agnoRestoredMessages : []);
   const [input, setInput] = useState("");
-  const [sessionId, setSessionId] = useState<string | undefined>();
+  const [sessionId, setSessionId] = useState<string | undefined>(initialSessionId);
   const [isSending, setIsSending] = useState(false);
+  const [showInactiveOverlay, setShowInactiveOverlay] = useState(initialDeepLinkSession);
 
   const availableEntities = fallbackEntities[entityGroup];
   const hasMessages = messages.length > 0;
   const placeholder = useMemo(
-    () => (hasMessages ? "Ask a follow-up..." : "Ask anything..."),
-    [hasMessages],
+    () => (showInactiveOverlay || !hasMessages ? "Ask anything..." : "Ask a follow-up..."),
+    [hasMessages, showInactiveOverlay],
   );
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -107,6 +166,7 @@ export function ChatSurface() {
       role: "user",
       content: message,
     };
+    setShowInactiveOverlay(false);
     setMessages((current) => [...current, userMessage]);
     setInput("");
     setIsSending(true);
@@ -114,6 +174,7 @@ export function ChatSurface() {
     try {
       const response = await sendChatMessage(message, sessionId);
       setSessionId(response.session_id ?? sessionId);
+      updateChatUrl(entityGroup, selectedEntity, response.session_id ?? sessionId);
       setMessages((current) => [
         ...current,
         {
@@ -137,11 +198,14 @@ export function ChatSurface() {
   }
 
   function selectGroup(nextGroup: EntityGroup) {
+    const nextEntity = fallbackEntities[nextGroup][0];
     setEntityGroup(nextGroup);
-    setSelectedEntity(fallbackEntities[nextGroup][0]);
+    setSelectedEntity(nextEntity);
     setMenu(null);
     setMessages([]);
     setSessionId(undefined);
+    setShowInactiveOverlay(false);
+    updateChatUrl(nextGroup, nextEntity, null);
   }
 
   function selectEntity(entity: EntityCardData) {
@@ -149,6 +213,8 @@ export function ChatSurface() {
     setMenu(null);
     setMessages([]);
     setSessionId(undefined);
+    setShowInactiveOverlay(false);
+    updateChatUrl(entityGroup, entity, null);
   }
 
   function startNewSession() {
@@ -157,6 +223,8 @@ export function ChatSurface() {
     setSessionId(undefined);
     setInspector(null);
     setMenu(null);
+    setShowInactiveOverlay(false);
+    updateChatUrl(entityGroup, selectedEntity, null);
   }
 
   return (
@@ -294,21 +362,42 @@ export function ChatSurface() {
             </div>
           ) : (
             <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-3 overflow-auto px-2 pb-36 pt-8">
-              {messages.map((message) => (
-                <div
-                  className={cn(
-                    "max-w-[78%] rounded-lg px-3 py-2 text-sm leading-6",
-                    message.role === "user"
-                      ? "ml-auto bg-neutral-950 text-white"
-                      : "mr-auto border border-neutral-200 bg-white text-neutral-700",
-                  )}
-                  key={message.id}
-                >
-                  {message.content}
-                </div>
-              ))}
+              {messages.map((message) =>
+                message.role === "assistant" ? (
+                  <div className="mr-auto max-w-[78%] space-y-2" key={message.id}>
+                    {message.stepLabel ? (
+                      <details className="group rounded-lg border border-neutral-200 bg-white text-sm" open>
+                        <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2 font-medium text-neutral-700">
+                          <ChevronRight className="size-4 transition-transform group-open:rotate-90" />
+                          {message.stepLabel}
+                        </summary>
+                        <div className="border-t border-neutral-100 px-3 py-2 font-mono text-[11px] uppercase text-neutral-500">
+                          Run started from restored session
+                        </div>
+                      </details>
+                    ) : null}
+                    <div className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm leading-6 text-neutral-700">
+                      {message.content}
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className="ml-auto max-w-[78%] rounded-lg bg-neutral-950 px-3 py-2 text-sm leading-6 text-white"
+                    key={message.id}
+                  >
+                    {message.content}
+                  </div>
+                ),
+              )}
             </div>
           )}
+
+          {showInactiveOverlay ? (
+            <AgentOsInactiveOverlay
+              onDismiss={() => setShowInactiveOverlay(false)}
+              onRefresh={() => window.location.reload()}
+            />
+          ) : null}
 
           <form
             className="absolute inset-x-0 bottom-2 mx-auto w-full max-w-3xl rounded-2xl border border-neutral-200 bg-white p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)]"
@@ -350,6 +439,54 @@ export function ChatSurface() {
       {inspector === "sessions" ? (
         <SessionsInspector messages={messages} onClose={() => setInspector(null)} />
       ) : null}
+    </div>
+  );
+}
+
+function AgentOsInactiveOverlay({
+  onDismiss,
+  onRefresh,
+}: {
+  onDismiss: () => void;
+  onRefresh: () => void;
+}) {
+  return (
+    <div className="absolute inset-x-0 top-1/2 z-20 mx-auto w-[min(92%,560px)] -translate-y-1/2 rounded-lg border border-neutral-200 bg-white px-8 py-7 text-center shadow-[0_18px_60px_rgba(0,0,0,0.18)]">
+      <p className="mb-5 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-neutral-400">
+        No teams available
+      </p>
+      <div className="mx-auto mb-4 grid size-10 place-items-center rounded-full bg-neutral-100">
+        <Database className="size-5 text-neutral-500" />
+      </div>
+      <h2 className="text-lg font-semibold">AgentOS not active</h2>
+      <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-neutral-500">
+        Your AgentOS is connected but is not active. After running the AgentOS you need to refresh the page.
+      </p>
+      <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <a
+          className="inline-flex h-9 items-center rounded-md border border-neutral-200 px-3 text-xs font-semibold uppercase hover:bg-neutral-50"
+          href="https://docs.agno.com/agent-os/connect-your-os"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Learn more
+        </a>
+        <button
+          className="inline-flex h-9 items-center rounded-md border border-neutral-200 px-3 text-xs font-semibold uppercase hover:bg-neutral-50"
+          onClick={onRefresh}
+          type="button"
+        >
+          Refresh
+        </button>
+        <button
+          className="inline-flex h-9 items-center rounded-md bg-neutral-900 px-3 text-xs font-semibold uppercase text-white hover:bg-neutral-700"
+          onClick={onDismiss}
+          type="button"
+        >
+          Explore a live demo AgentOS
+        </button>
+      </div>
+      <p className="mt-5 text-xs text-red-500">Failed to connect to the AgentOS</p>
     </div>
   );
 }

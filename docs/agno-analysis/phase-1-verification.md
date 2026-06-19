@@ -115,6 +115,49 @@ Target reference screenshots:
 - `docs/agno-analysis/next-reference-screenshots/chat-config-panel.png`
 - `docs/agno-analysis/next-reference-screenshots/chat-sessions-panel.png`
 
+## Chat Deep Link Iteration
+
+Chrome/CDP analysis added the authenticated Agno Chat deep-link verification
+for:
+
+`https://os.agno.com/chat?type=team&id=router-team&session=1534cf8b-ec92-40e3-91ed-2fb1e942267c`
+
+Observed Agno behavior:
+
+- The route keeps `type=team`, `id=router-team`, and the session UUID in the
+  URL.
+- The selected runnable context is `Teams / Router Team`.
+- The previous user message is restored as `write insights on ai trends in 200
+  words`.
+- The assistant run shows a `Finance Agent: Working...` step accordion and an
+  answer starting with `Artificial Intelligence (AI) continues to be a
+  transformative force in 2024`.
+- The composer placeholder remains `Ask anything...`.
+- When local AgentOS health checks fail, the page shows `AgentOS not active`,
+  `NO TEAMS AVAILABLE`, `LEARN MORE`, `REFRESH`, `EXPLORE A LIVE DEMO AGENTOS`,
+  and `Failed to connect to the AgentOS`.
+
+Local Chrome assertions passed for:
+
+- `/chat?type=team&id=router-team&session=1534cf8b-ec92-40e3-91ed-2fb1e942267c`
+  preserves the URL and renders `Teams / Router Team`.
+- The restored user message, `Finance Agent: Working...`, restored assistant
+  answer, inactive overlay, and `Ask anything...` placeholder are visible.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/chat-deeplink-restored.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/chat-deeplink-reference.png`
+
+2026-06-19 Chat deep-link follow-up verification:
+
+- `pnpm lint`: passed.
+- `pnpm build`: passed.
+- Production preview used `pnpm exec next start -p 3003`.
+
 ## Studio And Learning Iteration
 
 Chrome/CDP interaction analysis added Studio and Learning verification passes:

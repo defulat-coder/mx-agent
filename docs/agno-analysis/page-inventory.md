@@ -10,6 +10,7 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 |---|---|---|
 | Home | `https://os.agno.com/try-demo` | `docs/agno-analysis/reference-screenshots/home.png` |
 | Chat | `https://os.agno.com/try-demo/chat?type=agent` | `docs/agno-analysis/reference-screenshots/chat.png` |
+| Chat deep link | `https://os.agno.com/chat?type=team&id=router-team&session=1534cf8b-ec92-40e3-91ed-2fb1e942267c` | `docs/agno-analysis/next-reference-screenshots/chat-deeplink-reference.png` |
 | Sessions | `https://os.agno.com/try-demo/sessions?sort_by=updated_at_desc&type=all&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/sessions.png` |
 | Traces | `https://os.agno.com/try-demo/traces?group_by=sessions&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/traces.png` |
 | Studio | `https://os.agno.com/try-demo/studio/agents` | `docs/agno-analysis/next-reference-screenshots/studio-list-reference.png` |
@@ -90,6 +91,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 ### Chat
 
 - Main modes: agent/team/workflow selection inferred from `type` query param.
+- Authenticated deep links preserve `type`, `id`, and `session` query params to
+  restore the selected runnable entity and conversation state.
 - Empty state: entity selector, See Config, Sessions, New Session, starter prompt suggestions.
 - Active session state: centered conversation column, assistant step accordion, markdown response, copy action, bottom sticky composer.
 - Composer: textarea, attachment/settings icon buttons, entity selector, send button. Disabled when no runnable entity or OS inactive.
@@ -101,6 +104,25 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - When any inspector is open, text controls collapse to icon buttons for config/session history plus `NEW SESSION`.
   - `SESSIONS` opens the same right-side inspector area with `Sessions`, close control, and an empty state: `No session found` plus `No session records yet. Start a conversation to create one.`
   - Starter prompt pills fill the composer, while `NEW SESSION` resets the conversation state.
+  - The authenticated route
+    `/chat?type=team&id=router-team&session=1534cf8b-ec92-40e3-91ed-2fb1e942267c`
+    restores the Router Team context, a user message `write insights on ai
+    trends in 200 words`, a `Finance Agent: Working...` step accordion, and an
+    assistant answer beginning `Artificial Intelligence (AI) continues to be a
+    transformative force in 2024`.
+  - When the connected local AgentOS is unreachable, the authenticated route
+    checks `http://localhost:7777/health` and overlays `AgentOS not active`,
+    `Your AgentOS is connected but is not active. After running the AgentOS you
+    need to refresh the page.`, `LEARN MORE`, `REFRESH`, `EXPLORE A LIVE DEMO
+    AGENTOS`, and `Failed to connect to the AgentOS`.
+  - Authenticated shell/API traffic observed for the deep link includes
+    `POST https://os-api.agno.com/api/v1/auth/authenticate`, organization/user
+    lookups, `GET /api/v1/operating-systems/`, operating-system security keys,
+    and billing lookup before local AgentOS health checks.
+  - Local implementation now initializes `/chat` from `type/id/session`, syncs
+    later entity/session changes back into the URL, restores the captured Router
+    Team conversation, and renders the inactive-AgentOS overlay for the captured
+    session.
 
 ### Sessions
 
