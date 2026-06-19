@@ -83,12 +83,20 @@ export function AppShell({
   userInitials: string;
 }) {
   const pathname = usePathname();
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = (href: string, label?: string) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+    if (label === "Learning") {
+      return pathname.startsWith("/learning");
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
   const settingsLabel = settingsSubNav.find(([, href]) => pathname === href)?.[0];
   const studioLabel = studioSubNav.find(([, href]) => pathname === href)?.[0];
   const learningLabel = learningSubNav.find(([, href]) => pathname === href)?.[0];
-  const pageLabel = !settingsLabel && pathname !== "/" ? navigation.find((item) => isActive(item.href))?.label : null;
+  const pageLabel = !settingsLabel && pathname !== "/" ? navigation.find((item) => isActive(item.href, item.label))?.label : null;
 
   return (
     <div className="min-h-svh bg-[#f4f4f5] text-neutral-950">
@@ -113,7 +121,7 @@ export function AppShell({
           <nav className="flex-1 space-y-0.5 px-2">
             {navigation.map((item, index) => {
               const Icon = iconMap[item.icon] ?? Home;
-              const active = isActive(item.href);
+              const active = isActive(item.href, item.label);
               const hasDivider = index === 1 || item.group === "settings";
 
               return (

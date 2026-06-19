@@ -16,7 +16,11 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 | Sessions | `https://os.agno.com/try-demo/sessions?sort_by=updated_at_desc&type=all&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/sessions.png` |
 | Traces | `https://os.agno.com/try-demo/traces?group_by=sessions&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/traces.png` |
 | Studio | `https://os.agno.com/try-demo/studio/agents` | `docs/agno-analysis/next-reference-screenshots/studio-list-reference.png` |
-| Learning | `https://os.agno.com/learning/user_memory?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/next-reference-screenshots/learning-user-memory-reference.png` |
+| Learning User Memories | `https://os.agno.com/learning/user_memory?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/next-reference-screenshots/learning-user-memory-reference.png` |
+| Learning User Profiles | `https://os.agno.com/learning/user_profile?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/next-reference-screenshots/learning-user-profile-reference.png` |
+| Learning Entity Memories | `https://os.agno.com/learning/entity_memory?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/next-reference-screenshots/learning-entity-memory-reference.png` |
+| Learning Session Context | `https://os.agno.com/learning/session_context?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/next-reference-screenshots/learning-session-context-reference.png` |
+| Learning Decision Logs | `https://os.agno.com/learning/decision_log?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/next-reference-screenshots/learning-decision-log-reference.png` |
 | Memory | `https://os.agno.com/try-demo/memory?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/memory.png` |
 | Knowledge | `https://os.agno.com/try-demo/knowledge?sort_by=updated_at_desc&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/knowledge.png` |
 | Metrics | `https://os.agno.com/try-demo/metrics` | `docs/agno-analysis/reference-screenshots/metrics.png` |
@@ -84,11 +88,25 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Default route redirects to `/learning/user_memory`.
 - Learning expands the sidebar with second-level navigation: User Memories, User
   Profiles, Entity Memories, Session Context, and Decision Logs.
-- The main header breadcrumb shows the active section, while the content area is
-  an empty/loading workspace with a centered three-dot indicator when the data
-  surface is unavailable.
-- Local implementation now adds `/learning/[section]`, the sidebar subnav, and
-  reference-style blank/loading states for User Memories and Decision Logs.
+- The main header breadcrumb shows the active section.
+- `User Memories` can render an empty/loading workspace with a centered
+  three-dot indicator while the memory page is loading.
+- `User Profiles`, `Entity Memories`, `Session Context`, and `Decision Logs`
+  reuse a MemoryPage-style entity table under the authenticated shell. Observed
+  columns are checkbox, `ENTITY NAME`, `ENTITY TYPE`, and `UPDATED AT`.
+- Captured entity rows include `Acme Corp`, `Sarah Chen`, `Project Phoenix`,
+  `Q3 Roadmap`, `Stripe`, `Marcus Lee`, `Design System`, `Series A Round`,
+  `Kubernetes Migration`, and `Postgres Cluster`.
+- Authenticated Learning traffic loads `MemoryPage` assets, performs OS/user/org
+  API lookups through `https://os-api.agno.com`, then checks
+  `http://localhost:7777/health`.
+- When the connected AgentOS is down, Learning keeps the table visible behind a
+  blurred inactive overlay with `AgentOS not active`, `LEARN MORE`, `REFRESH`,
+  `EXPLORE A LIVE DEMO AGENTOS`, and a bottom-right
+  `Failed to connect to the AgentOS` toast.
+- Local implementation now adds `/learning/[section]`, sidebar subnav, shell
+  active-state support for every Learning child route, User Memories loading
+  state, and inactive entity-table states for the other four sections.
 
 ### Chat
 

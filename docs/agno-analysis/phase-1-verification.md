@@ -341,11 +341,12 @@ Chrome/CDP interaction analysis added Studio and Learning verification passes:
 - Publish is disabled until required fields are present.
 - Learning expands second-level sidebar navigation for User Memories, User
   Profiles, Entity Memories, Session Context, and Decision Logs.
-- Learning section pages render a blank/loading workspace with a centered
-  three-dot indicator when data is unavailable.
+- User Memories renders a blank/loading workspace with a centered three-dot
+  indicator when data is unavailable.
 - Local `/studio/agents` now implements the list and builder states.
-- Local `/learning/[section]` now implements the observed sidebar subnav and
-  loading workspace.
+- Local `/learning/[section]` implements the observed sidebar subnav and User
+  Memories loading workspace; later Learning sections are covered in the
+  Learning Entity Table iteration below.
 
 Local Chrome assertions passed for:
 
@@ -355,8 +356,7 @@ Local Chrome assertions passed for:
   Save Draft, and a disabled Publish button.
 - `/learning/user_memory` includes the expanded Learning subnav and three-dot
   loading state.
-- `/learning/decision_log` switches the breadcrumb/active section and keeps the
-  three-dot loading state.
+- `/learning/decision_log` switches the breadcrumb/active section.
 
 Local screenshots:
 
@@ -372,6 +372,64 @@ Target reference screenshots:
 - `docs/agno-analysis/next-reference-screenshots/learning-user-memory-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/learning-user-profile-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/learning-entity-memory-reference.png`
+
+## Learning Entity Table Iteration
+
+Chrome/CDP analysis expanded the Learning coverage for:
+
+- `https://os.agno.com/learning/user_profile?sort_by=updated_at_desc&page=1&limit=25`
+- `https://os.agno.com/learning/entity_memory?sort_by=updated_at_desc&page=1&limit=25`
+- `https://os.agno.com/learning/session_context?sort_by=updated_at_desc&page=1&limit=25`
+- `https://os.agno.com/learning/decision_log?sort_by=updated_at_desc&page=1&limit=25`
+
+Observed Agno behavior:
+
+- These routes use the authenticated shell with the Learning subnav expanded and
+  the active child route highlighted.
+- The main surface renders a table with checkbox, `ENTITY NAME`, `ENTITY TYPE`,
+  and `UPDATED AT` columns.
+- Captured rows include `Acme Corp`, `Sarah Chen`, `Project Phoenix`, `Q3
+  Roadmap`, `Stripe`, `Marcus Lee`, `Design System`, `Series A Round`,
+  `Kubernetes Migration`, and `Postgres Cluster`.
+- CDP network events show authenticated shell/API traffic, `MemoryPage` assets,
+  and `http://localhost:7777/health` checks before the inactive overlay appears.
+- When AgentOS is down, the table remains visible under a blurred `AgentOS not
+  active` overlay plus a bottom-right `Failed to connect to the AgentOS` toast.
+
+Local implementation now mirrors this state:
+
+- The app shell treats every `/learning/*` route as an active Learning route so
+  the sidebar and breadcrumb show the active child label.
+- `User Memories` keeps the reference-style three-dot loading state.
+- `User Profiles`, `Entity Memories`, `Session Context`, and `Decision Logs`
+  render the observed entity table with inactive overlay and error toast.
+
+Local Chrome assertions passed for:
+
+- `/learning/user_profile`, `/learning/entity_memory`,
+  `/learning/session_context`, and `/learning/decision_log` each render the
+  active child label, `ENTITY NAME`, `Acme Corp`, `AgentOS not active`, and
+  `Failed to connect to the AgentOS`.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/learning-user-profile-local.png`
+- `docs/agno-analysis/local-screenshots/learning-entity-memory-local.png`
+- `docs/agno-analysis/local-screenshots/learning-session-context-local.png`
+- `docs/agno-analysis/local-screenshots/learning-decision-log-local.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/learning-user-profile-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/learning-entity-memory-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/learning-session-context-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/learning-decision-log-reference.png`
+
+2026-06-19 Learning entity table follow-up verification:
+
+- `pnpm lint`: passed.
+- `pnpm build`: passed.
+- Production preview used `HOSTNAME=0.0.0.0 PORT=3003 node .next/standalone/server.js`.
 
 ## Data Page Interaction Iteration
 
