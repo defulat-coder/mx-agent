@@ -68,6 +68,9 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - Local implementation now follows the three-group Home card flow, supports
     collapse/expand, Show More/Show Less, Chat links, and a local `/config`
     page with the observed configuration sections.
+  - Home is now covered by the desktop screenshot diff gate as
+    `home-demo-shell`; the gate is structural because entity copy differs
+    between public Demo OS sample data and MX enterprise sample data.
 
 ### Studio
 

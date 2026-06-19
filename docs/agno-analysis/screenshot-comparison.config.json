@@ -12,6 +12,13 @@
   },
   "pairs": [
     {
+      "name": "home-demo-shell",
+      "reference": "docs/agno-analysis/next-reference-screenshots/home-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/home-reference-local.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
+    },
+    {
       "name": "studio-builder-advanced",
       "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-advanced-reference.png",
       "local": "docs/agno-analysis/local-screenshots/studio-builder-advanced-local.png",

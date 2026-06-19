@@ -1010,3 +1010,19 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `studio-builder-advanced`: passed, different ratio `0.079296` against max
   `0.08`.
 - `settings-os-shell`: passed, different ratio `0.065668` against max `0.12`.
+
+2026-06-19 Home visual diff matrix expansion:
+
+- Current visual diff gate remains desktop-only at 1512 x 828; mobile is
+  intentionally out of scope for this phase.
+- Added `home-demo-shell` to the screenshot comparison matrix using
+  `docs/agno-analysis/next-reference-screenshots/home-reference.png` and
+  `docs/agno-analysis/local-screenshots/home-reference-local.png`.
+- The Home threshold is a structural drift gate because the local product uses
+  MX enterprise entities while the Agno reference uses public Demo OS sample
+  entities.
+- `pnpm visual:diff` now reports `3/3 passed`.
+- `home-demo-shell`: passed, different ratio `0.107337` against max `0.14`.
+- `studio-builder-advanced`: passed, different ratio `0.079296` against max
+  `0.08`.
+- `settings-os-shell`: passed, different ratio `0.065668` against max `0.12`.
