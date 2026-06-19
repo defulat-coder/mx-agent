@@ -111,7 +111,24 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Controls: Add Content, sort by Updated At.
 - Table columns: Name, Content Type, Metadata, Status, Updated At.
 - Metadata uses key/value chips; statuses include Completed/Processing.
-- Public demo shows skeleton/empty table rows when knowledge content is not available; local implementation keeps rows visible for MX data and uses the same compact table geometry.
+- Interaction pass on 2026-06-19:
+  - Public Demo OS renders `Knowledge`, collection selector `Clinic Records`,
+    disabled `ADD CONTENT`, and an `Updated at` sort control.
+  - Demo rows are loaded for `clinic_records_contents` and include
+    `P-1002-care_plan`, `P-1003-bloodwork`, `P-1003-care_plan`,
+    `P-1001-bloodwork`, `P-1001-visit_note`, and `P-1002-bloodwork`.
+  - Collection selector opens a compact popover with entries such as
+    `Clinic Records`, `Dash Knowledge`, `Dash Learnings`,
+    `Investment Knowledge`, `Investment Learnings`, and `Coach Learnings`.
+    Each entry shows `Db Id` and `Table` metadata.
+  - Metadata renders as uppercase key/value chips, showing the first metadata
+    key and a `+N` overflow chip for hidden metadata.
+  - Row click opens a right-side edit drawer with Name, Description optional,
+    Metadata, Content Type, Updated At, and Delete/Cancel/Save actions. Save is
+    disabled until edits.
+  - Local implementation now uses a dedicated Knowledge panel with the observed
+    collection menu, disabled Add Content state, table geometry, metadata
+    overflow chips, sort toggle, and right-side edit drawer.
 
 ### Metrics
 

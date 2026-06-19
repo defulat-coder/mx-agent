@@ -290,6 +290,48 @@ Target reference screenshots:
 - `docs/agno-analysis/next-reference-screenshots/memory-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/memory-create-reference.png`
 
+## Knowledge Workflow Iteration
+
+Chrome/CDP interaction analysis added a Knowledge verification pass:
+
+- Public demo reference renders `Knowledge` with selected collection
+  `Clinic Records`, disabled `ADD CONTENT`, Name/Content Type/Metadata/Status/
+  Updated At columns, and six clinic-record rows.
+- Collection selector opens a popover with collection name plus `Db Id` and
+  `Table` metadata for each option.
+- Metadata uses uppercase key/value chips and `+N` overflow chips when a row
+  has additional metadata.
+- Row click opens a right-side edit drawer with Name, Description optional,
+  Metadata, Content Type, Status, Updated At, Delete, Cancel, and disabled Save
+  controls.
+- Local `/knowledge` now renders a dedicated Knowledge table, collection menu,
+  disabled Add Content state, sort toggle, metadata overflow chips, and
+  reference-style edit drawer.
+
+Local Chrome assertions passed for:
+
+- `/knowledge` includes the observed Name, Content Type, Metadata, Status, and
+  Updated At columns.
+- Local table includes six clinic-record rows with `COMPLETED` status and
+  metadata overflow chips.
+- `ADD CONTENT` is disabled to match Demo OS.
+- `Clinic Records` opens a collection popover with `Db Id: mx-agent-db` and
+  `Table: clinic_records_contents`.
+- Clicking `P-1003-care_plan` opens the details drawer with Delete/Cancel/Save;
+  Save is disabled before edits.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/knowledge-list.png`
+- `docs/agno-analysis/local-screenshots/knowledge-collection.png`
+- `docs/agno-analysis/local-screenshots/knowledge-detail.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/knowledge-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/knowledge-collection-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/knowledge-sort-reference.png`
+
 ## Metrics Workflow Iteration
 
 Chrome/CDP interaction analysis added a Metrics verification pass:
