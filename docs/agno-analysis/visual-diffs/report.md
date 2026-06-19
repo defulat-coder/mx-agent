@@ -1,10 +1,10 @@
 # Visual Diff Report
 
-Generated: 2026-06-19T12:31:49.008Z
+Generated: 2026-06-19T12:34:59.894Z
 
 Config: `docs/agno-analysis/screenshot-comparison.config.json`
 
-Totals: 23/23 passed, 0 failed.
+Totals: 24/24 passed, 0 failed.
 
 | Status | Pair | Viewport | Reference | Local | Different ratio | Max ratio | Diff |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -30,4 +30,5 @@ pass | learning-user-memory-loading | desktop-compact | 1512x772 | 1512x772 | 0.
 pass | settings-profile | desktop | 1512x828 | 1512x828 | 0.02799 | 0.08 | docs/agno-analysis/visual-diffs/diffs/settings-profile.diff.png
 pass | settings-organization | desktop | 1512x828 | 1512x828 | 0.055464 | 0.08 | docs/agno-analysis/visual-diffs/diffs/settings-organization.diff.png
 pass | settings-billing | desktop | 1512x828 | 1512x828 | 0.092232 | 0.1 | docs/agno-analysis/visual-diffs/diffs/settings-billing.diff.png
+pass | settings-roles | desktop | 1512x828 | 1512x828 | 0.07783 | 0.08 | docs/agno-analysis/visual-diffs/diffs/settings-roles.diff.png
 pass | settings-os-shell | desktop | 1512x828 | 1512x828 | 0.065668 | 0.12 | docs/agno-analysis/visual-diffs/diffs/settings-os-shell.diff.png

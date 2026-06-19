@@ -1295,3 +1295,16 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `pnpm visual:diff` now reports `23/23 passed`.
 - `settings-organization`: passed, different ratio `0.055464` against max
   `0.08`.
+
+2026-06-19 Settings roles visual diff matrix expansion:
+
+- Rechecked `https://os.agno.com/settings/roles` with Chrome/CDP at 1512 x 828.
+  The current Chrome session redirects to `https://os.agno.com/signin`, so the
+  existing authenticated Roles reference screenshot from the earlier successful
+  Settings pass remains the source of truth.
+- Used the existing Roles reference and current local Roles screenshot to cover
+  the blurred role grid, Enterprise upgrade gate, `LEARN MORE`, and
+  `CONTACT SALES` structure.
+- Added `settings-roles` to the screenshot comparison matrix.
+- `pnpm visual:diff` now reports `24/24 passed`.
+- `settings-roles`: passed, different ratio `0.07783` against max `0.08`.

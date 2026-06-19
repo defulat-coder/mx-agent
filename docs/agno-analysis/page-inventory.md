@@ -457,6 +457,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - Roles shows role tiles with `MANAGE` and `DELETE` actions behind a blurred
     Enterprise upgrade gate. The foreground callout has `LEARN MORE` and
     `CONTACT SALES`.
+  - Roles is now covered by the desktop screenshot diff gate as
+    `settings-roles`.
   - Billing shows three equal-height pricing columns: Free/current tier, Pro
     at `$150 per month`, and Enterprise/contact us.
   - Billing is now covered by the desktop screenshot diff gate as

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T12:31:49.008Z",
+  "generatedAt": "2026-06-19T12:34:59.894Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 23,
-    "passed": 23,
+    "pairs": 24,
+    "passed": 24,
     "failed": 0
   },
   "results": [
@@ -566,6 +566,31 @@
         "differentRatio": 0.092232,
         "meanAbsDelta": 20.723,
         "rmseDelta": 82.386
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "settings-roles",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/settings-roles-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/settings-roles.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/settings-roles.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.08
+      },
+      "metrics": {
+        "differentPixels": 97438,
+        "totalPixels": 1251936,
+        "differentRatio": 0.07783,
+        "meanAbsDelta": 23.172,
+        "rmseDelta": 93.506
       },
       "sizeMismatch": false
     },
