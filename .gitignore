@@ -21,6 +21,7 @@ backend/.env
 # Logs
 log/
 backend/log/
+.codex/logs/
 
 # Cursor
 # .cursor/ 全部纳入版本管理
