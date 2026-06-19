@@ -108,6 +108,22 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Header context: database and `agno_eval_runs` table.
 - Controls: View filters, New Eval, evaluation type filter, sort by Updated At.
 - Table columns: Evaluation Name, Agent/Team, Model, Type, Updated At.
+- Interaction pass on 2026-06-19:
+  - Demo OS requests evaluation runs from
+    `/eval-runs?db_id=demo-os-db&table=agno_eval_runs&page=1&limit=25&sort_by=updated_at&sort_order=desc`
+    on the configured AgentOS endpoint after fetching the demo SDK token.
+  - Demo table rows include `Agno docs lookup`, `Response quality`,
+    `Secret leakage guard`, `Latency baseline`, and `Tool call add_task`.
+  - `NEW EVAL` is visible but disabled in Demo OS.
+  - The first View menu filters by `All`, `Agents`, and `Teams`; the second
+    View menu groups `Types` (`Accuracy`, `Performance`, `Reliability`,
+    `Agent as Judge`) and `Models` (`gpt-5.5`).
+  - Row click opens a right-side evaluation details panel with aggregate score
+    tiles, result fields (`Score`, `Output`, `Expected Output`, `Input`,
+    `Reason`), and `Delete`, `ReRun`, `Close`, `Save` actions.
+  - Local implementation preserves the table controls, implements type/scope
+    filtering, makes `NEW EVAL` open a creation inspector, and adds a functional
+    run-detail inspector.
 
 ### Approvals
 

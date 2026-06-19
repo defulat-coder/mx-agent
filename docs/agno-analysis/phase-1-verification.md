@@ -208,3 +208,41 @@ Target reference screenshots:
 
 - `docs/agno-analysis/next-reference-screenshots/scheduler-demo-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/scheduler-authenticated-reference.png`
+
+## Evaluation Workflow Iteration
+
+Chrome/CDP interaction analysis added an Evaluation verification pass:
+
+- Public demo reference renders `Evaluation` with database `demo-os-db`, table
+  `agno_eval_runs`, `View: All`, disabled `New Eval`, evaluation type/model
+  filter, and Updated At sorting.
+- Demo evaluation rows include `Agno docs lookup`, `Response quality`,
+  `Secret leakage guard`, `Latency baseline`, and `Tool call add_task`.
+- The page requests demo data from the AgentOS endpoint at
+  `/eval-runs?db_id=demo-os-db&table=agno_eval_runs&page=1&limit=25&sort_by=updated_at&sort_order=desc`.
+- Row click opens a right-side details panel with aggregate score tiles,
+  Results fields, Delete, ReRun, Close, and Save actions.
+- Local `/evaluation` now renders a dedicated evaluation table, scope filter,
+  type/model filter, sort toggle, row details inspector, and New Eval creation
+  inspector.
+
+Local Chrome assertions passed for:
+
+- `/evaluation` includes five rows and the observed Evaluation Name,
+  Agent/Team, Model, Type, and Updated At columns.
+- Clicking `Agno docs lookup` opens a details inspector with score tiles,
+  Results fields, and Delete/ReRun/Close/Save actions.
+- The Performance filter reduces the table to the `Latency baseline` row.
+- `New Eval` opens a right-side creation inspector with five inputs.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/evaluation-list.png`
+- `docs/agno-analysis/local-screenshots/evaluation-detail.png`
+- `docs/agno-analysis/local-screenshots/evaluation-filter-performance.png`
+- `docs/agno-analysis/local-screenshots/evaluation-new-eval.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/evaluation-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/evaluation-row-click-reference.png`
