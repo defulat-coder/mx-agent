@@ -1,11 +1,6 @@
-from pathlib import Path
-
 import pytest
 
 from app.evals.seed_inventory import SeedInventory, SeedInventoryLookupError, parse_insert_values
-
-
-ROOT = Path("/Users/cy/PycharmProjects/mx-agent")
 
 
 def test_parse_insert_values_supports_multiline_batch_insert():

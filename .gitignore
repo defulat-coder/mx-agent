@@ -8,15 +8,19 @@ wheels/
 
 # Virtual environments
 .venv
+backend/.venv
 
 # Data (SQLite databases)
 data/
+backend/data/
 
 # Environment variables
 .env
+backend/.env
 
 # Logs
 log/
+backend/log/
 
 # Cursor
 # .cursor/ 全部纳入版本管理

@@ -58,7 +58,8 @@ base_app.include_router(v1_router, prefix="/v1")
 
 # AgentOS
 agent_os = AgentOS(
-    name="马喜智能助手",
+    id=settings.AGENTOS_ID,
+    name=settings.AGENTOS_NAME or settings.APP_NAME,
     teams=[router_team],
     base_app=base_app,
     db=SqliteDb(db_file="data/agent_sessions.db"),
@@ -82,6 +83,7 @@ app.add_middleware(
         "/redoc",
         "/openapi.json",
         "/health",
+        "/info",
         "/agents",
         "/agents/*",
         "/teams",
@@ -126,6 +128,7 @@ async def cors_middleware(request: Request, call_next):
         response.headers["access-control-allow-credentials"] = "true"
         response.headers["access-control-allow-methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
         response.headers["access-control-allow-headers"] = "content-type, authorization, x-requested-with, accept, origin"
+        response.headers["access-control-allow-private-network"] = "true"
         response.headers["access-control-max-age"] = "600"
 
     return response

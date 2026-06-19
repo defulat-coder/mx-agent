@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/v1"
     APP_NAME: str = "马喜智能助手"
     DEBUG: bool = False
+    AGENTOS_ID: str | None = None
+    AGENTOS_NAME: str | None = None
 
     # Database
     DATABASE_URL: str = "sqlite+aiosqlite:///data/mx_agent.db"

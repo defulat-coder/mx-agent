@@ -1,8 +1,14 @@
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
 from app.evals import load_profiles, load_yaml
 from app.evals.dataset_models import EvalDatasetCase
+
+
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
+PROFILES_PATH = BACKEND_ROOT / "evals" / "profiles.yaml"
 
 
 def make_valid_payload() -> dict:
@@ -50,14 +56,14 @@ def test_router_case_schema_validation():
 
 
 def test_load_yaml_returns_mapping():
-    data = load_yaml("/Users/cy/PycharmProjects/mx-agent/evals/profiles.yaml")
+    data = load_yaml(PROFILES_PATH)
 
     assert "employee" in data
     assert data["manager"]["department_id"] == 2
 
 
 def test_load_profiles_returns_named_personas():
-    profiles = load_profiles("/Users/cy/PycharmProjects/mx-agent/evals/profiles.yaml")
+    profiles = load_profiles(PROFILES_PATH)
 
     assert "employee" in profiles
     assert profiles["manager"].department_id == 2

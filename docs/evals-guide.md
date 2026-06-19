@@ -4,16 +4,17 @@
 > `docs/superpowers/specs/2026-03-23-langfuse-evals-design.md`。
 >
 > **快速开始（新架构）：**
-> 1. 迁移用例：`uv run python scripts/migrate_evals.py`
-> 2. 执行评测：`uv run python scripts/run_evals.py --limit 20 --auth-token <token>`
-> 3. 查看结果：登录 Langfuse UI → Datasets → mx-agent-evals
-> 4. API 触发：`POST /v1/evals/runs`，查询进度：`GET /v1/evals/runs/{run_name}`
+> 1. 进入后端目录：`cd backend`
+> 2. 迁移用例：`uv run python scripts/migrate_evals.py`
+> 3. 执行评测：`uv run python scripts/run_evals.py --limit 20 --auth-token <token>`
+> 4. 查看结果：登录 Langfuse UI → Datasets → mx-agent-evals
+> 5. API 触发：`POST /v1/evals/runs`，查询进度：`GET /v1/evals/runs/{run_name}`
 >
-> 历史 Markdown 用例已归档至 `tests/archived/`。
+> 历史 Markdown 用例已归档至 `backend/tests/archived/`。
 
 ## 1. 目标与范围
 
-本项目评估模块用于将 `tests/test_evaluation_*.md` 中的用例结构化解析后，按需进行：
+本项目评估模块用于将 `backend/tests/archived/test_evaluation_*.md` 中的用例结构化解析后，按需进行：
 
 - 静态统计（用例数量、前缀分布）
 - 在线执行（调用接口并打分）
@@ -29,12 +30,12 @@
 
 ## 2. 代码结构
 
-- 解析与过滤：`app/evals/runner.py`
-- 执行与打分：`app/evals/executor.py`
-- 命令行入口：`scripts/run_evals.py`
+- 解析与过滤：`backend/app/evals/runner.py`
+- 执行与打分：`backend/app/evals/executor.py`
+- 命令行入口：`backend/scripts/run_evals.py`
 - 核心测试：
-  - `tests/test_eval_runner.py`
-  - `tests/test_eval_executor.py`
+  - `backend/tests/test_eval_runner.py`
+  - `backend/tests/test_eval_executor.py`
 
 ---
 
@@ -109,6 +110,7 @@
 ### 5.1 仅统计
 
 ```bash
+cd backend
 uv run python scripts/run_evals.py
 uv run python scripts/run_evals.py --id-prefix EMP,ADM
 uv run python scripts/run_evals.py --output-json data/evals/cases.json
@@ -117,6 +119,7 @@ uv run python scripts/run_evals.py --output-json data/evals/cases.json
 ### 5.2 执行评估
 
 ```bash
+cd backend
 uv run python scripts/run_evals.py --mode execute --limit 20 --base-url http://localhost:8000
 uv run python scripts/run_evals.py --mode execute --endpoint /v1/chat --request-mode json
 uv run python scripts/run_evals.py --mode execute --show-failed 10 --output-json data/evals/results.json
