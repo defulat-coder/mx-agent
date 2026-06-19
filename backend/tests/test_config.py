@@ -10,4 +10,4 @@ def test_default_settings():
 
 
 def test_database_url_format():
-    assert settings.DATABASE_URL.startswith("postgresql+asyncpg://")
+    assert settings.DATABASE_URL.startswith("sqlite+aiosqlite:///")

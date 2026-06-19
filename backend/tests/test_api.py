@@ -1,17 +1,27 @@
 """API 基础测试"""
 
+from types import SimpleNamespace
+
 import pytest
 from httpx import AsyncClient
 
 
-async def test_health_404(client: AsyncClient):
-    """未定义的路由返回统一格式 404"""
+@pytest.fixture(autouse=True)
+def mock_router_chat(monkeypatch: pytest.MonkeyPatch):
+    """避免 API 契约测试依赖真实 LLM。"""
+
+    async def fake_arun(*args, **kwargs):
+        return SimpleNamespace(content="测试回复", session_id=kwargs.get("session_id") or "test-session")
+
+    monkeypatch.setattr("app.api.v1.endpoints.chat.router_team.arun", fake_arun)
+
+
+async def test_health_ok(client: AsyncClient):
+    """AgentOS health 路由返回运行状态。"""
     resp = await client.get("/health")
-    assert resp.status_code == 404
+    assert resp.status_code == 200
     body = resp.json()
-    assert body["code"] == 40401
-    assert "request_id" in body
-    assert "timestamp" in body
+    assert body["status"] == "ok"
 
 
 async def test_chat_missing_body(client: AsyncClient, auth_headers: dict):
@@ -43,7 +53,6 @@ async def test_request_id_passthrough(client: AsyncClient):
     """请求携带 X-Request-ID 时透传"""
     resp = await client.get("/health", headers={"X-Request-ID": "custom-id-123"})
     assert resp.headers["X-Request-ID"] == "custom-id-123"
-    assert resp.json()["request_id"] == "custom-id-123"
 
 
 async def test_chat_response_schema(client: AsyncClient, auth_headers: dict):

@@ -101,6 +101,7 @@ app.add_middleware(
         "/metrics",
         "/metrics/*",
         "/config",
+        "/v1/chat",
         "/components",
         "/components/*",
         "/models",
