@@ -217,3 +217,30 @@ Autoreview:
   not change function bodies.
 - `app.services.hr.__init__` is down to 585 lines. The HR service package now
   has explicit employee, manager, and admin slices.
+
+### Step 6 - Split HR talent-development service queries
+
+Status: completed
+
+Architecture change:
+
+- Moved talent-development employee details, training, nine-grid, performance,
+  turnover, promotion, IDP, and employee search queries into
+  `app.services.hr.talent`.
+- Replaced `app.services.hr.__init__` with an explicit re-export module and
+  `__all__`, preserving the existing `hr_service.*` interface for tools.
+
+Verification:
+
+- Import compatibility check for representative HR exports -> passed.
+- Full backend suite: `uv run pytest` -> 103 passed.
+- Live HTTP check on port 8001:
+  - `GET /health` -> 200.
+  - `POST /v1/chat` without token -> 401 with `code=40101`.
+
+Autoreview:
+
+- HR service depth improved materially: the old 1630-line `hr.py` is now a
+  package with role-oriented modules and a 107-line export surface.
+- No tool call sites changed; this keeps the refactor focused on locality and
+  navigability.
