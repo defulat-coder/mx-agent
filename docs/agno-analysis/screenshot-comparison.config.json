@@ -50,6 +50,13 @@
       "viewport": "desktop"
     },
     {
+      "name": "chat-shell-state",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-shell-state.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-interaction.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
+    },
+    {
       "name": "chat-run-sage",
       "reference": "docs/agno-analysis/next-reference-screenshots/chat-run-sage-reference.png",
       "local": "docs/agno-analysis/local-screenshots/chat-run-local.png",

@@ -1390,3 +1390,14 @@ repeatable measurement path for subsequent page-by-page iterations.
   `desktop-compact` viewport.
 - `pnpm visual:diff` now reports `33/33 passed`.
 - `chat-sessions-run`: passed, different ratio `0.082403` against max `0.12`.
+
+2026-06-19 Chat shell visual diff matrix expansion:
+
+- Mobile validation is intentionally deferred for this phase; the active
+  screenshot matrix remains desktop-only at the Agno reference viewport.
+- Added the base Chat shell/entity-selector state to the official screenshot
+  comparison matrix as `chat-shell-state`, using the captured Agno reference
+  `docs/agno-analysis/next-reference-screenshots/chat-shell-state.png` and
+  local screenshot `docs/agno-analysis/local-screenshots/chat-interaction.png`.
+- `pnpm visual:diff` now reports `34/34 passed`.
+- `chat-shell-state`: passed, different ratio `0.065168` against max `0.14`.

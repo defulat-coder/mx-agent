@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T12:56:47.918Z",
+  "generatedAt": "2026-06-19T13:04:39.339Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 33,
-    "passed": 33,
+    "pairs": 34,
+    "passed": 34,
     "failed": 0
   },
   "results": [
@@ -141,6 +141,31 @@
         "differentRatio": 0.064963,
         "meanAbsDelta": 16.437,
         "rmseDelta": 69.057
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "chat-shell-state",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-shell-state.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-interaction.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/chat-shell-state.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 81586,
+        "totalPixels": 1251936,
+        "differentRatio": 0.065168,
+        "meanAbsDelta": 17.362,
+        "rmseDelta": 78.107
       },
       "sizeMismatch": false
     },

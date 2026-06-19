@@ -216,10 +216,10 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - Local implementation now mirrors the observed tool-call run state for Agno
     prompts: `1 TOOL CALLED` appears in the conversation and opens a `Tool
     Calls` inspector containing `SEARCH_AGNO`.
-  - Chat is now covered by desktop screenshot diff gates for the configuration
-    inspector, empty recent-session inspector, completed Sage run, completed-run
-    Sessions inspector, collapsed tool-call pill, and expanded Tool Calls
-    inspector states.
+  - Chat is now covered by desktop screenshot diff gates for the base shell and
+    entity-selector state, configuration inspector, empty recent-session
+    inspector, completed Sage run, completed-run Sessions inspector, collapsed
+    tool-call pill, and expanded Tool Calls inspector states.
 
 ### Sessions
 
