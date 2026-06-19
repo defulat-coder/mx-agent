@@ -405,8 +405,35 @@ def get_schedules() -> OSTableResponse:
                 "cron": "0 9 * * *",
                 "endpoint": "/v1/agents/summary/runs",
                 "next_run": "20 Jun 2026, 09:00 UTC",
+                "updated_at": "19 Jun 2026, 08:10",
+            },
+            {
+                "id": "sc-2",
+                "enabled": False,
+                "name": "Weekly Backup",
+                "cron": "0 4 * * 0",
+                "endpoint": "/v1/agents/backup/runs",
+                "next_run": "23 Jun 2026, 04:00 UTC",
+                "updated_at": "18 Jun 2026, 17:25",
+            },
+            {
+                "id": "sc-3",
+                "enabled": True,
+                "name": "Quarterly Compliance Audit",
+                "cron": "0 6 1 1,4,7,10 *",
+                "endpoint": "/v1/agents/compliance/runs",
+                "next_run": "1 Jul 2026, 06:00 UTC",
+                "updated_at": "16 Jun 2026, 11:42",
+            },
+            {
+                "id": "sc-4",
+                "enabled": False,
+                "name": "Daily Customer Feedback Digest",
+                "cron": "0 8 * * *",
+                "endpoint": "/v1/agents/feedback-digest/runs",
+                "next_run": "20 Jun 2026, 08:00 UTC",
                 "updated_at": "-",
-            }
+            },
         ],
     )
 

@@ -174,3 +174,37 @@ Target reference screenshots:
 
 - `docs/agno-analysis/next-reference-screenshots/traces-list-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/traces-authenticated-reference.png`
+
+## Scheduler Workflow Iteration
+
+Chrome/CDP interaction analysis added a Scheduler verification pass:
+
+- Public demo reference shows a `Not available for Demo OS` overlay over a
+  blurred scheduler table.
+- Authenticated reference can show the Scheduler shell and loading state while
+  account/control-plane data resolves.
+- Local `/scheduler` now renders a dedicated scheduler table with Enabled
+  switches, Name, Cron, Endpoint, Next Run, Updated At, and Run actions.
+- Row click opens a schedule details inspector with enabled state, cron,
+  endpoint, next run, updated at, Run now, Refresh, and execution-window copy.
+- View filter supports All, Enabled, and Disabled schedule states.
+
+Local Chrome assertions passed for:
+
+- `/scheduler` includes the `MX AgentOS / Scheduler` breadcrumb.
+- Scheduler table includes Enabled, Cron, Endpoint, and Next Run columns.
+- Local schedule rows include daily summary, weekly backup, quarterly
+  compliance audit, and customer feedback digest.
+- Clicking a row opens the details inspector.
+- Enabled filter hides disabled schedule rows while keeping enabled rows.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/scheduler-list.png`
+- `docs/agno-analysis/local-screenshots/scheduler-detail.png`
+- `docs/agno-analysis/local-screenshots/scheduler-filter-enabled.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/scheduler-demo-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/scheduler-authenticated-reference.png`

@@ -123,6 +123,16 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Table columns: Enabled, Name, Cron, Endpoint, Next Run, Updated At.
 - Rows use switches for enable state and cron/endpoint monospace content.
 - Demo state includes not-available messaging.
+- Interaction pass on 2026-06-19:
+  - Public demo eventually resolves to a `Not available for Demo OS` overlay on
+    top of a blurred schedule table.
+  - Authenticated/account state can remain in a loading state when the connected
+    AgentOS scheduler data is unavailable.
+  - Underlying table rows include switch controls, schedule name, cron string,
+    endpoint path, next run timestamp, and updated-at timestamp.
+  - Local implementation keeps the schedule table usable, adds View filters for
+    all/enabled/disabled, preserves the switch-first row layout, supports Run
+    actions, and opens a right-side schedule details inspector.
 
 ### Settings
 
