@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T14:15:45.021Z",
+  "generatedAt": "2026-06-19T15:07:28.079Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -741,11 +741,11 @@
         "maxDifferentRatio": 0.08
       },
       "metrics": {
-        "differentPixels": 74292,
+        "differentPixels": 74502,
         "totalPixels": 1251936,
-        "differentRatio": 0.059342,
-        "meanAbsDelta": 17.027,
-        "rmseDelta": 67.185
+        "differentRatio": 0.059509,
+        "meanAbsDelta": 17.158,
+        "rmseDelta": 67.769
       },
       "sizeMismatch": false
     },
@@ -866,11 +866,11 @@
         "maxDifferentRatio": 0.08
       },
       "metrics": {
-        "differentPixels": 72310,
+        "differentPixels": 74895,
         "totalPixels": 1251936,
-        "differentRatio": 0.057759,
-        "meanAbsDelta": 16.475,
-        "rmseDelta": 74.424
+        "differentRatio": 0.059823,
+        "meanAbsDelta": 17.07,
+        "rmseDelta": 76.275
       },
       "sizeMismatch": false
     },

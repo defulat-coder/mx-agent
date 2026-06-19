@@ -83,7 +83,8 @@ export function AppShell({
   userInitials: string;
 }) {
   const pathname = usePathname();
-  const isDemoSurface = !pathname.startsWith("/settings");
+  const isLocalProductionSurface = pathname === "/metrics/local" || pathname === "/scheduler/local";
+  const isDemoSurface = !pathname.startsWith("/settings") && !isLocalProductionSurface;
   const isActive = (href: string, label?: string) => {
     if (href === "/") {
       return pathname === "/";

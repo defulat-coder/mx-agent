@@ -1,6 +1,6 @@
 # Visual Diff Report
 
-Generated: 2026-06-19T14:15:45.021Z
+Generated: 2026-06-19T15:07:28.079Z
 
 Config: `docs/agno-analysis/screenshot-comparison.config.json`
 
@@ -36,12 +36,12 @@ pass | knowledge-table | desktop | 1512x828 | 1512x828 | 0.075372 | 0.08 | docs/
 pass | knowledge-collection-menu | desktop | 1512x828 | 1512x828 | 0.082309 | 0.09 | docs/agno-analysis/visual-diffs/diffs/knowledge-collection-menu.diff.png
 pass | memory-empty-overlay | desktop | 1512x828 | 1512x828 | 0.145103 | 0.15 | docs/agno-analysis/visual-diffs/diffs/memory-empty-overlay.diff.png
 pass | memory-create-dialog | desktop | 1512x828 | 1512x828 | 0.092857 | 0.1 | docs/agno-analysis/visual-diffs/diffs/memory-create-dialog.diff.png
-pass | metrics-gated-overlay | desktop | 1512x828 | 1512x828 | 0.059342 | 0.08 | docs/agno-analysis/visual-diffs/diffs/metrics-gated-overlay.diff.png
+pass | metrics-gated-overlay | desktop | 1512x828 | 1512x828 | 0.059509 | 0.08 | docs/agno-analysis/visual-diffs/diffs/metrics-gated-overlay.diff.png
 pass | approvals-gated-overlay | desktop | 1512x828 | 1512x828 | 0.053984 | 0.08 | docs/agno-analysis/visual-diffs/diffs/approvals-gated-overlay.diff.png
 pass | approvals-status-menu | desktop | 1512x828 | 1512x828 | 0.059634 | 0.08 | docs/agno-analysis/visual-diffs/diffs/approvals-status-menu.diff.png
 pass | approvals-pending-filter | desktop | 1512x828 | 1512x828 | 0.054344 | 0.08 | docs/agno-analysis/visual-diffs/diffs/approvals-pending-filter.diff.png
 pass | approvals-table-gated-overlay | desktop | 1512x828 | 1512x828 | 0.049324 | 0.14 | docs/agno-analysis/visual-diffs/diffs/approvals-table-gated-overlay.diff.png
-pass | scheduler-gated-overlay | desktop | 1512x828 | 1512x828 | 0.057759 | 0.08 | docs/agno-analysis/visual-diffs/diffs/scheduler-gated-overlay.diff.png
+pass | scheduler-gated-overlay | desktop | 1512x828 | 1512x828 | 0.059823 | 0.08 | docs/agno-analysis/visual-diffs/diffs/scheduler-gated-overlay.diff.png
 pass | evaluation-list | desktop | 1512x828 | 1512x828 | 0.067094 | 0.12 | docs/agno-analysis/visual-diffs/diffs/evaluation-list.diff.png
 pass | evaluation-detail | desktop | 1512x828 | 1512x828 | 0.107163 | 0.12 | docs/agno-analysis/visual-diffs/diffs/evaluation-detail.diff.png
 pass | traces-sessions-table | desktop-compact | 1512x772 | 1512x772 | 0.058645 | 0.08 | docs/agno-analysis/visual-diffs/diffs/traces-sessions-table.diff.png

@@ -93,7 +93,7 @@ function MetricChart({
   );
 }
 
-export function MetricsGrid({ data }: { data: MetricsResponse }) {
+export function MetricsGrid({ data, gated = true }: { data: MetricsResponse; gated?: boolean }) {
   const [monthIndex, setMonthIndex] = useState(months.indexOf(data.period) >= 0 ? months.indexOf(data.period) : 2);
   const [exported, setExported] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState(data.metrics[0]?.label ?? "");
@@ -111,7 +111,7 @@ export function MetricsGrid({ data }: { data: MetricsResponse }) {
         <div className="flex gap-6 text-sm">
           <div>
             <p className="mb-1 text-xs text-neutral-500">Database</p>
-            <p className="whitespace-nowrap font-medium">demo-os-db</p>
+            <p className="whitespace-nowrap font-medium">{gated ? "demo-os-db" : data.database}</p>
           </div>
           <div className="pt-6 font-mono text-neutral-500">/</div>
           <div>
@@ -154,7 +154,7 @@ export function MetricsGrid({ data }: { data: MetricsResponse }) {
       </div>
 
       <div className="relative min-h-[720px] overflow-hidden">
-        <div className="blur-[5px]">
+        <div className={cn(gated && "blur-[5px]")}>
           <div className="grid gap-4 xl:grid-cols-2">
             {data.metrics.map((metric) => (
               <MetricChart
@@ -197,25 +197,27 @@ export function MetricsGrid({ data }: { data: MetricsResponse }) {
           </div>
         </div>
 
-        <div className="absolute inset-0 flex items-start justify-center bg-white/70 pt-20">
-          <div className="text-center">
-            <div className="relative mx-auto mb-8 h-11 w-20">
-              <div className="absolute left-0 top-2 grid size-8 -rotate-12 place-items-center rounded-full bg-neutral-950 text-white shadow-sm">
-                <Gauge className="size-4" />
+        {gated ? (
+          <div className="absolute inset-0 flex items-start justify-center bg-white/70 pt-20">
+            <div className="text-center">
+              <div className="relative mx-auto mb-8 h-11 w-20">
+                <div className="absolute left-0 top-2 grid size-8 -rotate-12 place-items-center rounded-full bg-neutral-950 text-white shadow-sm">
+                  <Gauge className="size-4" />
+                </div>
+                <div className="absolute right-4 top-0 grid size-8 rotate-12 place-items-center rounded-full bg-red-500 text-white shadow-sm">
+                  <TriangleAlert className="size-4" />
+                </div>
               </div>
-              <div className="absolute right-4 top-0 grid size-8 rotate-12 place-items-center rounded-full bg-red-500 text-white shadow-sm">
-                <TriangleAlert className="size-4" />
-              </div>
+              <h2 className="text-[26px] font-medium leading-none tracking-normal">Not available for Demo OS</h2>
+              <p className="mx-auto mt-4 max-w-[352px] text-center text-sm leading-[21px] tracking-normal text-neutral-500">
+                {data.gated_message}
+              </p>
+              <CommandButton className="mt-7 h-9 px-5">
+                Learn More
+              </CommandButton>
             </div>
-            <h2 className="text-[26px] font-medium leading-none tracking-normal">Not available for Demo OS</h2>
-            <p className="mx-auto mt-4 max-w-[352px] text-center text-sm leading-[21px] tracking-normal text-neutral-500">
-              {data.gated_message}
-            </p>
-            <CommandButton className="mt-7 h-9 px-5">
-              Learn More
-            </CommandButton>
           </div>
-        </div>
+        ) : null}
       </div>
     </div>
   );

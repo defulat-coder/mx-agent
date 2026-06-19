@@ -1581,3 +1581,28 @@ repeatable measurement path for subsequent page-by-page iterations.
   the Approvals table at 1512 x 828.
 - Added `learning-user-memory-desktop-loading`, covering the Learning/User
   Memories desktop loading shell at 1512 x 828.
+
+2026-06-19 Metrics and Scheduler local production mode:
+
+- Rechecked `https://os.agno.com/try-demo/metrics` and
+  `https://os.agno.com/try-demo/scheduler` with Chrome/CDP. In the current
+  Chrome profile the Metrics route rendered an empty app shell before auth
+  resolution, while Scheduler redirected to `/signin`; observed auth traffic
+  included `users/me`, `auth/authenticate`, `demo-sdk-token`, and
+  `auth/authrefresh` responses with 401s during the redirect path.
+- Kept the default local `/metrics` and `/scheduler` routes in Demo/gated mode
+  for the existing Agno reference gates.
+- Added local production routes for deployable MX AgentOS operation:
+  `/metrics/local` and `/scheduler/local`.
+- `/metrics/local` removes the Demo banner and gated overlay, uses
+  `mx-agent-db`, keeps export/month controls active, and preserves selected
+  metric state such as `Selected: Team Runs`.
+- `/scheduler/local` removes the Demo banner and gated overlay, adds export,
+  `View: All`/`Enabled`/`Disabled` filtering, row Run actions, schedule detail
+  inspector, `Run now`/`Queued` state, and the execution-window panel.
+- Captured local production verification screenshots:
+  `docs/agno-analysis/local-screenshots/metrics-local-production.png` and
+  `docs/agno-analysis/local-screenshots/scheduler-local-production.png`.
+- Removed `next/font/google` from the root layout and switched to local CSS
+  font stacks so `pnpm build` no longer depends on fetching Google Fonts at
+  build time.
