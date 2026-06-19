@@ -545,6 +545,56 @@ Target reference screenshots:
 - `docs/agno-analysis/next-reference-screenshots/settings-roles-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/settings-billing-reference.png`
 
+## Settings OS Security Interaction Iteration
+
+Chrome/CDP analysis expanded the authenticated Settings OS & Security page:
+
+`https://os.agno.com/settings/os`
+
+Observed Agno behavior:
+
+- The page requests authenticated account/control-plane data including
+  `/auth/authenticate`, `/org/`, `/users/me`, `/users/me/organizations`,
+  `/operating-systems/`, `/operating-systems/{id}/security-keys`, and
+  `/org/billing/`.
+- The lower OS & Security form has security-key generation, additional
+  settings, description, tag entry, custom header key/value inputs, a disabled
+  custom-header add button until inputs are filled, a dedicated `Danger zone`,
+  red `DELETE AGENTOS`, and a bottom disabled `SAVE`.
+
+Local implementation now mirrors these interaction states:
+
+- AgentOS ID copy button shows temporary copied feedback.
+- Security key generation populates a local preview key and marks the form
+  dirty.
+- Tag input adds uppercase chips.
+- Custom header name/value inputs enable `Add header`, append a header row, and
+  allow local removal.
+- `SAVE` enables after edits, while destructive deletion remains a local-only
+  command button.
+
+Local Chrome assertions passed for:
+
+- `/settings/os` renders `OS & Security`, `Danger zone`, `Custom headers`, and
+  the disabled baseline controls.
+- Clicking copy, generating a security key, adding `OPS`, and adding
+  `X-AgentOS-Preview: enabled` render the generated key value, chip, header row,
+  remove-header control, and enabled `Save`.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/settings-os-interactions-local.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/settings-os-interactions-reference.png`
+
+2026-06-19 Settings OS Security follow-up verification:
+
+- `pnpm lint`: passed.
+- `pnpm build`: passed.
+- Production preview used `HOSTNAME=0.0.0.0 PORT=3003 node .next/standalone/server.js`.
+
 ## Traces Explorer Iteration
 
 Chrome/CDP interaction analysis added a Traces verification pass:

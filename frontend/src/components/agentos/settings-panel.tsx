@@ -247,17 +247,21 @@ function OSSecuritySettings({ settings }: { settings: SettingsResponse }) {
   const os = settings.os;
   const initialTags = useMemo(() => (Array.isArray(os.tags) ? os.tags.map(String) : ["LOCAL", "PRODUCTION"]), [os.tags]);
   const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [copied, setCopied] = useState(false);
   const [name, setName] = useState(asString(os.name, "MX AgentOS"));
   const [protocol, setProtocol] = useState(asString(os.protocol, "http://"));
   const [endpoint, setEndpoint] = useState(asString(os.endpoint_host, asString(os.endpoint_url, "localhost:8000").replace(/^https?:\/\//, "")));
   const [authorization, setAuthorization] = useState(asString(os.authorization, "jwt") === "jwt");
+  const [securityKey, setSecurityKey] = useState("");
   const [description, setDescription] = useState(asString(os.description, ""));
   const [tags, setTags] = useState(initialTags);
   const [tagValue, setTagValue] = useState("");
   const [headerName, setHeaderName] = useState("");
   const [headerValue, setHeaderValue] = useState("");
+  const [headers, setHeaders] = useState<Array<{ name: string; value: string }>>([]);
   const osId = asString(os.id, "mx-agent");
   const markDirty = () => setSaveState("dirty");
+  const canAddHeader = headerName.trim().length > 0 && headerValue.trim().length > 0;
 
   return (
     <div className="max-w-5xl space-y-5 pb-12">
@@ -267,8 +271,18 @@ function OSSecuritySettings({ settings }: { settings: SettingsResponse }) {
       <Field label="AgentOS ID" wide>
         <div className="flex">
           <input className={cn(inputClass, "rounded-r-none font-mono")} disabled value={osId} />
-          <button aria-label="Copy AgentOS ID" className={cn(buttonClass, "rounded-l-none px-3")} type="button">
-            <Copy className="size-3.5" />
+          <button
+            aria-label="Copy AgentOS ID"
+            className={cn(buttonClass, "min-w-24 rounded-l-none px-3")}
+            onClick={() => {
+              void navigator.clipboard?.writeText(osId);
+              setCopied(true);
+              window.setTimeout(() => setCopied(false), 1600);
+            }}
+            type="button"
+          >
+            {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+            {copied ? "Copied" : "Copy"}
           </button>
         </div>
       </Field>
@@ -308,8 +322,16 @@ function OSSecuritySettings({ settings }: { settings: SettingsResponse }) {
         </div>
         <Field label="Security key" wide>
           <div className="grid grid-cols-[1fr_44px] gap-2">
-            <input className={inputClass} disabled placeholder="Set or generate a security key" value="" />
-            <button aria-label="Generate security key" className={buttonClass} type="button">
+            <input className={cn(inputClass, "font-mono")} disabled placeholder="Set or generate a security key" value={securityKey} />
+            <button
+              aria-label="Generate security key"
+              className={buttonClass}
+              onClick={() => {
+                setSecurityKey("sk_live_mx_agent_preview_4f9d2a");
+                markDirty();
+              }}
+              type="button"
+            >
               <KeyRound className="size-3.5" />
             </button>
           </div>
@@ -354,19 +376,62 @@ function OSSecuritySettings({ settings }: { settings: SettingsResponse }) {
         </div>
         <div className="mt-5 space-y-2">
           <span className={labelClass}>Custom headers</span>
-          <div className="grid max-w-4xl gap-2 sm:grid-cols-2">
+          <div className="grid max-w-4xl gap-2 sm:grid-cols-[1fr_1fr_44px]">
             <input className={inputClass} onChange={(event) => { setHeaderName(event.target.value); markDirty(); }} placeholder="Header name (e.g., X-Custom-Auth)" value={headerName} />
             <input className={inputClass} onChange={(event) => { setHeaderValue(event.target.value); markDirty(); }} placeholder="Header value" value={headerValue} />
+            <button
+              aria-label="Add header"
+              className={buttonClass}
+              disabled={!canAddHeader}
+              onClick={() => {
+                setHeaders((current) => [...current, { name: headerName.trim(), value: headerValue.trim() }]);
+                setHeaderName("");
+                setHeaderValue("");
+                markDirty();
+              }}
+              type="button"
+            >
+              <Plus className="size-3.5" />
+            </button>
           </div>
+          <p className="max-w-3xl text-sm text-neutral-500">
+            Add custom headers to pass through your infrastructure (e.g., X-Forwarded-For, X-Custom-Auth)
+          </p>
+          {headers.length ? (
+            <div className="mt-3 max-w-4xl overflow-hidden rounded-lg border border-neutral-100">
+              {headers.map((header) => (
+                <div className="grid grid-cols-[1fr_1fr_44px] items-center gap-2 border-b border-neutral-100 px-3 py-2 last:border-b-0" key={`${header.name}-${header.value}`}>
+                  <span className="font-mono text-[11px] uppercase text-neutral-700">{header.name}</span>
+                  <span className="truncate font-mono text-[11px] text-neutral-500">{header.value}</span>
+                  <button
+                    aria-label={`Remove ${header.name}`}
+                    className="grid size-8 place-items-center rounded-md text-neutral-400 hover:bg-neutral-50 hover:text-red-600"
+                    onClick={() => {
+                      setHeaders((current) => current.filter((item) => item !== header));
+                      markDirty();
+                    }}
+                    type="button"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
+      </section>
+
+      <section className="max-w-4xl rounded-lg border border-red-100 bg-white p-5">
+        <p className="text-sm font-semibold">Danger zone</p>
+        <p className="mt-2 text-sm text-neutral-500">Permanently delete this AgentOS and all its resources</p>
+        <button className={cn(buttonClass, "mt-4 border-red-200 text-red-600 hover:bg-red-50")} type="button">
+          <Trash2 className="size-3.5" />
+          Delete AgentOS
+        </button>
       </section>
 
       <div className="flex items-center gap-3">
         <SaveButton onSave={() => setSaveState("saved")} state={saveState} />
-        <button className={cn(buttonClass, "border-red-200 text-red-600 hover:bg-red-50")} type="button">
-          <Trash2 className="size-3.5" />
-          Delete AgentOS
-        </button>
       </div>
     </div>
   );

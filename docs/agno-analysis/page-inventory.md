@@ -26,6 +26,7 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 | Metrics | `https://os.agno.com/try-demo/metrics` | `docs/agno-analysis/reference-screenshots/metrics.png` |
 | Approvals | `https://os.agno.com/try-demo/approvals?status=all&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/approvals.png` |
 | Scheduler | `https://os.agno.com/try-demo/scheduler` | `docs/agno-analysis/reference-screenshots/scheduler.png` |
+| Settings OS interactions | `https://os.agno.com/settings/os` | `docs/agno-analysis/next-reference-screenshots/settings-os-interactions-reference.png` |
 
 ## Application Shell
 
@@ -367,6 +368,14 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
     JWT toggle, security key generation control, additional settings,
     description textarea, tag entry, custom header key/value inputs, `SAVE`,
     and `DELETE AGENTOS`.
+  - In OS & Security, `ADD TAG` and custom-header add controls are disabled
+    until their inputs are populated. The lower section includes a custom
+    headers helper line, a dedicated `Danger zone`, a red `DELETE AGENTOS`
+    command, and a bottom `SAVE` command that stays disabled until edits.
+  - Local implementation now mirrors the OS & Security interaction states:
+    copy feedback for AgentOS ID, security-key generation placeholder, tag
+    addition, custom header add/remove rows, enabled save state after edits, and
+    the separated danger-zone block.
   - Roles shows role tiles with `MANAGE` and `DELETE` actions behind a blurred
     Enterprise upgrade gate. The foreground callout has `LEARN MORE` and
     `CONTACT SALES`.
