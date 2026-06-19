@@ -951,3 +951,37 @@ Target reference screenshots:
 - `pnpm lint`: passed.
 - `pnpm build`: passed.
 - Production preview used `HOSTNAME=0.0.0.0 PORT=3003 node .next/standalone/server.js`.
+
+## Visual Diff Gate Iteration
+
+A reusable screenshot comparison gate was added for the final 1:1 verification
+work:
+
+- Config: `docs/agno-analysis/screenshot-comparison.config.json`.
+- Script: `frontend/scripts/compare-screenshots.mjs`.
+- Command: `cd frontend && pnpm visual:diff`.
+- Output: `docs/agno-analysis/visual-diffs/report.json`,
+  `docs/agno-analysis/visual-diffs/report.md`, and per-pair diff PNGs under
+  `docs/agno-analysis/visual-diffs/diffs/`.
+- The script uses Node standard library plus local `sips` normalization, so it
+  can compare the current Chrome screenshots even when they are JPEG bytes saved
+  with `.png` names.
+- Default desktop matrix is 1512 x 828, with per-pair channel and ratio
+  thresholds.
+- `--fail-on-diff` is available for future CI or stricter local gates.
+
+Initial visual diff run:
+
+```bash
+cd frontend
+pnpm visual:diff
+```
+
+Result:
+
+- `studio-builder-advanced`: failed, different ratio `0.134473` against max
+  `0.08`.
+- `settings-os-shell`: passed, different ratio `0.065668` against max `0.12`.
+
+This does not claim final 1:1 completion; it gives the remaining visual drift a
+repeatable measurement path for subsequent page-by-page iterations.

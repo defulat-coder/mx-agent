@@ -451,4 +451,6 @@ The page also connects to a local AgentOS endpoint configured on the OS record. 
 ## Open Verification Items
 
 - Whether local AgentOS routes provide enough data for traces, memories, knowledge, metrics, evals, approvals, and scheduler, or whether MX-specific facade endpoints are needed.
-- Pixel-diff tolerance and viewport matrix for final 1:1 screenshot verification.
+- Expand `docs/agno-analysis/screenshot-comparison.config.json` from the current
+  desktop smoke matrix to every page/interaction state before final 1:1
+  acceptance.

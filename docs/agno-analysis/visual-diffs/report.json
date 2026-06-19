@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-06-19T08:26:34.752Z",
+  "config": "docs/agno-analysis/screenshot-comparison.config.json",
+  "viewportMatrix": [
+    {
+      "name": "desktop",
+      "width": 1512,
+      "height": 828
+    }
+  ],
+  "totals": {
+    "pairs": 2,
+    "passed": 1,
+    "failed": 1
+  },
+  "results": [
+    {
+      "name": "studio-builder-advanced",
+      "status": "fail",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-advanced-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-builder-advanced-local.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/studio-builder-advanced.diff.png",
+      "dimensions": {
+        "reference": "1512x772",
+        "local": "1512x772",
+        "compared": "1512x772"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.08
+      },
+      "metrics": {
+        "differentPixels": 156966,
+        "totalPixels": 1167264,
+        "differentRatio": 0.134473,
+        "meanAbsDelta": 43.592,
+        "rmseDelta": 129.493
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "settings-os-shell",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/settings-os-nav-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/settings-os.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/settings-os-shell.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.12
+      },
+      "metrics": {
+        "differentPixels": 82212,
+        "totalPixels": 1251936,
+        "differentRatio": 0.065668,
+        "meanAbsDelta": 15.533,
+        "rmseDelta": 65.24
+      },
+      "sizeMismatch": false
+    }
+  ]
+}
