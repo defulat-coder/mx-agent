@@ -1259,3 +1259,23 @@ repeatable measurement path for subsequent page-by-page iterations.
 - Added `settings-profile` to the screenshot comparison matrix.
 - `pnpm visual:diff` now reports `21/21 passed`.
 - `settings-profile`: passed, different ratio `0.02799` against max `0.08`.
+
+2026-06-19 Settings billing visual diff matrix expansion:
+
+- Rechecked `https://os.agno.com/try-demo` with Chrome/CDP at 1512 x 828. The
+  current Chrome session redirects to `https://os.agno.com/signin?callbackUrl=%2Ftry-demo`
+  and does not expose a usable public Demo OS surface, so the existing
+  authenticated Billing reference screenshot from the earlier successful
+  Settings pass remains the source of truth.
+- Aligned local `/settings/billing` with the captured Billing page by adding the
+  bottom-right `Failed to connect to the AgentOS` toast and tightening the
+  Billing pricing grid vertical placement.
+- Recaptured `docs/agno-analysis/local-screenshots/settings-billing.png` from
+  the standalone build.
+- Added `settings-billing` to the screenshot comparison matrix with
+  `maxDifferentRatio: 0.1` to allow account/workspace identity drift while still
+  covering the Billing page structure.
+- `pnpm lint`: passed.
+- `pnpm build`: passed.
+- `pnpm visual:diff` now reports `22/22 passed`.
+- `settings-billing`: passed, different ratio `0.092232` against max `0.1`.

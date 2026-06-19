@@ -457,6 +457,9 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
     `CONTACT SALES`.
   - Billing shows three equal-height pricing columns: Free/current tier, Pro
     at `$150 per month`, and Enterprise/contact us.
+  - Billing is now covered by the desktop screenshot diff gate as
+    `settings-billing`; the threshold allows account/workspace identity drift
+    between the Agno reference account and MX local preview.
   - Settings page requests observed through CDP: `/auth/authenticate`,
     `/org/`, `/users/me`, `/users/me/organizations`, `/operating-systems/`,
     `/operating-systems/{id}/security-keys`, `/org/billing/`,

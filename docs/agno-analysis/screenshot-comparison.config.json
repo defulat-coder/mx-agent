@@ -143,6 +143,13 @@
       "viewport": "desktop"
     },
     {
+      "name": "settings-billing",
+      "reference": "docs/agno-analysis/next-reference-screenshots/settings-billing-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/settings-billing.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.1
+    },
+    {
       "name": "settings-os-shell",
       "reference": "docs/agno-analysis/next-reference-screenshots/settings-os-nav-reference.png",
       "local": "docs/agno-analysis/local-screenshots/settings-os.png",

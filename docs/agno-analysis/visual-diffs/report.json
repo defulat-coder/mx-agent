@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T10:17:20.930Z",
+  "generatedAt": "2026-06-19T12:27:59.989Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 21,
-    "passed": 21,
+    "pairs": 22,
+    "passed": 22,
     "failed": 0
   },
   "results": [
@@ -516,6 +516,31 @@
         "differentRatio": 0.02799,
         "meanAbsDelta": 7.434,
         "rmseDelta": 45.334
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "settings-billing",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/settings-billing-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/settings-billing.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/settings-billing.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.1
+      },
+      "metrics": {
+        "differentPixels": 115469,
+        "totalPixels": 1251936,
+        "differentRatio": 0.092232,
+        "meanAbsDelta": 20.723,
+        "rmseDelta": 82.386
       },
       "sizeMismatch": false
     },

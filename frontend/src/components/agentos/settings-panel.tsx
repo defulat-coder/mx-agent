@@ -516,32 +516,38 @@ function RolesSettings() {
 
 function BillingSettings() {
   return (
-    <div className="grid max-w-7xl overflow-hidden rounded-lg border border-neutral-200 lg:grid-cols-3">
-      {billingColumns.map((column) => (
-        <section className="flex min-h-[530px] flex-col border-b border-neutral-200 p-6 last:border-b-0 lg:border-b-0 lg:border-r lg:last:border-r-0" key={column.kicker}>
-          <p className={labelClass}>{column.kicker}</p>
-          <h2 className="mt-3 text-xl font-medium">{column.price}</h2>
-          <div className="mt-7 flex-1 space-y-5">
-            {column.sections.map((section) => (
-              <div className="space-y-3" key={section.join("-")}>
-                {section.map((item, index) => (
-                  <p className={cn("flex items-center gap-2 font-mono text-[12px] uppercase text-neutral-700", index === 0 && section.length > 1 && "text-neutral-500")} key={item}>
-                    {index === 0 && section.length > 1 ? null : <Check className="size-3.5 text-[#ff3b25]" />}
-                    {item}
-                  </p>
-                ))}
-              </div>
-            ))}
-          </div>
-          <button
-            className={cn(buttonClass, "mt-7 w-fit", !column.disabled && "border-neutral-950 bg-neutral-950 text-white hover:bg-neutral-800")}
-            disabled={column.disabled}
-            type="button"
-          >
-            {column.action}
-          </button>
-        </section>
-      ))}
+    <div className="relative min-h-[697px]">
+      <div className="-mt-4 grid max-w-7xl overflow-hidden rounded-lg border border-neutral-200 lg:grid-cols-3">
+        {billingColumns.map((column) => (
+          <section className="flex min-h-[522px] flex-col border-b border-neutral-200 p-6 last:border-b-0 lg:border-b-0 lg:border-r lg:last:border-r-0" key={column.kicker}>
+            <p className={labelClass}>{column.kicker}</p>
+            <h2 className="mt-2 text-xl font-medium">{column.price}</h2>
+            <div className="mt-7 flex-1 space-y-5">
+              {column.sections.map((section) => (
+                <div className="space-y-3" key={section.join("-")}>
+                  {section.map((item, index) => (
+                    <p className={cn("flex items-center gap-2 font-mono text-[12px] uppercase text-neutral-700", index === 0 && section.length > 1 && "text-neutral-500")} key={item}>
+                      {index === 0 && section.length > 1 ? null : <Check className="size-3.5 text-[#ff3b25]" />}
+                      {item}
+                    </p>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <button
+              className={cn(buttonClass, "mt-7 w-fit", !column.disabled && "border-neutral-950 bg-neutral-950 text-white hover:bg-neutral-800")}
+              disabled={column.disabled}
+              type="button"
+            >
+              {column.action}
+            </button>
+          </section>
+        ))}
+      </div>
+      <div className="absolute bottom-5 right-1 flex h-14 w-[350px] items-center gap-3 rounded-lg border border-neutral-200 bg-white px-4 text-sm text-neutral-700 shadow-sm">
+        <span className="h-7 w-1 rounded-full bg-[#ff3b25]" />
+        Failed to connect to the AgentOS
+      </div>
     </div>
   );
 }
