@@ -22,7 +22,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 
 - Layout: fixed left sidebar around 208px wide, main workspace to the right.
 - Top bar: 56px workspace header, breadcrumb/current OS selector on the left, support and refresh controls on the right.
-- Demo mode: a 40px gray banner sits above the app shell with "WHAT IS DEMO OS?" and "LEAVE DEMO OS".
+- Demo mode: public `/try-demo` pages can show a gray demo banner; authenticated
+  Settings pages render without that banner and use the app shell directly.
 - Sidebar sections: Home, Chat, Sessions, Traces, Studio, Learning, Memory, Knowledge, Metrics, Evaluation, Approvals, Scheduler, Settings.
 - Sidebar footer: docs, Discord, GitHub links and compact user display.
 - Visual system: Inter for text, DM Mono for uppercase command buttons, white canvas, light zinc borders, orange-red brand accent, tight 8-16px spacing.
@@ -115,6 +116,29 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - OS & Security: OS name/id, endpoint URL protocol selector, JWT authorization, security key, description, tags, custom headers, danger zone, save.
   - Roles: built-in roles and upgrade gate for custom role management.
   - Billing: Free/Pro/Enterprise pricing columns and upgrade actions.
+- Interaction pass on 2026-06-19:
+  - Settings sub-navigation is rendered under the sidebar Settings item:
+    `Profile`, `Organization`, `OS & Security`, `Roles`, `Billing`.
+  - Profile uses a sparse form: `NAME`, `USER NAME`, disabled `EMAIL`, and a
+    disabled `SAVE` button until edits are made.
+  - Organization uses the same sparse form top section, then a bordered Pro
+    upgrade panel for multi-user access, tab-like `Members` and
+    `Pending invites` counters, member rows, and `DELETE ORGANIZATION`.
+  - OS & Security is a long form with a disabled ID + copy control, protocol
+    select plus endpoint input, collapsible-looking authorization section,
+    JWT toggle, security key generation control, additional settings,
+    description textarea, tag entry, custom header key/value inputs, `SAVE`,
+    and `DELETE AGENTOS`.
+  - Roles shows role tiles with `MANAGE` and `DELETE` actions behind a blurred
+    Enterprise upgrade gate. The foreground callout has `LEARN MORE` and
+    `CONTACT SALES`.
+  - Billing shows three equal-height pricing columns: Free/current tier, Pro
+    at `$150 per month`, and Enterprise/contact us.
+  - Settings page requests observed through CDP: `/auth/authenticate`,
+    `/org/`, `/users/me`, `/users/me/organizations`, `/operating-systems/`,
+    `/operating-systems/{id}/security-keys`, `/org/billing/`,
+    `/org/memberships`, `/org/invitations`, and
+    `/org/roles/?include_scopes=true`.
 
 ## Observed API Shape
 

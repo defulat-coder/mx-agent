@@ -46,6 +46,14 @@ const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   settings: Settings,
 };
 
+const settingsSubNav = [
+  ["Profile", "/settings/profile"],
+  ["Organization", "/settings/organization"],
+  ["OS & Security", "/settings/os"],
+  ["Roles", "/settings/roles"],
+  ["Billing", "/settings/billing"],
+] as const;
+
 type ShellItem = {
   label: string;
   href: string;
@@ -67,22 +75,11 @@ export function AppShell({
   const pathname = usePathname();
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+  const settingsLabel = settingsSubNav.find(([, href]) => pathname === href)?.[0];
 
   return (
     <div className="min-h-svh bg-[#f4f4f5] text-neutral-950">
-      <div className="flex h-10 items-center justify-between bg-[#777780] px-4 text-sm text-white">
-        <p>You are using MX AgentOS local preview. Production data stays in your deployment.</p>
-        <div className="flex items-center gap-2">
-          <CommandButton className="h-6 border-neutral-950 bg-neutral-950 text-white">
-            What is Demo OS?
-          </CommandButton>
-          <CommandButton className="h-6 border-white/40 bg-white text-neutral-900">
-            Leave Demo OS
-          </CommandButton>
-        </div>
-      </div>
-
-      <div className="flex h-[calc(100svh-40px)]">
+      <div className="flex h-svh">
         <aside className="flex w-52 shrink-0 flex-col border-r border-neutral-200 bg-[#f2f2f3]">
           <div className="flex h-16 items-center justify-between px-4">
             <Link className="flex items-center gap-2 text-sm font-medium" href="/">
@@ -123,6 +120,23 @@ export function AppShell({
                       <ChevronDown className="size-3.5 text-neutral-900" />
                     ) : null}
                   </Link>
+                  {item.label === "Settings" && pathname.startsWith("/settings") ? (
+                    <div className="ml-6 mt-1 space-y-0.5 border-l border-neutral-200 pl-3">
+                      {settingsSubNav.map(([label, href]) => (
+                        <Link
+                          className={cn(
+                            "block rounded-md px-2 py-1.5 text-sm text-neutral-600 transition-colors",
+                            pathname === href && "text-[#ff3b25]",
+                            pathname !== href && "hover:bg-neutral-200/70 hover:text-neutral-900",
+                          )}
+                          href={href}
+                          key={href}
+                        >
+                          {label}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               );
             })}
@@ -153,6 +167,14 @@ export function AppShell({
                 </span>
                 <span className="text-sm font-medium">{workspaceName}</span>
                 <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.16)]" />
+                {settingsLabel ? (
+                  <>
+                    <span className="text-neutral-300">/</span>
+                    <span className="text-sm">Settings</span>
+                    <span className="text-neutral-300">/</span>
+                    <span className="text-sm">{settingsLabel === "OS & Security" ? "AgentOS" : settingsLabel}</span>
+                  </>
+                ) : null}
               </div>
               <div className="flex items-center gap-2">
                 <CommandButton>

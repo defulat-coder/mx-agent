@@ -96,3 +96,46 @@ Target reference screenshots:
 - `docs/agno-analysis/next-reference-screenshots/sessions-filter-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/knowledge-table-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/approvals-table-reference.png`
+
+## Settings Workflow Iteration
+
+Chrome/CDP interaction analysis added a Settings verification pass against the
+authenticated Agno OS settings pages:
+
+- Profile: editable name and username fields, disabled email field, disabled
+  save state until edits.
+- Organization: name form, Pro upgrade panel, members/pending invites tabs,
+  member row, and delete organization command.
+- OS & Security: AgentOS name/id, copy ID control, protocol selector, endpoint
+  input, JWT authorization toggle, security key control, description, tags,
+  custom headers, save, and delete AgentOS command.
+- Roles: blurred role grid with Enterprise upgrade gate and Learn More/Contact
+  Sales actions.
+- Billing: Free/Pro/Enterprise pricing columns with current tier and upgrade
+  actions.
+
+Local Chrome assertions passed for:
+
+- No local-preview banner in the production shell.
+- `/settings/profile` contains Profile, Email, and Save.
+- `/settings/organization` contains invite, members, and pending invite states.
+- `/settings/os` contains OS & Security, Endpoint URL, Authorization, Security
+  key, and Custom headers.
+- `/settings/roles` contains the upgrade gate and Contact sales action.
+- `/settings/billing` contains Free, Pro, Enterprise, and Current tier.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/settings-profile.png`
+- `docs/agno-analysis/local-screenshots/settings-organization.png`
+- `docs/agno-analysis/local-screenshots/settings-os.png`
+- `docs/agno-analysis/local-screenshots/settings-roles.png`
+- `docs/agno-analysis/local-screenshots/settings-billing.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/settings-profile-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/settings-organization-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/settings-os-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/settings-roles-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/settings-billing-reference.png`
