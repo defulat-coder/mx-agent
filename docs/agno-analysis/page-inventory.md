@@ -27,6 +27,7 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 | Approvals | `https://os.agno.com/try-demo/approvals?status=all&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/approvals.png` |
 | Scheduler | `https://os.agno.com/try-demo/scheduler` | `docs/agno-analysis/reference-screenshots/scheduler.png` |
 | Settings OS interactions | `https://os.agno.com/settings/os` | `docs/agno-analysis/next-reference-screenshots/settings-os-interactions-reference.png` |
+| Settings Organization interactions | `https://os.agno.com/settings/organization` | `docs/agno-analysis/next-reference-screenshots/settings-organization-interactions-reference.png` |
 
 ## Application Shell
 
@@ -363,6 +364,16 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - Organization uses the same sparse form top section, then a bordered Pro
     upgrade panel for multi-user access, tab-like `Members` and
     `Pending invites` counters, member rows, and `DELETE ORGANIZATION`.
+  - Organization data loads through `GET /org/memberships?statuses=active&limit=10&offset=0`
+    and `GET /org/invitations?invitation_state=pending&limit=10&offset=0`.
+    The tab controls expose `role=tab`, with `Members 1` and `Pending invites
+    0`; member rows show an avatar initial, account email, and `OWNER` role.
+    Free-tier Organization keeps invitations behind a Pro upgrade panel and
+    renders a bottom-right `Failed to connect to the AgentOS` toast when the
+    connected OS health check fails.
+  - Local implementation now mirrors the Organization tab semantics, member
+    row, pending-invites empty state, danger-zone block, and connection-failure
+    toast.
   - OS & Security is a long form with a disabled ID + copy control, protocol
     select plus endpoint input, collapsible-looking authorization section,
     JWT toggle, security key generation control, additional settings,

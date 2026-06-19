@@ -545,6 +545,56 @@ Target reference screenshots:
 - `docs/agno-analysis/next-reference-screenshots/settings-roles-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/settings-billing-reference.png`
 
+## Settings Organization Interaction Iteration
+
+Chrome/CDP analysis expanded the authenticated Settings Organization page:
+
+`https://os.agno.com/settings/organization`
+
+Observed Agno behavior:
+
+- The page requests authenticated account/control-plane data including
+  `/auth/authenticate`, `/org/`, `/users/me`, `/users/me/organizations`,
+  `/operating-systems/`, `/org/memberships?statuses=active&limit=10&offset=0`,
+  `/org/invitations?invitation_state=pending&limit=10&offset=0`, security keys,
+  and billing.
+- Organization renders a disabled `SAVE` button until edits, a Pro-gated invite
+  card, `Members 1` and `Pending invites 0` tabs, an owner member row, a danger
+  zone, and a bottom-right `Failed to connect to the AgentOS` toast when the
+  connected OS is unavailable.
+
+Local implementation now mirrors these interaction states:
+
+- Members/Pending invites are real tab controls with active styling.
+- The member row includes avatar initial, user name/email, and `OWNER` role.
+- Pending invites shows a local empty state explaining Pro is required for
+  invites.
+- Organization danger zone is separated, and the AgentOS connection-failure
+  toast is visible.
+
+Local Chrome assertions passed for:
+
+- `/settings/organization` renders `Organization`, `Invite new organization
+  members`, `Members`, `Pending invites`, `OWNER`, `Danger zone`, and `Failed
+  to connect to the AgentOS`.
+- Clicking `Pending invites 0` renders `No pending invitations` and `Upgrade to
+  Pro to invite teammates`.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/settings-organization-members-local.png`
+- `docs/agno-analysis/local-screenshots/settings-organization-pending-local.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/settings-organization-interactions-reference.png`
+
+2026-06-19 Settings Organization follow-up verification:
+
+- `pnpm lint`: passed.
+- `pnpm build`: passed.
+- Production preview used `HOSTNAME=0.0.0.0 PORT=3003 node .next/standalone/server.js`.
+
 ## Settings OS Security Interaction Iteration
 
 Chrome/CDP analysis expanded the authenticated Settings OS & Security page:

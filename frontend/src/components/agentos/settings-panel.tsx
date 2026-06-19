@@ -176,9 +176,11 @@ function OrganizationSettings({ settings }: { settings: SettingsResponse }) {
   const [tab, setTab] = useState<"members" | "pending">("members");
   const members = asNumber(organization.members, 1);
   const pendingInvites = asNumber(organization.pending_invites, 0);
+  const memberEmail = asString(settings.profile.email, "operator@mx.local");
+  const memberInitial = memberEmail[0]?.toUpperCase() ?? "M";
 
   return (
-    <div className="max-w-5xl space-y-5">
+    <div className="relative max-w-5xl space-y-5 pb-16">
       <Field label="Name">
         <input
           className={inputClass}
@@ -215,30 +217,62 @@ function OrganizationSettings({ settings }: { settings: SettingsResponse }) {
       </section>
 
       <section className="border-t border-neutral-100 pt-5">
-        <div className="mb-4 flex items-center gap-2 text-sm">
-          <button className={cn("rounded-md px-2 py-1", tab === "members" && "bg-neutral-100 font-medium")} onClick={() => setTab("members")} type="button">
+        <div aria-label="Organization access tabs" className="mb-4 flex items-center gap-2 text-sm" role="tablist">
+          <button
+            aria-selected={tab === "members"}
+            className={cn("rounded-md px-2 py-1", tab === "members" && "bg-neutral-100 font-medium")}
+            onClick={() => setTab("members")}
+            role="tab"
+            type="button"
+          >
             Members <span className="ml-1 rounded-full bg-neutral-100 px-2">{members}</span>
           </button>
-          <button className={cn("rounded-md px-2 py-1", tab === "pending" && "bg-neutral-100 font-medium")} onClick={() => setTab("pending")} type="button">
+          <button
+            aria-selected={tab === "pending"}
+            className={cn("rounded-md px-2 py-1", tab === "pending" && "bg-neutral-100 font-medium")}
+            onClick={() => setTab("pending")}
+            role="tab"
+            type="button"
+          >
             Pending invites <span className="ml-1 rounded-full bg-neutral-100 px-2">{pendingInvites}</span>
           </button>
         </div>
         <div className="max-w-4xl rounded-lg border border-neutral-100">
           {tab === "members" ? (
-            <div className="grid grid-cols-[1fr_140px_120px] items-center gap-4 px-4 py-4 text-sm">
-              <span className="font-medium">MX Operator</span>
-              <span className="font-mono text-[11px] uppercase text-neutral-500">Owner</span>
-              <span className="text-right text-neutral-500">Active</span>
+            <div className="grid grid-cols-[44px_1fr_140px] items-center gap-3 px-4 py-4 text-sm">
+              <span className="grid size-8 place-items-center rounded-full bg-neutral-100 font-mono text-[11px] uppercase text-neutral-600">
+                {memberInitial}
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate font-medium">MX Operator</span>
+                <span className="block truncate text-neutral-500">{memberEmail}</span>
+              </span>
+              <span className="justify-self-end rounded-md bg-neutral-50 px-2 py-1 font-mono text-[11px] uppercase text-neutral-500">
+                Owner
+              </span>
             </div>
           ) : (
-            <div className="px-4 py-8 text-sm text-neutral-500">No pending invitations.</div>
+            <div className="px-4 py-8 text-sm text-neutral-500">
+              <p className="font-medium text-neutral-700">No pending invitations</p>
+              <p className="mt-1">Upgrade to Pro to invite teammates into this organization.</p>
+            </div>
           )}
         </div>
-        <button className={cn(buttonClass, "mt-5 border-red-200 text-red-600 hover:bg-red-50")} type="button">
+      </section>
+
+      <section className="max-w-4xl rounded-lg border border-red-100 bg-white p-5">
+        <p className="text-sm font-semibold">Danger zone</p>
+        <p className="mt-2 text-sm text-neutral-500">Permanently delete this organization and all its resources</p>
+        <button className={cn(buttonClass, "mt-4 border-red-200 text-red-600 hover:bg-red-50")} type="button">
           <Trash2 className="size-3.5" />
           Delete organization
         </button>
       </section>
+
+      <div className="absolute bottom-0 right-0 flex h-14 w-[360px] items-center gap-3 rounded-lg border border-neutral-200 bg-white px-4 text-sm text-neutral-700 shadow-sm">
+        <span className="h-7 w-1 rounded-full bg-[#ff3b25]" />
+        Failed to connect to the AgentOS
+      </div>
     </div>
   );
 }
