@@ -24,6 +24,20 @@
       "maxDifferentRatio": 0.14
     },
     {
+      "name": "home-config",
+      "reference": "docs/agno-analysis/next-reference-screenshots/home-config-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/home-config.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
+    },
+    {
+      "name": "home-agents-collapsed",
+      "reference": "docs/agno-analysis/next-reference-screenshots/home-agents-collapsed-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/home-agents-collapsed.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
+    },
+    {
       "name": "chat-config-panel",
       "reference": "docs/agno-analysis/next-reference-screenshots/chat-config-panel.png",
       "local": "docs/agno-analysis/local-screenshots/chat-config-panel.png",
@@ -34,6 +48,27 @@
       "reference": "docs/agno-analysis/next-reference-screenshots/chat-sessions-panel.png",
       "local": "docs/agno-analysis/local-screenshots/chat-sessions-panel.png",
       "viewport": "desktop"
+    },
+    {
+      "name": "chat-run-sage",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-run-sage-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-run-local.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.12
+    },
+    {
+      "name": "studio-list",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-list-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-list.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.12
+    },
+    {
+      "name": "studio-new-agent",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-new-agent-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-new-agent.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.12
     },
     {
       "name": "studio-builder-advanced",

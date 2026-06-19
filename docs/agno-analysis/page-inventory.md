@@ -68,9 +68,11 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - Local implementation now follows the three-group Home card flow, supports
     collapse/expand, Show More/Show Less, Chat links, and a local `/config`
     page with the observed configuration sections.
-  - Home is now covered by the desktop screenshot diff gate as
-    `home-demo-shell`; the gate is structural because entity copy differs
-    between public Demo OS sample data and MX enterprise sample data.
+  - Home is now covered by desktop screenshot diff gates for the shell,
+    configuration page, and collapsed Agents section: `home-demo-shell`,
+    `home-config`, and `home-agents-collapsed`. These gates are structural
+    because entity copy differs between public Demo OS sample data and MX
+    enterprise sample data.
 
 ### Studio
 
@@ -111,6 +113,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Local implementation now mirrors the observed `/studio/agents` list, builder
   accordion sections, tool multi-select popover, section fields/switches, live
   Basics summary, reset/draft/publish button states, and Demo OS database label.
+- Studio is now covered by desktop screenshot diff gates for the agents list,
+  new-agent entry surface, and Advanced builder state.
 
 ### Learning
 
@@ -212,8 +216,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - Local implementation now mirrors the observed tool-call run state for Agno
     prompts: `1 TOOL CALLED` appears in the conversation and opens a `Tool
     Calls` inspector containing `SEARCH_AGNO`.
-  - Chat is now covered by the desktop screenshot diff gate for both the
-    configuration inspector and the recent-session inspector states.
+  - Chat is now covered by desktop screenshot diff gates for the configuration
+    inspector, recent-session inspector, and completed Sage run states.
 
 ### Sessions
 

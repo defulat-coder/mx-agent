@@ -1327,3 +1327,30 @@ repeatable measurement path for subsequent page-by-page iterations.
   existing `settings-os-shell` shell/navigation gate.
 - `pnpm visual:diff` now reports `25/25 passed`.
 - `settings-os-form`: passed, different ratio `0.065668` against max `0.08`.
+
+2026-06-19 Core interaction visual diff matrix expansion:
+
+- Attempted to reconnect Chrome for a fresh Agno demo Chat recheck. Chrome is
+  running, the Codex Chrome Extension is installed and enabled, and the native
+  host manifest is valid, but the extension browser endpoint currently reports
+  unavailable. Opening a fresh Chrome window requires user confirmation under
+  the Chrome plugin safety flow, so no live Agno screenshot was overwritten in
+  this pass.
+- Used the existing successful reference captures and current local screenshots
+  to expand the desktop matrix across already-implemented core interactions.
+- Added `chat-run-sage` to cover the completed Demo OS Sage run layout:
+  breadcrumb prompt segment, user message, assistant run duration, answer body,
+  copy/metrics actions, and sticky composer.
+- Added `home-config` and `home-agents-collapsed` to cover Home config
+  navigation and group collapse behavior. Both use structural thresholds because
+  the Agno reference and MX local preview intentionally use different entity
+  copy.
+- Added `studio-list` and `studio-new-agent` to cover the Studio agents list and
+  the full-page new-agent entry surface.
+- `pnpm visual:diff` now reports `30/30 passed`.
+- `home-config`: passed, different ratio `0.084781` against max `0.14`.
+- `home-agents-collapsed`: passed, different ratio `0.138229` against max
+  `0.14`.
+- `chat-run-sage`: passed, different ratio `0.109638` against max `0.12`.
+- `studio-list`: passed, different ratio `0.096546` against max `0.12`.
+- `studio-new-agent`: passed, different ratio `0.1185` against max `0.12`.
