@@ -1308,3 +1308,22 @@ repeatable measurement path for subsequent page-by-page iterations.
 - Added `settings-roles` to the screenshot comparison matrix.
 - `pnpm visual:diff` now reports `24/24 passed`.
 - `settings-roles`: passed, different ratio `0.07783` against max `0.08`.
+
+2026-06-19 Settings OS form visual diff matrix expansion:
+
+- Rechecked `https://os.agno.com/settings/os` with Chrome/CDP at 1512 x 828.
+  The current Chrome session redirects to `https://os.agno.com/signin` and the
+  page title is `Sign in | Agno`, so the current live route does not expose the
+  OS & Security form DOM.
+- Observed redirect traffic includes `https://os.agno.com/signin`,
+  `POST https://os-api.agno.com/api/v1/auth/authenticate`, PostHog decide, and
+  New Relic telemetry. OS form labels such as `OS & Security`, `Endpoint URL`,
+  `Authorization`, `Security key`, and `Danger zone` were absent from the live
+  DOM in this session.
+- Used the existing authenticated OS & Security form reference captured from
+  the earlier successful Settings pass and the current local OS screenshot to
+  add a stable desktop visual gate for the form body.
+- Added `settings-os-form` to the screenshot comparison matrix alongside the
+  existing `settings-os-shell` shell/navigation gate.
+- `pnpm visual:diff` now reports `25/25 passed`.
+- `settings-os-form`: passed, different ratio `0.065668` against max `0.08`.

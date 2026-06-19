@@ -162,6 +162,12 @@
       "viewport": "desktop"
     },
     {
+      "name": "settings-os-form",
+      "reference": "docs/agno-analysis/next-reference-screenshots/settings-os-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/settings-os.png",
+      "viewport": "desktop"
+    },
+    {
       "name": "settings-os-shell",
       "reference": "docs/agno-analysis/next-reference-screenshots/settings-os-nav-reference.png",
       "local": "docs/agno-analysis/local-screenshots/settings-os.png",
