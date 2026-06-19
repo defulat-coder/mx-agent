@@ -119,6 +119,22 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Controls: export, month navigation.
 - Main content: metric chart grid for tokens, users, agent/team/workflow runs and sessions.
 - Secondary content: model run distribution and gated Demo OS empty/upgrade notice for unavailable data.
+- Interaction pass on 2026-06-19:
+  - Demo OS shows database `demo-os-db`, table `agno_metrics`, `EXPORT`, and
+    month navigation with previous enabled and next disabled while viewing
+    `JUN 2026`.
+  - The chart grid includes eight time series: Total tokens, Users, Agent Runs,
+    Agent Sessions, Team Runs, Team Sessions, Workflow Runs, and Workflow
+    Sessions.
+  - Metrics uses SVG-based line charts with dotted grid backgrounds, axis labels
+    at days 1/8/15/22/29, and per-chart export icon controls.
+  - Model runs totals `688` and lists `gpt-4o`, `gpt-4.1`, `claude-...`,
+    `gpt-4o-...`, `gpt-4.5`, and `Others` with percentage shares.
+  - Demo OS renders a `Not available for Demo OS` gated notice over a blurred
+    chart-like background for unavailable analytics.
+  - Local implementation now renders the eight-chart grid, month navigation,
+    export state, selectable metric charts, model run distribution, and gated
+    notice.
 
 ### Evaluation
 

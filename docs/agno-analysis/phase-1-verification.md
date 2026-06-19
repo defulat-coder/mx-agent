@@ -289,3 +289,42 @@ Target reference screenshots:
 
 - `docs/agno-analysis/next-reference-screenshots/memory-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/memory-create-reference.png`
+
+## Metrics Workflow Iteration
+
+Chrome/CDP interaction analysis added a Metrics verification pass:
+
+- Public demo reference renders database `demo-os-db`, table `agno_metrics`,
+  `EXPORT`, and month navigation for `JUN 2026`.
+- Demo metrics include eight SVG chart panels: Total tokens, Users, Agent Runs,
+  Agent Sessions, Team Runs, Team Sessions, Workflow Runs, and Workflow
+  Sessions.
+- Each chart uses dotted grid texture, day-axis labels, value-axis labels, and
+  an export icon.
+- Model runs total `688` with `gpt-4o`, `gpt-4.1`, `claude-...`,
+  `gpt-4o-...`, `gpt-4.5`, and `Others` percentage rows.
+- Demo OS also includes a `Not available for Demo OS` gated notice over a
+  blurred chart-like background.
+- Local `/metrics` now renders the same eight-chart analytics grid, month
+  navigation, export state, selectable charts, model distribution, and gated
+  notice.
+
+Local Chrome assertions passed for:
+
+- `/metrics` includes the database/table labels and eight chart SVGs.
+- The page includes all observed metric headings and model run rows.
+- Previous-month navigation changes `JUN 2026` to `MAY 2026`.
+- Export changes to `EXPORTED`.
+- Selecting `Team Runs` updates the model section selected metric label.
+- The bottom section includes Model runs and the Demo OS unavailable notice.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/metrics-grid.png`
+- `docs/agno-analysis/local-screenshots/metrics-month-export.png`
+- `docs/agno-analysis/local-screenshots/metrics-selected-team-runs.png`
+- `docs/agno-analysis/local-screenshots/metrics-bottom.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/metrics-reference.png`

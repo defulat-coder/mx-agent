@@ -376,24 +376,60 @@ def get_knowledge() -> OSTableResponse:
 
 
 def get_metrics() -> OSMetricsResponse:
-    points = [
-        OSMetricPoint(label=str(day), value=value)
-        for day, value in [(1, 4), (8, 9), (15, 12), (22, 8), (29, 14)]
-    ]
+    def points(values: list[int]) -> list[OSMetricPoint]:
+        return [OSMetricPoint(label=str(index + 1), value=value) for index, value in enumerate(values)]
+
     return OSMetricsResponse(
+        database="mx-agent-db",
+        table="agno_metrics",
         period="JUN 2026",
         metrics=[
-            OSMetricSeries(label="Total tokens", value="317.2K", points=points),
-            OSMetricSeries(label="Users", value="35", points=points),
-            OSMetricSeries(label="Agent Runs", value="170", points=points),
-            OSMetricSeries(label="Team Runs", value="264", points=points),
+            OSMetricSeries(
+                label="Total tokens",
+                value="317.2K",
+                points=points([0, 0, 0, 0, 6500, 6500, 18000, 7200, 14000, 9100, 26000, 30000, 0]),
+            ),
+            OSMetricSeries(label="Users", value="35", points=points([0, 0, 1, 1, 2, 2, 4, 1, 3, 2, 4, 3, 0])),
+            OSMetricSeries(
+                label="Agent Runs",
+                value="170",
+                points=points([0, 0, 0, 0, 6, 6, 15, 5, 10, 5, 14, 15, 0]),
+            ),
+            OSMetricSeries(
+                label="Agent Sessions",
+                value="170",
+                points=points([0, 0, 0, 0, 6, 6, 15, 5, 10, 5, 14, 15, 0]),
+            ),
+            OSMetricSeries(
+                label="Team Runs",
+                value="264",
+                points=points([0, 0, 0, 0, 7, 7, 21, 8, 14, 9, 20, 24, 0]),
+            ),
+            OSMetricSeries(
+                label="Team Sessions",
+                value="258",
+                points=points([0, 0, 0, 0, 7, 7, 20, 9, 12, 8, 19, 23, 0]),
+            ),
+            OSMetricSeries(
+                label="Workflow Runs",
+                value="124",
+                points=points([0, 0, 0, 0, 15, 15, 46, 18, 34, 20, 54, 60, 0]),
+            ),
+            OSMetricSeries(
+                label="Workflow Sessions",
+                value="100",
+                points=points([0, 0, 0, 0, 7, 7, 22, 9, 14, 10, 25, 28, 0]),
+            ),
         ],
         model_runs=[
-            {"model": "glm-4-plus", "share": "54%"},
-            {"model": "gpt-4o", "share": "26%"},
-            {"model": "others", "share": "20%"},
+            {"model": "gpt-4o", "runs": 268, "share": "39%"},
+            {"model": "gpt-4.1", "runs": 172, "share": "25%"},
+            {"model": "claude-...", "runs": 96, "share": "14%"},
+            {"model": "gpt-4o-...", "runs": 69, "share": "10%"},
+            {"model": "gpt-4.5", "runs": 48, "share": "7%"},
+            {"model": "Others", "runs": 35, "share": "6%"},
         ],
-        gated_message="Detailed cost analytics will be connected in a later phase.",
+        gated_message="This isn't included in the Demo OS. Sign up or connect your own AgentOS to use it.",
     )
 
 

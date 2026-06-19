@@ -504,19 +504,28 @@ export const fallbackTables = {
 } satisfies Record<string, TableResponse>;
 
 export const fallbackMetrics: MetricsResponse = {
+  database: "mx-agent-db",
+  table: "agno_metrics",
   period: "JUN 2026",
   metrics: [
-    { label: "Total tokens", value: "317.2K", points: [4, 9, 12, 8, 14].map((value, index) => ({ label: String(index + 1), value })) },
-    { label: "Users", value: "35", points: [2, 4, 6, 9, 11].map((value, index) => ({ label: String(index + 1), value })) },
-    { label: "Agent Runs", value: "170", points: [5, 8, 15, 12, 18].map((value, index) => ({ label: String(index + 1), value })) },
-    { label: "Team Runs", value: "264", points: [7, 11, 9, 15, 21].map((value, index) => ({ label: String(index + 1), value })) },
+    { label: "Total tokens", value: "317.2K", points: [0, 0, 0, 0, 6500, 6500, 18000, 7200, 14000, 9100, 26000, 30000, 0].map((value, index) => ({ label: String(index + 1), value })) },
+    { label: "Users", value: "35", points: [0, 0, 1, 1, 2, 2, 4, 1, 3, 2, 4, 3, 0].map((value, index) => ({ label: String(index + 1), value })) },
+    { label: "Agent Runs", value: "170", points: [0, 0, 0, 0, 6, 6, 15, 5, 10, 5, 14, 15, 0].map((value, index) => ({ label: String(index + 1), value })) },
+    { label: "Agent Sessions", value: "170", points: [0, 0, 0, 0, 6, 6, 15, 5, 10, 5, 14, 15, 0].map((value, index) => ({ label: String(index + 1), value })) },
+    { label: "Team Runs", value: "264", points: [0, 0, 0, 0, 7, 7, 21, 8, 14, 9, 20, 24, 0].map((value, index) => ({ label: String(index + 1), value })) },
+    { label: "Team Sessions", value: "258", points: [0, 0, 0, 0, 7, 7, 20, 9, 12, 8, 19, 23, 0].map((value, index) => ({ label: String(index + 1), value })) },
+    { label: "Workflow Runs", value: "124", points: [0, 0, 0, 0, 15, 15, 46, 18, 34, 20, 54, 60, 0].map((value, index) => ({ label: String(index + 1), value })) },
+    { label: "Workflow Sessions", value: "100", points: [0, 0, 0, 0, 7, 7, 22, 9, 14, 10, 25, 28, 0].map((value, index) => ({ label: String(index + 1), value })) },
   ],
   model_runs: [
-    { model: "glm-4-plus", share: "54%" },
-    { model: "gpt-4o", share: "26%" },
-    { model: "others", share: "20%" },
+    { model: "gpt-4o", runs: 268, share: "39%" },
+    { model: "gpt-4.1", runs: 172, share: "25%" },
+    { model: "claude-...", runs: 96, share: "14%" },
+    { model: "gpt-4o-...", runs: 69, share: "10%" },
+    { model: "gpt-4.5", runs: 48, share: "7%" },
+    { model: "Others", runs: 35, share: "6%" },
   ],
-  gated_message: "Detailed cost analytics will be connected in a later phase.",
+  gated_message: "This isn't included in the Demo OS. Sign up or connect your own AgentOS to use it.",
 };
 
 export const fallbackSettings: SettingsResponse = {

@@ -59,6 +59,8 @@ export type TableResponse = {
 };
 
 export type MetricsResponse = {
+  database: string;
+  table: string;
   period: string;
   metrics: Array<{
     label: string;

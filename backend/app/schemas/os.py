@@ -71,6 +71,8 @@ class OSMetricSeries(BaseModel):
 
 
 class OSMetricsResponse(BaseModel):
+    database: str = "mx-agent-db"
+    table: str = "agno_metrics"
     period: str
     metrics: list[OSMetricSeries]
     model_runs: list[dict[str, str | int]]
