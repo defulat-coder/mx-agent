@@ -1494,3 +1494,27 @@ repeatable measurement path for subsequent page-by-page iterations.
 - Added `sessions-row-click` using the compact 1512 x 772 viewport.
 - `pnpm visual:diff` now reports `44/44 passed`.
 - `sessions-row-click`: passed, different ratio `0.107023` against max `0.14`.
+
+2026-06-19 Traces runs-list visual diff matrix expansion:
+
+- Rechecked
+  `https://os.agno.com/try-demo/traces?group_by=sessions&page=1&limit=25`
+  with Chrome/CDP. In the current anonymous Chrome session the route redirects
+  to
+  `https://os.agno.com/signin?callbackUrl=%2Ftry-demo%2Ftraces%3Fgroup_by%3Dsessions%26page%3D1%26limit%3D25`.
+- Observed auth traffic includes `GET https://os-api.agno.com/api/v1/users/me`,
+  `POST https://os-api.agno.com/api/v1/auth/authenticate`,
+  `POST https://os-api.agno.com/api/v1/auth/demo-sdk-token`, and
+  `POST https://os-api.agno.com/api/v1/auth/authrefresh`, all returning 401 in
+  the anonymous session before the sign-in page renders.
+- Preserved the previously captured Agno Traces list reference and expanded the
+  local segmented control so `Sessions` renders the grouped session table while
+  `Runs` renders the trace list table.
+- Re-captured `docs/agno-analysis/local-screenshots/traces-list.png` at
+  1512 x 771 after clicking `Runs`, verifying columns `NAME`, `TRACE ID`,
+  `STATUS`, `DURATION`, `SPANS`, `AGENT ID`, `INPUT`, and `CREATED AT`.
+- Added `desktop-traces-list` and `traces-list` to the official screenshot
+  comparison matrix.
+- `pnpm visual:diff` now reports `45/45 passed`.
+- `traces-list`: passed, different ratio `0.074854` against max `0.14`.
+- `pnpm lint` passed for the frontend component change.

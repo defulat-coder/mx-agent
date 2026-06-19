@@ -1,10 +1,10 @@
 # Visual Diff Report
 
-Generated: 2026-06-19T13:21:06.891Z
+Generated: 2026-06-19T13:28:42.964Z
 
 Config: `docs/agno-analysis/screenshot-comparison.config.json`
 
-Totals: 44/44 passed, 0 failed.
+Totals: 45/45 passed, 0 failed.
 
 | Status | Pair | Viewport | Reference | Local | Different ratio | Max ratio | Diff |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -39,6 +39,7 @@ pass | scheduler-gated-overlay | desktop | 1512x828 | 1512x828 | 0.057759 | 0.08
 pass | evaluation-list | desktop | 1512x828 | 1512x828 | 0.067094 | 0.12 | docs/agno-analysis/visual-diffs/diffs/evaluation-list.diff.png
 pass | evaluation-detail | desktop | 1512x828 | 1512x828 | 0.107163 | 0.12 | docs/agno-analysis/visual-diffs/diffs/evaluation-detail.diff.png
 pass | traces-sessions-table | desktop-compact | 1512x772 | 1512x772 | 0.058645 | 0.08 | docs/agno-analysis/visual-diffs/diffs/traces-sessions-table.diff.png
+pass | traces-list | desktop-traces-list | 1512x771 | 1512x771 | 0.074854 | 0.14 | docs/agno-analysis/visual-diffs/diffs/traces-list.diff.png
 pass | learning-user-memory-loading | desktop-compact | 1512x772 | 1512x772 | 0.025909 | 0.08 | docs/agno-analysis/visual-diffs/diffs/learning-user-memory-loading.diff.png
 pass | learning-user-profile-table | desktop | 1512x828 | 1512x828 | 0.115811 | 0.14 | docs/agno-analysis/visual-diffs/diffs/learning-user-profile-table.diff.png
 pass | learning-entity-memory-table | desktop | 1512x828 | 1512x828 | 0.116153 | 0.14 | docs/agno-analysis/visual-diffs/diffs/learning-entity-memory-table.diff.png

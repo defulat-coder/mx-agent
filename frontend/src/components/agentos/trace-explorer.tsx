@@ -19,6 +19,7 @@ import type { TableResponse } from "@/lib/agentos-types";
 import { cn } from "@/lib/utils";
 
 type TraceTab = "info" | "metadata";
+type TraceView = "sessions" | "runs";
 type TextMode = "text" | "formatted";
 
 const traceSpans = [
@@ -86,11 +87,15 @@ function StatusBadge({ status }: { status: string }) {
 export function TraceExplorer({ table }: { table: TableResponse }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [exported, setExported] = useState(false);
+  const [traceView, setTraceView] = useState<TraceView>("sessions");
   const displayDatabase = table.database === "mx-agent-db" ? "demo-os-db" : table.database;
 
   const selectedRow = useMemo(
-    () => traceSessionRows.find((row) => row.id === selectedId) ?? null,
-    [selectedId],
+    () =>
+      traceView === "sessions"
+        ? traceSessionRows.find((row) => row.id === selectedId) ?? null
+        : table.rows.find((row) => value(row, "id", "") === selectedId) ?? null,
+    [selectedId, table.rows, traceView],
   );
 
   if (selectedRow) {
@@ -120,10 +125,30 @@ export function TraceExplorer({ table }: { table: TableResponse }) {
 
       <div className="mb-4 flex items-center justify-between gap-4">
         <div className="inline-flex h-9 rounded-md border border-neutral-200 bg-neutral-50 p-1 font-mono text-xs uppercase">
-          <button className="h-full rounded-sm bg-white px-3 shadow-sm" type="button">
+          <button
+            className={cn(
+              "h-full rounded-sm px-3",
+              traceView === "sessions" ? "bg-white shadow-sm" : "text-neutral-500",
+            )}
+            onClick={() => {
+              setTraceView("sessions");
+              setSelectedId(null);
+            }}
+            type="button"
+          >
             Sessions
           </button>
-          <button className="h-full rounded-sm px-3 text-neutral-500" type="button">
+          <button
+            className={cn(
+              "h-full rounded-sm px-3",
+              traceView === "runs" ? "bg-white shadow-sm" : "text-neutral-500",
+            )}
+            onClick={() => {
+              setTraceView("runs");
+              setSelectedId(null);
+            }}
+            type="button"
+          >
             Runs
           </button>
         </div>
@@ -142,39 +167,102 @@ export function TraceExplorer({ table }: { table: TableResponse }) {
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto">
-        <table className="w-full border-collapse text-left text-sm">
-          <thead>
-            <tr className="border-b border-neutral-100 text-[11px] uppercase text-neutral-500">
-              <th className="px-4 py-3 font-mono font-medium">Session ID</th>
-              <th className="px-4 py-3 font-mono font-medium">User</th>
-              <th className="px-4 py-3 font-mono font-medium">Agent/Team/Workflow</th>
-              <th className="px-4 py-3 font-mono font-medium">Traces</th>
-              <th className="px-4 py-3 font-mono font-medium">First Trace</th>
-              <th className="px-4 py-3 font-mono font-medium">Last Trace</th>
-            </tr>
-          </thead>
-          <tbody>
-            {traceSessionRows.map((row) => {
-              const id = String(row.id);
-              return (
-                <tr
-                  className="h-14 cursor-pointer border-b border-neutral-100 text-neutral-700 hover:bg-neutral-50"
-                  key={id}
-                  onClick={() => setSelectedId(id)}
-                >
-                  <td className="px-4 py-4 font-mono text-xs">{row.session_id}</td>
-                  <td className="px-4 py-4">{row.user}</td>
-                  <td className="px-4 py-4">{row.target}</td>
-                  <td className="px-4 py-4">{row.traces}</td>
-                  <td className="px-4 py-4 text-neutral-600">{row.first_trace}</td>
-                  <td className="px-4 py-4 text-neutral-600">{row.last_trace}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        {traceView === "sessions" ? (
+          <SessionsTraceTable onSelect={setSelectedId} />
+        ) : (
+          <RunsTraceTable columns={table.columns} onSelect={setSelectedId} rows={table.rows} />
+        )}
       </div>
     </div>
+  );
+}
+
+function SessionsTraceTable({ onSelect }: { onSelect: (id: string) => void }) {
+  return (
+    <table className="w-full border-collapse text-left text-sm">
+      <thead>
+        <tr className="border-b border-neutral-100 text-[11px] uppercase text-neutral-500">
+          <th className="px-4 py-3 font-mono font-medium">Session ID</th>
+          <th className="px-4 py-3 font-mono font-medium">User</th>
+          <th className="px-4 py-3 font-mono font-medium">Agent/Team/Workflow</th>
+          <th className="px-4 py-3 font-mono font-medium">Traces</th>
+          <th className="px-4 py-3 font-mono font-medium">First Trace</th>
+          <th className="px-4 py-3 font-mono font-medium">Last Trace</th>
+        </tr>
+      </thead>
+      <tbody>
+        {traceSessionRows.map((row) => {
+          const id = String(row.id);
+          return (
+            <tr
+              className="h-14 cursor-pointer border-b border-neutral-100 text-neutral-700 hover:bg-neutral-50"
+              key={id}
+              onClick={() => onSelect(id)}
+            >
+              <td className="px-4 py-4 font-mono text-xs">{row.session_id}</td>
+              <td className="px-4 py-4">{row.user}</td>
+              <td className="px-4 py-4">{row.target}</td>
+              <td className="px-4 py-4">{row.traces}</td>
+              <td className="px-4 py-4 text-neutral-600">{row.first_trace}</td>
+              <td className="px-4 py-4 text-neutral-600">{row.last_trace}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+function RunsTraceTable({
+  columns,
+  onSelect,
+  rows,
+}: {
+  columns: TableResponse["columns"];
+  onSelect: (id: string) => void;
+  rows: TableResponse["rows"];
+}) {
+  return (
+    <table className="w-full border-collapse text-left text-sm">
+      <thead>
+        <tr className="border-b border-neutral-100 text-[11px] uppercase text-neutral-500">
+          {columns.map((column) => (
+            <th className="px-4 py-3 font-mono font-medium" key={column.key}>
+              {column.label}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, index) => {
+          const id = value(row, "id", `trace-${index}`);
+          return (
+            <tr
+              className="h-14 cursor-pointer border-b border-neutral-100 text-neutral-700 hover:bg-neutral-50"
+              key={id}
+              onClick={() => onSelect(id)}
+            >
+              {columns.map((column) => {
+                const cell = value(row, column.key, "—");
+                return (
+                  <td
+                    className={cn(
+                      "max-w-[260px] truncate px-4 py-4",
+                      column.mono && "font-mono text-xs",
+                      column.key === "created_at" && "text-neutral-600",
+                    )}
+                    key={`${id}-${column.key}`}
+                    title={cell}
+                  >
+                    {column.key === "status" ? <StatusBadge status={cell} /> : cell}
+                  </td>
+                );
+              })}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }
 

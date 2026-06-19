@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T13:21:06.891Z",
+  "generatedAt": "2026-06-19T13:28:42.964Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -11,11 +11,16 @@
       "name": "desktop-compact",
       "width": 1512,
       "height": 772
+    },
+    {
+      "name": "desktop-traces-list",
+      "width": 1512,
+      "height": 771
     }
   ],
   "totals": {
-    "pairs": 44,
-    "passed": 44,
+    "pairs": 45,
+    "passed": 45,
     "failed": 0
   },
   "results": [
@@ -791,6 +796,31 @@
         "differentRatio": 0.058645,
         "meanAbsDelta": 14.685,
         "rmseDelta": 67.714
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "traces-list",
+      "status": "pass",
+      "viewport": "desktop-traces-list",
+      "reference": "docs/agno-analysis/next-reference-screenshots/traces-list-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/traces-list.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/traces-list.diff.png",
+      "dimensions": {
+        "reference": "1512x771",
+        "local": "1512x771",
+        "compared": "1512x771"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 87261,
+        "totalPixels": 1165752,
+        "differentRatio": 0.074854,
+        "meanAbsDelta": 23.323,
+        "rmseDelta": 88.429
       },
       "sizeMismatch": false
     },

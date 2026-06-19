@@ -246,9 +246,12 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 
 - Public demo state can show a `No traces logged` overlay while preserving a
   blurred trace-detail surface behind it.
-- Current public Demo OS state at
+- Previously captured public Demo OS state at
   `/try-demo/traces?group_by=sessions&page=1&limit=25` renders the grouped
   Sessions table instead of the older empty overlay.
+- Current anonymous Chrome state on 2026-06-19 redirects
+  `/try-demo/traces?group_by=sessions&page=1&limit=25` to `/signin` after
+  `users/me`, `auth/authenticate`, and `demo-sdk-token` return 401.
 - Authenticated/account state can show an inactive-AgentOS overlay over the
   traces table when the connected AgentOS is unreachable.
 - Grouped Sessions controls include `Sessions`/`Runs` segments, filter query
@@ -271,11 +274,18 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - 2026-06-19 follow-up: rechecked the public Demo OS route and observed
     populated grouped-session rows plus `/traces/filter-schema`, `/traces`,
     `/trace_session_stats`, and `/config` requests.
+  - 2026-06-19 later follow-up: the same route redirects the current anonymous
+    Chrome session to sign-in, so new implementation work preserves the
+    previously captured product references while documenting the current auth
+    gate.
   - Local implementation now mirrors the current public Demo OS grouped
     Sessions table state and keeps the trace detail explorer available after row
     click for subsequent trace-detail iteration.
-  - Traces is covered by the desktop screenshot diff gate for the grouped
-    Sessions table state.
+  - Local Traces supports the `Sessions` and `Runs` segmented states. `Runs`
+    renders the trace list columns Name, Trace ID, Status, Duration, Spans,
+    Agent ID, Input, and Created At.
+  - Traces is covered by desktop screenshot diff gates for both the grouped
+    Sessions table and the Runs trace-list table.
 
 ### Memory
 

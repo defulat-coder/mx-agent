@@ -9,6 +9,11 @@
       "name": "desktop-compact",
       "width": 1512,
       "height": 772
+    },
+    {
+      "name": "desktop-traces-list",
+      "width": 1512,
+      "height": 771
     }
   ],
   "defaults": {
@@ -220,6 +225,13 @@
       "reference": "docs/agno-analysis/next-reference-screenshots/traces-sessions-reference.png",
       "local": "docs/agno-analysis/local-screenshots/traces-current.png",
       "viewport": "desktop-compact"
+    },
+    {
+      "name": "traces-list",
+      "reference": "docs/agno-analysis/next-reference-screenshots/traces-list-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/traces-list.png",
+      "viewport": "desktop-traces-list",
+      "maxDifferentRatio": 0.14
     },
     {
       "name": "learning-user-memory-loading",
