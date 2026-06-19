@@ -105,6 +105,27 @@
       "viewport": "desktop"
     },
     {
+      "name": "studio-builder-tool-selected",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-tool-selected-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-builder-tool-selected-local.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.14
+    },
+    {
+      "name": "studio-builder-context",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-context-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-builder-context-local.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.14
+    },
+    {
+      "name": "studio-builder-session",
+      "reference": "docs/agno-analysis/next-reference-screenshots/studio-builder-session-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/studio-builder-context-toggled-local.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.14
+    },
+    {
       "name": "sessions-view-menu",
       "reference": "docs/agno-analysis/next-reference-screenshots/sessions-filter-reference.png",
       "local": "docs/agno-analysis/local-screenshots/sessions-filter-current-772.png",

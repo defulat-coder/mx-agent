@@ -1401,3 +1401,26 @@ repeatable measurement path for subsequent page-by-page iterations.
   local screenshot `docs/agno-analysis/local-screenshots/chat-interaction.png`.
 - `pnpm visual:diff` now reports `34/34 passed`.
 - `chat-shell-state`: passed, different ratio `0.065168` against max `0.14`.
+
+2026-06-19 Studio Builder visual diff matrix expansion:
+
+- Rechecked `https://os.agno.com/try-demo/studio/agents/create` with Chrome/CDP.
+  The direct create URL now redirects to
+  `/signin?callbackUrl=%2Ftry-demo%2Fstudio%2Fagents%2Fcreate`.
+- Rechecked `https://os.agno.com/try-demo/studio/agents` with Chrome/CDP. The
+  shell now issues authenticated API calls including
+  `GET https://os-api.agno.com/api/v1/users/me` and
+  `POST https://os-api.agno.com/api/v1/auth/authenticate`; in the current
+  anonymous Chrome session the visible page body is empty after navigation.
+- Because the public Studio Builder route is now auth-gated in the current
+  session, this pass preserves the previously captured Agno reference Builder
+  screenshots and adds the matching local desktop states to the official matrix.
+- Added `studio-builder-tool-selected`, `studio-builder-context`, and
+  `studio-builder-session` using the `desktop-compact` 1512 x 772 viewport.
+- `pnpm visual:diff` now reports `37/37 passed`.
+- `studio-builder-tool-selected`: passed, different ratio `0.137246` against
+  max `0.14`.
+- `studio-builder-context`: passed, different ratio `0.135223` against max
+  `0.14`.
+- `studio-builder-session`: passed, different ratio `0.136262` against max
+  `0.14`.
