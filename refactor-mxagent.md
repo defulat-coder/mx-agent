@@ -189,3 +189,31 @@ Autoreview:
 - `app.services.hr.__init__` is down to 945 lines. The largest remaining HR
   slice is admin/reporting/talent-development, which can now be split further
   without changing external imports.
+
+### Step 5 - Split HR admin and reporting service queries
+
+Status: completed
+
+Architecture change:
+
+- Moved admin-scoped employee queries, company-wide attendance/leave/overtime
+  queries, reports, and admin approvals into `app.services.hr.admin`.
+- Re-exported admin functions from `app.services.hr`, preserving existing
+  `hr_service.*` callers.
+- Left talent-development functions in `app.services.hr.__init__` as the final
+  large slice to evaluate separately.
+
+Verification:
+
+- Import compatibility check for admin exports -> passed.
+- Full backend suite: `uv run pytest` -> 103 passed.
+- Live HTTP check on port 8001:
+  - `GET /health` -> 200.
+  - `POST /v1/chat` without token -> 401 with `code=40101`.
+
+Autoreview:
+
+- The split used section markers from the previously committed module and did
+  not change function bodies.
+- `app.services.hr.__init__` is down to 585 lines. The HR service package now
+  has explicit employee, manager, and admin slices.
