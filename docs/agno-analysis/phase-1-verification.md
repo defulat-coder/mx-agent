@@ -1376,3 +1376,17 @@ repeatable measurement path for subsequent page-by-page iterations.
   `0.12`.
 - `chat-tool-call-expanded`: passed, different ratio `0.072087` against max
   `0.12`.
+
+2026-06-19 Chat completed-run Sessions visual diff matrix expansion:
+
+- Revalidated the local completed-run Sessions flow through the in-app browser
+  against `http://localhost:3010/chat?type=agent&id=sage` at 1512 x 772.
+- Sent `What is Agno?`, verified the completed run, opened the `Sessions`
+  inspector, and confirmed it rendered the active `What is Agno?` session,
+  previous session rows, and `Load more sessions`.
+- Recaptured `docs/agno-analysis/local-screenshots/chat-sessions-run-local.png`
+  from the current local implementation.
+- Added `chat-sessions-run` to the screenshot comparison matrix using the
+  `desktop-compact` viewport.
+- `pnpm visual:diff` now reports `33/33 passed`.
+- `chat-sessions-run`: passed, different ratio `0.082403` against max `0.12`.

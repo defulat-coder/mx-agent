@@ -57,6 +57,13 @@
       "maxDifferentRatio": 0.12
     },
     {
+      "name": "chat-sessions-run",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-sessions-run-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-sessions-run-local.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.12
+    },
+    {
       "name": "chat-tool-call-collapsed",
       "reference": "docs/agno-analysis/next-reference-screenshots/chat-tool-call-collapsed-reference.png",
       "local": "docs/agno-analysis/local-screenshots/chat-tool-call-collapsed-local.png",
