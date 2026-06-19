@@ -1424,3 +1424,32 @@ repeatable measurement path for subsequent page-by-page iterations.
   `0.14`.
 - `studio-builder-session`: passed, different ratio `0.136262` against max
   `0.14`.
+
+2026-06-19 Learning entity-table visual diff matrix expansion:
+
+- Rechecked
+  `https://os.agno.com/learning/user_profile?sort_by=updated_at_desc&page=1&limit=25`
+  with Chrome/CDP. In the current anonymous Chrome session the route renders an
+  empty document body and issues authenticated API calls including
+  `GET https://os-api.agno.com/api/v1/users/me` and
+  `POST https://os-api.agno.com/api/v1/auth/authenticate`.
+- Because current anonymous access no longer exposes the authenticated-style
+  Learning tables, this pass preserves the previously captured Agno references
+  and re-captures the local table states at the matching desktop viewport
+  1512 x 828.
+- Re-captured local screenshots for User Profiles, Entity Memories, Session
+  Context, and Decision Logs, verifying each rendered `ENTITY NAME`,
+  `Acme Corp`, `AgentOS not active`, and
+  `Failed to connect to the AgentOS`.
+- Added `learning-user-profile-table`, `learning-entity-memory-table`,
+  `learning-session-context-table`, and `learning-decision-log-table` to the
+  official screenshot comparison matrix.
+- `pnpm visual:diff` now reports `41/41 passed`.
+- `learning-user-profile-table`: passed, different ratio `0.115811` against
+  max `0.14`.
+- `learning-entity-memory-table`: passed, different ratio `0.116153` against
+  max `0.14`.
+- `learning-session-context-table`: passed, different ratio `0.116072` against
+  max `0.14`.
+- `learning-decision-log-table`: passed, different ratio `0.115843` against
+  max `0.14`.

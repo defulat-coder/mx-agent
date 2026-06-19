@@ -1,10 +1,10 @@
 # Visual Diff Report
 
-Generated: 2026-06-19T13:08:22.498Z
+Generated: 2026-06-19T13:12:39.904Z
 
 Config: `docs/agno-analysis/screenshot-comparison.config.json`
 
-Totals: 37/37 passed, 0 failed.
+Totals: 41/41 passed, 0 failed.
 
 | Status | Pair | Viewport | Reference | Local | Different ratio | Max ratio | Diff |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -39,6 +39,10 @@ pass | evaluation-list | desktop | 1512x828 | 1512x828 | 0.067094 | 0.12 | docs/
 pass | evaluation-detail | desktop | 1512x828 | 1512x828 | 0.107163 | 0.12 | docs/agno-analysis/visual-diffs/diffs/evaluation-detail.diff.png
 pass | traces-sessions-table | desktop-compact | 1512x772 | 1512x772 | 0.058645 | 0.08 | docs/agno-analysis/visual-diffs/diffs/traces-sessions-table.diff.png
 pass | learning-user-memory-loading | desktop-compact | 1512x772 | 1512x772 | 0.025909 | 0.08 | docs/agno-analysis/visual-diffs/diffs/learning-user-memory-loading.diff.png
+pass | learning-user-profile-table | desktop | 1512x828 | 1512x828 | 0.115811 | 0.14 | docs/agno-analysis/visual-diffs/diffs/learning-user-profile-table.diff.png
+pass | learning-entity-memory-table | desktop | 1512x828 | 1512x828 | 0.116153 | 0.14 | docs/agno-analysis/visual-diffs/diffs/learning-entity-memory-table.diff.png
+pass | learning-session-context-table | desktop | 1512x828 | 1512x828 | 0.116072 | 0.14 | docs/agno-analysis/visual-diffs/diffs/learning-session-context-table.diff.png
+pass | learning-decision-log-table | desktop | 1512x828 | 1512x828 | 0.115843 | 0.14 | docs/agno-analysis/visual-diffs/diffs/learning-decision-log-table.diff.png
 pass | settings-profile | desktop | 1512x828 | 1512x828 | 0.02799 | 0.08 | docs/agno-analysis/visual-diffs/diffs/settings-profile.diff.png
 pass | settings-organization | desktop | 1512x828 | 1512x828 | 0.055464 | 0.08 | docs/agno-analysis/visual-diffs/diffs/settings-organization.diff.png
 pass | settings-billing | desktop | 1512x828 | 1512x828 | 0.092232 | 0.1 | docs/agno-analysis/visual-diffs/diffs/settings-billing.diff.png

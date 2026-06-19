@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T13:08:22.498Z",
+  "generatedAt": "2026-06-19T13:12:39.904Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 37,
-    "passed": 37,
+    "pairs": 41,
+    "passed": 41,
     "failed": 0
   },
   "results": [
@@ -791,6 +791,106 @@
         "differentRatio": 0.025909,
         "meanAbsDelta": 6.654,
         "rmseDelta": 41.365
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "learning-user-profile-table",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/learning-user-profile-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/learning-user-profile-local.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/learning-user-profile-table.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 144988,
+        "totalPixels": 1251936,
+        "differentRatio": 0.115811,
+        "meanAbsDelta": 39.783,
+        "rmseDelta": 130.458
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "learning-entity-memory-table",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/learning-entity-memory-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/learning-entity-memory-local.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/learning-entity-memory-table.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 145416,
+        "totalPixels": 1251936,
+        "differentRatio": 0.116153,
+        "meanAbsDelta": 39.835,
+        "rmseDelta": 130.579
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "learning-session-context-table",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/learning-session-context-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/learning-session-context-local.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/learning-session-context-table.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 145315,
+        "totalPixels": 1251936,
+        "differentRatio": 0.116072,
+        "meanAbsDelta": 39.843,
+        "rmseDelta": 130.582
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "learning-decision-log-table",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/learning-decision-log-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/learning-decision-log-local.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/learning-decision-log-table.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 145028,
+        "totalPixels": 1251936,
+        "differentRatio": 0.115843,
+        "meanAbsDelta": 39.833,
+        "rmseDelta": 130.568
       },
       "sizeMismatch": false
     },

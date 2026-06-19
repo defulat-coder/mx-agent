@@ -144,8 +144,9 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   state, and inactive entity-table states for the other four sections.
 - 2026-06-19 follow-up: local Demo OS shell now suppresses the Learning subnav
   and child breadcrumb for the public User Memories state.
-- Learning is covered by the desktop screenshot diff gate for the public Demo OS
-  User Memories loading state.
+- Learning is covered by desktop screenshot diff gates for the public Demo OS
+  User Memories loading state plus authenticated-style User Profiles, Entity
+  Memories, Session Context, and Decision Logs inactive table states.
 
 ### Chat
 

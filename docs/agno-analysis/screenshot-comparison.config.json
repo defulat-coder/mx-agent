@@ -221,6 +221,34 @@
       "viewport": "desktop-compact"
     },
     {
+      "name": "learning-user-profile-table",
+      "reference": "docs/agno-analysis/next-reference-screenshots/learning-user-profile-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/learning-user-profile-local.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
+    },
+    {
+      "name": "learning-entity-memory-table",
+      "reference": "docs/agno-analysis/next-reference-screenshots/learning-entity-memory-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/learning-entity-memory-local.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
+    },
+    {
+      "name": "learning-session-context-table",
+      "reference": "docs/agno-analysis/next-reference-screenshots/learning-session-context-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/learning-session-context-local.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
+    },
+    {
+      "name": "learning-decision-log-table",
+      "reference": "docs/agno-analysis/next-reference-screenshots/learning-decision-log-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/learning-decision-log-local.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
+    },
+    {
       "name": "settings-profile",
       "reference": "docs/agno-analysis/next-reference-screenshots/settings-profile-reference.png",
       "local": "docs/agno-analysis/local-screenshots/settings-profile.png",
