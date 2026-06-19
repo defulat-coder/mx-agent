@@ -2,16 +2,15 @@
 
 import {
   AlertTriangle,
+  CalendarDays,
   Check,
   ChevronLeft,
   CircleDot,
   Code2,
   Copy,
   Download,
-  ExternalLink,
-  Filter,
   MessageSquare,
-  PanelRightOpen,
+  Search,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -32,6 +31,36 @@ const traceSpans = [
   { name: "approval_policy_check", kind: "tool", duration: "298ms", tokens: null, depth: 2 },
   { name: "format_router_response", kind: "tool", duration: "156ms", tokens: null, depth: 1 },
   { name: "performance_metrics", kind: "tool", duration: "34ms", tokens: null, depth: 1 },
+];
+
+const traceSessionRows = [
+  {
+    id: "tr-session-1",
+    session_id: "d47c4226-279c-48c9-ab48-4dd2723b862e",
+    user: "lovemyrmbb@gmail.com",
+    target: "sage",
+    traces: 1,
+    first_trace: "19 Jun 2026, 07:34",
+    last_trace: "19 Jun 2026, 07:34",
+  },
+  {
+    id: "tr-session-2",
+    session_id: "09c416a3-6254-4fe0-9f7a-a99309ac92cf",
+    user: "lovemyrmbb@gmail.com",
+    target: "sage",
+    traces: 1,
+    first_trace: "19 Jun 2026, 07:27",
+    last_trace: "19 Jun 2026, 07:27",
+  },
+  {
+    id: "tr-session-3",
+    session_id: "f86477d8-39eb-44ed-b911-fa8cd7d195c3",
+    user: "lovemyrmbb@gmail.com",
+    target: "sage",
+    traces: 1,
+    first_trace: "19 Jun 2026, 07:20",
+    last_trace: "19 Jun 2026, 07:20",
+  },
 ];
 
 function value(row: Record<string, unknown>, key: string, fallback: string) {
@@ -56,17 +85,16 @@ function StatusBadge({ status }: { status: string }) {
 
 export function TraceExplorer({ table }: { table: TableResponse }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [filter, setFilter] = useState("Group by: sessions");
   const [exported, setExported] = useState(false);
+  const displayDatabase = table.database === "mx-agent-db" ? "demo-os-db" : table.database;
 
   const selectedRow = useMemo(
-    () => table.rows.find((row, index) => String(row.id ?? index) === selectedId) ?? null,
-    [selectedId, table.rows],
+    () => traceSessionRows.find((row) => row.id === selectedId) ?? null,
+    [selectedId],
   );
 
   if (selectedRow) {
-    return <TraceDetail database={table.database} onBack={() => setSelectedId(null)} row={selectedRow} />;
+    return <TraceDetail database={displayDatabase} onBack={() => setSelectedId(null)} row={selectedRow} />;
   }
 
   return (
@@ -74,89 +102,78 @@ export function TraceExplorer({ table }: { table: TableResponse }) {
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
           <p className="mb-1 text-xs text-neutral-500">Database</p>
-          <p className="font-medium">{table.database}</p>
+          <p className="font-medium">{displayDatabase}</p>
         </div>
-        <div className="relative flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <CommandButton
-            className={cn("h-9 px-4", exported && "border-emerald-200 bg-emerald-50 text-emerald-700")}
+            aria-label="Export"
+            className={cn("h-9 w-9 px-0", exported && "border-emerald-200 bg-emerald-50 text-emerald-700")}
             onClick={() => {
               setExported(true);
               window.setTimeout(() => setExported(false), 1400);
             }}
           >
             <Download className="size-3.5" />
-            {exported ? "Exported" : "Export"}
           </CommandButton>
-          <CommandButton className="h-9 justify-between px-4 normal-case" onClick={() => setFilterOpen((open) => !open)}>
-            <Filter className="size-3.5" />
-            <span>{filter}</span>
-            <span className="ml-10 text-[9px]">▼</span>
-          </CommandButton>
-          {filterOpen ? (
-            <div className="absolute right-0 top-11 z-20 w-56 rounded-md border border-neutral-200 bg-white p-1 shadow-lg">
-              {["Group by: sessions", "Group by: traces", "Status: OK", "Status: Error"].map((option) => (
-                <button
-                  className={cn(
-                    "flex h-9 w-full items-center rounded px-2 text-left text-sm hover:bg-neutral-100",
-                    option === filter && "bg-neutral-100 font-medium",
-                  )}
-                  key={option}
-                  onClick={() => {
-                    setFilter(option);
-                    setFilterOpen(false);
-                  }}
-                  type="button"
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          ) : null}
         </div>
+      </div>
+
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <div className="inline-flex h-9 rounded-md border border-neutral-200 bg-neutral-50 p-1 font-mono text-xs uppercase">
+          <button className="h-full rounded-sm bg-white px-3 shadow-sm" type="button">
+            Sessions
+          </button>
+          <button className="h-full rounded-sm px-3 text-neutral-500" type="button">
+            Runs
+          </button>
+        </div>
+        <div className="relative flex min-w-[520px] items-center">
+          <Search className="absolute left-3 size-4 text-neutral-400" />
+          <input
+            className="h-9 w-full rounded-md border border-neutral-200 bg-white pl-9 pr-3 text-sm outline-none placeholder:text-neutral-500"
+            placeholder="Enter filter query"
+            readOnly
+          />
+        </div>
+        <CommandButton className="h-9 px-4 normal-case">
+          <CalendarDays className="size-3.5" />
+          All time
+        </CommandButton>
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto">
         <table className="w-full border-collapse text-left text-sm">
           <thead>
-            <tr className="border-b border-neutral-100 text-[11px] text-neutral-500">
-              <th className="w-12 px-4 py-3 font-mono font-medium">
-                <span className="block size-4 rounded border border-neutral-300" />
-              </th>
-              {table.columns.map((column) => (
-                <th className="px-4 py-3 font-mono font-medium" key={column.key}>
-                  {column.label}
-                </th>
-              ))}
+            <tr className="border-b border-neutral-100 text-[11px] uppercase text-neutral-500">
+              <th className="px-4 py-3 font-mono font-medium">Session ID</th>
+              <th className="px-4 py-3 font-mono font-medium">User</th>
+              <th className="px-4 py-3 font-mono font-medium">Agent/Team/Workflow</th>
+              <th className="px-4 py-3 font-mono font-medium">Traces</th>
+              <th className="px-4 py-3 font-mono font-medium">First Trace</th>
+              <th className="px-4 py-3 font-mono font-medium">Last Trace</th>
             </tr>
           </thead>
           <tbody>
-            {table.rows.map((row, index) => {
-              const id = String(row.id ?? index);
+            {traceSessionRows.map((row) => {
+              const id = String(row.id);
               return (
                 <tr
-                  className="cursor-pointer border-b border-neutral-100 text-neutral-700 hover:bg-neutral-50"
+                  className="h-14 cursor-pointer border-b border-neutral-100 text-neutral-700 hover:bg-neutral-50"
                   key={id}
-                  onClick={() => {
-                    setFilterOpen(false);
-                    setSelectedId(id);
-                  }}
+                  onClick={() => setSelectedId(id)}
                 >
-                  <td className="px-4 py-4">
-                    <span className="block size-4 rounded border border-neutral-300" />
-                  </td>
-                  {table.columns.map((column) => (
-                    <td className={cn("px-4 py-4 align-middle", column.mono && "font-mono text-xs")} key={column.key}>
-                      {column.key === "status" ? <StatusBadge status={value(row, column.key, "OK")} /> : value(row, column.key, "-")}
-                    </td>
-                  ))}
+                  <td className="px-4 py-4 font-mono text-xs">{row.session_id}</td>
+                  <td className="px-4 py-4">{row.user}</td>
+                  <td className="px-4 py-4">{row.target}</td>
+                  <td className="px-4 py-4">{row.traces}</td>
+                  <td className="px-4 py-4 text-neutral-600">{row.first_trace}</td>
+                  <td className="px-4 py-4 text-neutral-600">{row.last_trace}</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
-
-      {table.rows.length === 0 ? <TracesEmptyOverlay /> : null}
     </div>
   );
 }
@@ -392,36 +409,6 @@ function TraceTextPanel({
         ) : (
           <pre className="whitespace-pre-wrap font-mono text-xs leading-6 text-neutral-700">{text}</pre>
         )}
-      </div>
-    </div>
-  );
-}
-
-function TracesEmptyOverlay() {
-  return (
-    <div className="absolute inset-0 grid place-items-center bg-white/60 backdrop-blur-[2px]">
-      <div className="max-w-md text-center">
-        <div className="mb-6 inline-flex items-center gap-2">
-          <span className="grid size-10 place-items-center rounded-full bg-neutral-950 text-white">
-            <PanelRightOpen className="size-5" />
-          </span>
-          <span className="grid size-10 place-items-center rounded-full bg-[#ff3b25] text-white">
-            <AlertTriangle className="size-5" />
-          </span>
-        </div>
-        <h2 className="text-2xl font-semibold">No traces logged</h2>
-        <p className="mt-2 text-sm leading-6 text-neutral-600">
-          View traces created by agents and teams. Visit docs for more information.
-        </p>
-        <div className="mt-6 flex justify-center gap-2">
-          <CommandButton>
-            Learn more
-            <ExternalLink className="size-3.5" />
-          </CommandButton>
-          <CommandButton className="border-neutral-950 bg-neutral-950 text-white hover:bg-neutral-800">
-            Go to chat page
-          </CommandButton>
-        </div>
       </div>
     </div>
   );

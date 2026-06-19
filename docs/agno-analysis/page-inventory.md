@@ -227,8 +227,15 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 
 - Public demo state can show a `No traces logged` overlay while preserving a
   blurred trace-detail surface behind it.
+- Current public Demo OS state at
+  `/try-demo/traces?group_by=sessions&page=1&limit=25` renders the grouped
+  Sessions table instead of the older empty overlay.
 - Authenticated/account state can show an inactive-AgentOS overlay over the
   traces table when the connected AgentOS is unreachable.
+- Grouped Sessions controls include `Sessions`/`Runs` segments, filter query
+  input, `All time`, and an icon-only export button.
+- Grouped Sessions columns are `Session ID`, `User`, `Agent/Team/Workflow`,
+  `Traces`, `First Trace`, and `Last Trace`.
 - List/table mode uses columns: Name, Trace ID, Status, Duration, Spans,
   Agent ID, Input, Created At.
 - Detail mode includes trace metadata, trace tree, selected span summary,
@@ -242,8 +249,14 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - `https://os.agno.com/traces?group_by=sessions&page=1&limit=25` exposes
     account trace rows and an AgentOS-not-active overlay when the OS endpoint is
     down.
-  - Local implementation keeps the list operational, uses the observed trace
-    columns, and opens a functional trace detail explorer on row click.
+  - 2026-06-19 follow-up: rechecked the public Demo OS route and observed
+    populated grouped-session rows plus `/traces/filter-schema`, `/traces`,
+    `/trace_session_stats`, and `/config` requests.
+  - Local implementation now mirrors the current public Demo OS grouped
+    Sessions table state and keeps the trace detail explorer available after row
+    click for subsequent trace-detail iteration.
+  - Traces is covered by the desktop screenshot diff gate for the grouped
+    Sessions table state.
 
 ### Memory
 

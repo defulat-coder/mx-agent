@@ -113,6 +113,12 @@
       "maxDifferentRatio": 0.12
     },
     {
+      "name": "traces-sessions-table",
+      "reference": "docs/agno-analysis/next-reference-screenshots/traces-sessions-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/traces-current.png",
+      "viewport": "desktop-compact"
+    },
+    {
       "name": "settings-os-shell",
       "reference": "docs/agno-analysis/next-reference-screenshots/settings-os-nav-reference.png",
       "local": "docs/agno-analysis/local-screenshots/settings-os.png",

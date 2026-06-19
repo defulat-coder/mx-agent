@@ -1166,3 +1166,27 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `pnpm visual:diff` now reports `16/16 passed`.
 - `evaluation-list`: passed, different ratio `0.067094` against max `0.12`.
 - `evaluation-detail`: passed, different ratio `0.107163` against max `0.12`.
+
+2026-06-19 Traces visual diff matrix expansion:
+
+- Rechecked the Agno public Demo OS Traces route with Chrome/CDP at 1512 x 772:
+  `https://os.agno.com/try-demo/traces?group_by=sessions&page=1&limit=25`.
+  The current public state renders a grouped Sessions table rather than the
+  older `No traces logged` overlay.
+- Observed startup traffic includes `POST /api/v1/auth/authenticate`,
+  `POST /api/v1/auth/demo-sdk-token`, `GET /api/v1/users/me`,
+  `GET /api/v1/operating-systems/`, Demo OS `GET /health`, Demo OS
+  `GET /config`, Demo OS `GET /traces/filter-schema`, Demo OS
+  `GET /traces?page=1&limit=25&db_id=demo-os-db`, and Demo OS
+  `GET /trace_session_stats?page=1&limit=25&db_id=demo-os-db`.
+- Aligned the local Traces list state with the observed public Demo OS grouped
+  Sessions view: database header, `Sessions`/`Runs` segment, filter query input,
+  `All time`, icon-only export, and the session stats table columns.
+- Captured current reference
+  `docs/agno-analysis/next-reference-screenshots/traces-sessions-reference.png`
+  and recaptured `docs/agno-analysis/local-screenshots/traces-current.png` from
+  the standalone build.
+- Added `traces-sessions-table` to the screenshot comparison matrix.
+- `pnpm visual:diff` now reports `17/17 passed`.
+- `traces-sessions-table`: passed, different ratio `0.058645` against max
+  `0.08`.
