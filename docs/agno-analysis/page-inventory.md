@@ -11,6 +11,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 | Home | `https://os.agno.com/try-demo` | `docs/agno-analysis/reference-screenshots/home.png` |
 | Chat | `https://os.agno.com/try-demo/chat?type=agent` | `docs/agno-analysis/reference-screenshots/chat.png` |
 | Chat deep link | `https://os.agno.com/chat?type=team&id=router-team&session=1534cf8b-ec92-40e3-91ed-2fb1e942267c` | `docs/agno-analysis/next-reference-screenshots/chat-deeplink-reference.png` |
+| Chat tool call collapsed | `https://os.agno.com/try-demo/chat?type=agent&id=sage&session={uuid}` | `docs/agno-analysis/next-reference-screenshots/chat-tool-call-collapsed-reference.png` |
+| Chat tool call expanded | `https://os.agno.com/try-demo/chat?type=agent&id=sage&session={uuid}` | `docs/agno-analysis/next-reference-screenshots/chat-tool-call-expanded-reference.png` |
 | Sessions | `https://os.agno.com/try-demo/sessions?sort_by=updated_at_desc&type=all&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/sessions.png` |
 | Traces | `https://os.agno.com/try-demo/traces?group_by=sessions&page=1&limit=25` | `docs/agno-analysis/reference-screenshots/traces.png` |
 | Studio | `https://os.agno.com/try-demo/studio/agents` | `docs/agno-analysis/next-reference-screenshots/studio-list-reference.png` |
@@ -146,6 +148,15 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
     and backend chat responses: textarea composer, Enter-to-send, URL session
     sync, first-prompt breadcrumb, run duration row, copy/metrics actions, and a
     completed-session inspector list.
+  - When a completed run includes a tool call, Agno renders a compact uppercase
+    pill such as `1 TOOL CALLED` above the assistant run row. The pill includes a
+    tool icon and chevron and opens a right-side inspector when clicked.
+  - The Tool Calls inspector uses the same around-500px right panel geometry as
+    other Chat inspectors, with title `Tool Calls`, an `x` close control, and a
+    bordered accordion row such as `SEARCH_AGNO`.
+  - Local implementation now mirrors the observed tool-call run state for Agno
+    prompts: `1 TOOL CALLED` appears in the conversation and opens a `Tool
+    Calls` inspector containing `SEARCH_AGNO`.
 
 ### Sessions
 

@@ -90,4 +90,8 @@ export type ChatMessage = {
   content: string;
   stepLabel?: string;
   durationLabel?: string;
+  toolCalls?: Array<{
+    name: string;
+    summary?: string;
+  }>;
 };

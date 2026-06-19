@@ -254,6 +254,55 @@ Target reference screenshots:
 - `pnpm build`: passed.
 - Production preview used `HOSTNAME=0.0.0.0 PORT=3003 node .next/standalone/server.js`.
 
+## Chat Tool Calls Iteration
+
+Chrome/CDP analysis added the completed-run Tool Calls state for:
+
+`https://os.agno.com/try-demo/chat?type=agent&id=sage&session={uuid}`
+
+Observed Agno behavior:
+
+- Completed tool-backed runs show an uppercase `1 TOOL CALLED` pill above the
+  assistant run row.
+- Clicking the pill keeps the Chat canvas on the left and opens a right
+  inspector around 500px wide.
+- The inspector title is `Tool Calls`, the close control is an `x`, and the
+  first accordion row is `SEARCH_AGNO`.
+
+Local implementation now mirrors this state:
+
+- Agno prompts attach a preview `SEARCH_AGNO` tool call to the assistant
+  message.
+- The conversation renders the `1 TOOL CALLED` pill before the assistant run
+  duration row.
+- Clicking the pill opens the right-side `Tool Calls` inspector with a bordered
+  `SEARCH_AGNO` accordion row.
+
+Local Chrome assertions passed for:
+
+- `/chat?type=agent&id=hr-agent` sends `What is Agno?` and updates the URL with
+  `session=preview-session`.
+- The rendered page includes the prompt breadcrumb, `1 TOOL CALLED`, `Worked for
+  1 s`, the Agno preview answer, and `Ask anything...`.
+- Opening the tool pill renders `Tool Calls`, `SEARCH_AGNO`, and the close
+  control in the right inspector.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/chat-tool-call-collapsed-local.png`
+- `docs/agno-analysis/local-screenshots/chat-tool-call-expanded-local.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/chat-tool-call-collapsed-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/chat-tool-call-expanded-reference.png`
+
+2026-06-19 Chat Tool Calls follow-up verification:
+
+- `pnpm lint`: passed.
+- `pnpm build`: passed.
+- Production preview used `HOSTNAME=0.0.0.0 PORT=3003 node .next/standalone/server.js`.
+
 ## Production Deployment Iteration
 
 The standalone deployment gap was closed with production container artifacts:

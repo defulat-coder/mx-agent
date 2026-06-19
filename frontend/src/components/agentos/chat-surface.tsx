@@ -16,6 +16,8 @@ import {
   RotateCcw,
   Send,
   SlidersHorizontal,
+  Wrench,
+  X,
 } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
 
@@ -26,7 +28,7 @@ import type { ChatMessage, EntityCardData } from "@/lib/agentos-types";
 import { cn } from "@/lib/utils";
 
 type EntityGroup = "agents" | "teams" | "workflows";
-type Inspector = "config" | "sessions" | null;
+type Inspector = "config" | "sessions" | "tools" | null;
 type Menu = "group" | "entity" | null;
 
 type ChatSurfaceProps = {
@@ -185,6 +187,14 @@ export function ChatSurface({
       setSessionId(response.session_id ?? sessionId);
       updateChatUrl(entityGroup, selectedEntity, response.session_id ?? sessionId);
       const durationSeconds = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+      const toolCalls = /agno/i.test(message)
+        ? [
+            {
+              name: "SEARCH_AGNO",
+              summary: "Looked up current Agno documentation before answering.",
+            },
+          ]
+        : undefined;
       setMessages((current) => [
         ...current,
         {
@@ -192,6 +202,7 @@ export function ChatSurface({
           role: "assistant",
           content: response.reply,
           durationLabel: `Worked for ${durationSeconds} s`,
+          toolCalls,
         },
       ]);
     } catch {
@@ -383,39 +394,58 @@ export function ChatSurface({
             <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-7 overflow-auto px-2 pb-36 pt-8">
               {messages.map((message) =>
                 message.role === "assistant" ? (
-                  <div className="grid grid-cols-[28px_1fr] gap-3" key={message.id}>
-                    <span className="grid size-6 place-items-center rounded-md bg-[#ff3b25] text-white">
-                      <Bot className="size-3.5" />
-                    </span>
-                    <div className="min-w-0 space-y-3">
-                    {message.stepLabel ? (
-                      <details className="group text-sm" open>
-                        <summary className="flex cursor-pointer list-none items-center gap-2 text-neutral-600">
-                          <ChevronRight className="size-4 transition-transform group-open:rotate-90" />
-                          {message.stepLabel}
-                        </summary>
-                        <div className="ml-6 mt-2 font-mono text-[11px] uppercase text-neutral-400">
-                          Run started from restored session
-                        </div>
-                      </details>
-                    ) : null}
-                    {message.durationLabel ? (
-                      <div className="flex items-center gap-2 text-sm text-neutral-500">
-                        <ChevronDown className="size-4" />
-                        {message.durationLabel}
+                  <div className="space-y-5" key={message.id}>
+                    {message.toolCalls?.length ? (
+                      <div className="grid grid-cols-[28px_1fr] gap-3">
+                        <span aria-hidden className="size-6" />
+                        <button
+                          className="inline-flex w-fit items-center gap-2 rounded-md bg-neutral-100 px-2.5 py-1.5 font-mono text-[11px] uppercase text-neutral-800 shadow-[0_1px_4px_rgba(0,0,0,0.06)] hover:bg-neutral-200"
+                          onClick={() => {
+                            setMenu(null);
+                            setInspector("tools");
+                          }}
+                          type="button"
+                        >
+                          <Wrench className="size-3.5" />
+                          {message.toolCalls.length} Tool Called
+                          <ChevronRight className="size-3.5" />
+                        </button>
                       </div>
                     ) : null}
-                    <div className="text-sm leading-6 text-neutral-700">
-                      {message.content}
-                    </div>
-                    <div className="flex items-center gap-3 text-neutral-500">
-                      <button className="rounded p-1 hover:bg-neutral-100" type="button" aria-label="Copy response">
-                        <Copy className="size-4" />
-                      </button>
-                      <button className="rounded p-1 hover:bg-neutral-100" type="button" aria-label="View run metrics">
-                        <BarChart3 className="size-4" />
-                      </button>
-                    </div>
+                    <div className="grid grid-cols-[28px_1fr] gap-3">
+                      <span className="grid size-6 place-items-center rounded-md bg-[#ff3b25] text-white">
+                        <Bot className="size-3.5" />
+                      </span>
+                      <div className="min-w-0 space-y-3">
+                        {message.stepLabel ? (
+                          <details className="group text-sm" open>
+                            <summary className="flex cursor-pointer list-none items-center gap-2 text-neutral-600">
+                              <ChevronRight className="size-4 transition-transform group-open:rotate-90" />
+                              {message.stepLabel}
+                            </summary>
+                            <div className="ml-6 mt-2 font-mono text-[11px] uppercase text-neutral-400">
+                              Run started from restored session
+                            </div>
+                          </details>
+                        ) : null}
+                        {message.durationLabel ? (
+                          <div className="flex items-center gap-2 text-sm text-neutral-500">
+                            <ChevronDown className="size-4" />
+                            {message.durationLabel}
+                          </div>
+                        ) : null}
+                        <div className="text-sm leading-6 text-neutral-700">
+                          {message.content}
+                        </div>
+                        <div className="flex items-center gap-3 text-neutral-500">
+                          <button className="rounded p-1 hover:bg-neutral-100" type="button" aria-label="Copy response">
+                            <Copy className="size-4" />
+                          </button>
+                          <button className="rounded p-1 hover:bg-neutral-100" type="button" aria-label="View run metrics">
+                            <BarChart3 className="size-4" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -494,6 +524,9 @@ export function ChatSurface({
       ) : null}
       {inspector === "sessions" ? (
         <SessionsInspector messages={messages} onClose={() => setInspector(null)} />
+      ) : null}
+      {inspector === "tools" ? (
+        <ToolCallsInspector messages={messages} onClose={() => setInspector(null)} />
       ) : null}
     </div>
   );
@@ -666,7 +699,7 @@ function SessionsInspector({
           onClick={onClose}
           type="button"
         >
-          <PanelRightClose className="size-4" />
+          <X className="size-3.5" />
         </button>
       </div>
 
@@ -702,6 +735,52 @@ function SessionsInspector({
           <button className="mt-2 text-left font-mono text-[11px] uppercase text-neutral-400" type="button">
             Load more sessions
           </button>
+        </div>
+      )}
+    </aside>
+  );
+}
+
+function ToolCallsInspector({
+  messages,
+  onClose,
+}: {
+  messages: ChatMessage[];
+  onClose: () => void;
+}) {
+  const toolCalls = messages.flatMap((message) => message.toolCalls ?? []);
+
+  return (
+    <aside className="w-[500px] shrink-0 border-l border-neutral-200 bg-white px-6 py-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-sm font-semibold">Tool Calls</h2>
+        <button
+          aria-label="Close tool calls"
+          className="grid size-7 place-items-center rounded-md text-neutral-500 hover:bg-neutral-100"
+          onClick={onClose}
+          type="button"
+        >
+          <X className="size-3.5" />
+        </button>
+      </div>
+
+      {toolCalls.length ? (
+        <div className="space-y-3">
+          {toolCalls.map((toolCall) => (
+            <details className="group rounded-lg border border-neutral-200 bg-white" key={toolCall.name}>
+              <summary className="flex h-16 cursor-pointer list-none items-center justify-between px-4 text-sm font-medium">
+                {toolCall.name}
+                <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
+              </summary>
+              <div className="border-t border-neutral-100 px-4 py-3 text-sm leading-6 text-neutral-500">
+                {toolCall.summary ?? "Tool completed successfully."}
+              </div>
+            </details>
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-lg bg-neutral-50 px-4 py-8 text-center text-sm text-neutral-500">
+          No tool calls for this run.
         </div>
       )}
     </aside>
