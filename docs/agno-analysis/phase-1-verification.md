@@ -1245,3 +1245,17 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `chat-config-panel`: passed, different ratio `0.068992` against max `0.08`.
 - `chat-sessions-panel`: passed, different ratio `0.064963` against max
   `0.08`.
+
+2026-06-19 Settings profile visual diff matrix expansion:
+
+- Rechecked Agno Settings and Studio routes with Chrome/CDP at 1512 x 828 in
+  the current browser session. Both authenticated Settings Organization and
+  public Demo Studio routes stalled at the three-dot loader and did not provide
+  usable current reference surfaces, so no existing reference screenshot was
+  overwritten.
+- Used the existing authenticated Settings Profile reference captured from the
+  earlier successful Settings pass and the current local Settings Profile
+  screenshot for a stable desktop visual gate.
+- Added `settings-profile` to the screenshot comparison matrix.
+- `pnpm visual:diff` now reports `21/21 passed`.
+- `settings-profile`: passed, different ratio `0.02799` against max `0.08`.

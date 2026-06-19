@@ -424,6 +424,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
     `Profile`, `Organization`, `OS & Security`, `Roles`, `Billing`.
   - Profile uses a sparse form: `NAME`, `USER NAME`, disabled `EMAIL`, and a
     disabled `SAVE` button until edits are made.
+  - Profile is now covered by the desktop screenshot diff gate as
+    `settings-profile`.
   - Organization uses the same sparse form top section, then a bordered Pro
     upgrade panel for multi-user access, tab-like `Members` and
     `Pending invites` counters, member rows, and `DELETE ORGANIZATION`.
