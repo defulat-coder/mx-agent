@@ -34,9 +34,27 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 
 ### Home
 
-- Groups: Agents, Teams, Workflows, Interfaces, All OSes.
-- Main interactions: accordion collapse/expand, Chat buttons, Config buttons, Show More controls, OS switch/edit/delete controls.
-- Card pattern: red square icon, title, description, mono tag chips, command buttons in footer.
+- Groups: Agents, Teams, and Workflows. Interfaces and operating systems are
+  managed elsewhere in the shell rather than rendered in the public Demo OS Home
+  card flow.
+- Card pattern: red square icon, title, description, mono tag chips with `+N`
+  overflow chips, and command buttons in a tinted footer.
+- Interaction pass on 2026-06-19:
+  - Initial Home shows three cards per group and `Show more (+N)` controls.
+  - Agents sample rows include `Sage`, `Voyager`, and `Ledger`; Teams include
+    `Dash`, `Mentor`, and `Clinic`; Workflows include `Daily Brief`,
+    `AI Digest`, and `Scribe`.
+  - Clicking `Show more (+6)` expands the Agents group inline and changes the
+    control to `Show Less`.
+  - Clicking the group header collapses that group, leaving only the uppercase
+    section title while subsequent groups stay visible.
+  - Card `Config` navigates to `/try-demo/config?type=agent&id=sage` and renders
+    a configuration surface with `Open in chat`, `Open docs`, and accordion
+    rows for Agent Details, Model, Database, Tools, Sessions, Default Tools, and
+    System Message.
+  - Local implementation now follows the three-group Home card flow, supports
+    collapse/expand, Show More/Show Less, Chat links, and a local `/config`
+    page with the observed configuration sections.
 
 ### Studio
 

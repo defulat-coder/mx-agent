@@ -80,6 +80,30 @@ def get_entities() -> OSEntitiesResponse:
             tags=["FINANCE", "APPROVALS"],
             actions=["chat", "config"],
         ),
+        OSEntityCard(
+            id="research-agent",
+            name="Research Assistant",
+            kind="agent",
+            description="Searches policies, vendor docs, and market updates to produce sourced briefs.",
+            tags=["WEB-SEARCH", "FILE-GENERATION", "BRIEFING", "CITATIONS"],
+            actions=["chat", "config"],
+        ),
+        OSEntityCard(
+            id="planner-agent",
+            name="Planner Assistant",
+            kind="agent",
+            description="Tracks task state, ownership, and follow-ups across employee operations.",
+            tags=["SESSION-STATE", "TASKS", "FOLLOWUPS", "MEMORY"],
+            actions=["chat", "config"],
+        ),
+        OSEntityCard(
+            id="legal-agent",
+            name="Legal Assistant",
+            kind="agent",
+            description="Reviews contract clauses, policy language, and risk notes for internal teams.",
+            tags=["LEGAL", "CONTRACTS", "RISK", "POLICY"],
+            actions=["chat", "config"],
+        ),
     ]
     teams = [
         OSEntityCard(
@@ -106,6 +130,22 @@ def get_entities() -> OSEntitiesResponse:
             tags=["CONTEXT-PROVIDER", "KNOWLEDGE-FILTER", "FALLBACK"],
             actions=["chat", "config"],
         ),
+        OSEntityCard(
+            id="risk-team",
+            name="Risk Review Team",
+            kind="team",
+            description="Coordinates finance, legal, and HR checks before sensitive actions proceed.",
+            tags=["HITL", "APPROVALS", "AUDIT-TRAIL", "GUARDRAILS"],
+            actions=["chat", "config"],
+        ),
+        OSEntityCard(
+            id="analytics-team",
+            name="Analytics Team",
+            kind="team",
+            description="Runs SQL-style analysis, summarizes metrics, and explains operational trends.",
+            tags=["COORDINATE", "SQL", "DATA-ANALYSIS", "REPORTING"],
+            actions=["chat", "config"],
+        ),
     ]
     workflows = [
         OSEntityCard(
@@ -130,6 +170,30 @@ def get_entities() -> OSEntitiesResponse:
             kind="workflow",
             description="Scans calendar, tickets, finance updates, and policy changes in parallel.",
             tags=["PARALLEL", "SCHEDULED", "BRIEFING"],
+            actions=["chat", "config"],
+        ),
+        OSEntityCard(
+            id="content-review",
+            name="Content Review",
+            kind="workflow",
+            description="Runs research, drafting, review, and human sign-off for employee announcements.",
+            tags=["PARALLEL", "LOOP", "HITL", "CONTENT"],
+            actions=["chat", "config"],
+        ),
+        OSEntityCard(
+            id="access-renewal",
+            name="Access Renewal",
+            kind="workflow",
+            description="Checks access grants, manager approvals, and renewal deadlines on a schedule.",
+            tags=["SCHEDULED", "APPROVALS", "IT", "AUDIT"],
+            actions=["chat", "config"],
+        ),
+        OSEntityCard(
+            id="policy-digest",
+            name="Policy Digest",
+            kind="workflow",
+            description="Collects policy changes and sends concise impact summaries to stakeholders.",
+            tags=["SCHEDULED", "WEB-SEARCH", "BRIEFING", "POLICY"],
             actions=["chat", "config"],
         ),
     ]

@@ -53,6 +53,46 @@ Chrome verified `/chat` on the production build:
 
 Screenshot: `docs/agno-analysis/local-screenshots/chat-interaction.png`.
 
+## Home Workflow Iteration
+
+Chrome/CDP interaction analysis added a Home verification pass:
+
+- Public demo Home renders only Agents, Teams, and Workflows in the main card
+  flow.
+- Each group initially shows three cards and a `Show more (+N)` command when
+  additional entities exist.
+- `Show more` expands the group inline and changes to `Show Less`.
+- Clicking a group header collapses that group and keeps the rest of the page
+  visible.
+- `Config` navigates to `/try-demo/config?type=agent&id=sage`, which renders a
+  configuration surface with `Open in chat`, `Open docs`, and Agent Details,
+  Model, Database, Tools, Sessions, Default Tools, and System Message sections.
+- Local `/` now implements the same three-group card flow, collapse/expand,
+  Show More/Show Less, Chat links, and `/config` configuration route.
+
+Local Chrome assertions passed for:
+
+- `/` includes Agents, Teams, Workflows, Show More, Chat, and Config controls.
+- Interfaces and Operating Systems are no longer rendered in the Home card flow.
+- Expanding Agents shows additional agent cards and `Show Less`.
+- Collapsing Agents hides agent cards while Teams remains visible.
+- `/config?type=agent&id=hr-agent` includes the observed configuration actions
+  and sections.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/home-list.png`
+- `docs/agno-analysis/local-screenshots/home-show-more.png`
+- `docs/agno-analysis/local-screenshots/home-agents-collapsed.png`
+- `docs/agno-analysis/local-screenshots/home-config.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/home-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/home-show-more-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/home-agents-collapsed-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/home-config-reference.png`
+
 ## Chat Inspector Iteration
 
 Chrome/CDP interaction analysis added a second local verification pass for Chat:
