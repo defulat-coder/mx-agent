@@ -2,8 +2,11 @@
 
 from types import SimpleNamespace
 
+import jwt
 import pytest
 from httpx import AsyncClient
+
+from app.config import settings
 
 
 @pytest.fixture(autouse=True)
@@ -67,3 +70,38 @@ async def test_chat_response_schema(client: AsyncClient, auth_headers: dict):
     assert "reply" in data
     assert isinstance(data["reply"], str)
     assert "action" in data
+
+
+async def test_chat_passes_claims_to_agentos_session_state(client: AsyncClient, monkeypatch: pytest.MonkeyPatch):
+    """chat facade 将 JWT claims 转成 AgentOS session_state。"""
+    captured = {}
+
+    async def fake_arun(*args, **kwargs):
+        captured.update(kwargs)
+        return SimpleNamespace(content="测试回复", session_id=kwargs.get("session_id"))
+
+    monkeypatch.setattr("app.api.v1.endpoints.chat.router_team.arun", fake_arun)
+    token = jwt.encode(
+        {
+            "employee_id": 9,
+            "roles": ["employee", "manager"],
+            "department_id": 2,
+        },
+        settings.AUTH_SECRET,
+        algorithm="HS256",
+    )
+
+    resp = await client.post(
+        "/v1/chat",
+        json={"message": "你好", "session_id": "s-1"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert resp.status_code == 200
+    assert captured["user_id"] == "9"
+    assert captured["session_id"] == "s-1"
+    assert captured["session_state"] == {
+        "employee_id": 9,
+        "roles": ["employee", "manager"],
+        "department_id": 2,
+    }

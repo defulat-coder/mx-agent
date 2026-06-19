@@ -16,6 +16,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.agents.router_agent import router_team
 from app.config import settings
+from app.core.auth import SESSION_STATE_CLAIMS
 from app.core.database import engine, init_db
 from app.core.exceptions import (
     AppException,
@@ -75,7 +76,7 @@ app.add_middleware(
     verification_keys=[settings.AUTH_SECRET],
     algorithm="HS256",
     user_id_claim="employee_id",
-    session_state_claims=["employee_id", "roles", "department_id"],
+    session_state_claims=list(SESSION_STATE_CLAIMS),
     validate=True,
     excluded_route_paths=[
         "/",

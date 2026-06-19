@@ -91,3 +91,35 @@ Autoreview:
   validation. This is acceptable for now because it preserves the product API's
   unified error response; a later deepening pass can extract a shared JWT claims
   adapter.
+
+### Step 2 - Extract JWT claims adapter
+
+Status: completed
+
+Architecture change:
+
+- Added `app.core.auth` as the shared module for bearer token extraction, JWT
+  decoding, error-code mapping, AgentOS `session_state` construction, and
+  AgentOS `user_id` derivation.
+- Reused one `SESSION_STATE_CLAIMS` constant in AgentOS middleware setup and the
+  chat facade path, reducing drift between runtime auth configuration and tool
+  identity context.
+- Added a contract test proving `/v1/chat` passes `employee_id`, `roles`, and
+  `department_id` from JWT claims into `router_team.arun`.
+
+Verification:
+
+- Focused tests: `uv run pytest tests/test_api.py tests/test_auth.py`
+  -> 13 passed.
+- Full backend suite: `uv run pytest` -> 103 passed.
+- Live HTTP check on port 8001:
+  - `GET /health` -> 200 with request and trace IDs.
+  - `POST /v1/chat` without token -> 401 with `code=40101`.
+  - `POST /v1/chat` with invalid token -> 401 with `code=40103`.
+
+Autoreview:
+
+- The endpoint no longer owns JWT parsing details; it now only composes the
+  facade request, auth claims adapter, and router team call.
+- The auth module still intentionally covers only product API auth needs; it
+  does not replace AgentOS middleware validation for built-in AgentOS routes.
