@@ -87,6 +87,23 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Controls: create memory, sort by Updated At.
 - Table columns: Content, Topics, Updated At.
 - Row content uses topic chips and compact timestamps.
+- Interaction pass on 2026-06-19:
+  - Demo OS requests memory rows from
+    `/user_memory_stats?limit=25&page=1&db_id=demo-os-db&table=agno_memories`
+    on the configured AgentOS endpoint after fetching the demo SDK token.
+  - Memory rows are non-navigating table rows with `cursor-default`; the table
+    uses a 50/30/20 column split for Content, Topics, and Updated At.
+  - Topic chips are lowercase in data and uppercase visually, showing the first
+    three topics plus a `+N` chip for hidden topics.
+  - Pagination appears at the bottom as a page input and `/ 2` total marker.
+  - The empty/help state reads `No memories found`, includes short copy, and
+    provides `Learn more` and `Create memory` actions.
+  - `Create memory` opens a centered modal over a blurred page with `User ID`,
+    `Content`, `Topics optional`, disabled add-tag control until input, and
+    `Cancel`/`Create` actions.
+  - Local implementation now follows the dedicated memory table geometry, topic
+    chip truncation, search/empty state, pagination footer, and create-memory
+    dialog.
 
 ### Knowledge
 

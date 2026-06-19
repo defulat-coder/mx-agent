@@ -246,3 +246,46 @@ Target reference screenshots:
 
 - `docs/agno-analysis/next-reference-screenshots/evaluation-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/evaluation-row-click-reference.png`
+
+## Memory Workflow Iteration
+
+Chrome/CDP interaction analysis added a Memory verification pass:
+
+- Public demo reference renders `Memory` with database `demo-os-db`, table
+  `agno_memories`, Content/Topics/Updated At columns, topic chips, and page
+  input `/ 2` pagination.
+- Demo data is requested from the AgentOS endpoint at
+  `/user_memory_stats?limit=25&page=1&db_id=demo-os-db&table=agno_memories`.
+- Rows are display-only table rows; topics render as visible chips plus a `+N`
+  overflow chip.
+- The empty/help state includes `No memories found`, `Learn more`, and
+  `Create memory`.
+- `Create memory` opens a centered modal over a blurred workspace with User ID,
+  Content, Topics optional, add-tag, Cancel, and Create controls.
+- Local `/memory` now renders a dedicated memory table, search control,
+  export/create actions, target-like pagination footer, empty state, and
+  create-memory dialog with topic entry behavior.
+
+Local Chrome assertions passed for:
+
+- `/memory` includes 10 memory rows and the observed Content, Topics, and
+  Updated At columns.
+- The first row shows topic chips for Preferences, Notifications, Email, and a
+  `+1` overflow chip.
+- `Create Memory` opens the modal with the expected fields and disabled add-tag
+  state.
+- Pressing Enter in the topic field adds a tag and clears the field.
+- Searching for a missing token reduces the table to zero rows and shows the
+  `No memories found` empty state with actions.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/memory-list.png`
+- `docs/agno-analysis/local-screenshots/memory-create.png`
+- `docs/agno-analysis/local-screenshots/memory-create-topic.png`
+- `docs/agno-analysis/local-screenshots/memory-empty-search.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/memory-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/memory-create-reference.png`
