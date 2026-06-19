@@ -240,6 +240,7 @@ def _table(
     table: str,
     columns: list[tuple[str, str]],
     rows: list[dict[str, Any]],
+    filters: list[str] | None = None,
 ) -> OSTableResponse:
     return OSTableResponse(
         title=title,
@@ -249,20 +250,43 @@ def _table(
             for key, label in columns
         ],
         rows=rows,
-        filters=["View: All"],
+        filters=filters or ["View: All"],
     )
 
 
 def get_sessions() -> OSTableResponse:
+    seeds = [
+        {"name": "新员工入职材料清单", "type": "team", "updated_at": "19 Jun 2026, 09:30"},
+        {"name": "报销申请状态查询", "type": "agent", "updated_at": "18 Jun 2026, 16:12"},
+        {"name": "VPN 无法连接", "type": "agent", "updated_at": "18 Jun 2026, 10:04"},
+        {"name": "法务合同风险摘要", "type": "workflow", "updated_at": "17 Jun 2026, 18:42"},
+        {"name": "本月招聘漏斗分析", "type": "team", "updated_at": "17 Jun 2026, 11:15"},
+        {"name": "预算使用率预警", "type": "workflow", "updated_at": "16 Jun 2026, 17:58"},
+        {"name": "会议室预订冲突处理", "type": "agent", "updated_at": "16 Jun 2026, 14:20"},
+        {"name": "绩效校准会资料", "type": "team", "updated_at": "15 Jun 2026, 19:05"},
+        {"name": "供应商付款审批", "type": "workflow", "updated_at": "15 Jun 2026, 10:44"},
+        {"name": "员工证明开具", "type": "agent", "updated_at": "14 Jun 2026, 09:18"},
+    ]
+    rows = []
+    for index in range(58):
+        seed = seeds[index % len(seeds)]
+        round_index = index // len(seeds)
+        rows.append(
+            {
+                **seed,
+                "id": f"s-{index + 1}",
+                "name": seed["name"] if round_index == 0 else f"{seed['name']} {round_index + 1}",
+                "session_id": f"1534cf8b-ec92-40e3-91ed-{index + 1:012d}",
+                "user_id": "operator@mx.local" if index % 3 == 0 else "employee@mx.local",
+            }
+        )
+
     return _table(
         "Sessions",
         "agno_sessions",
         [("name", "SESSION NAME"), ("updated_at", "UPDATED AT")],
-        [
-            {"id": "s-1", "name": "新员工入职需要哪些步骤？", "updated_at": "19 Jun 2026, 09:30"},
-            {"id": "s-2", "name": "报销申请状态查询", "updated_at": "18 Jun 2026, 16:12"},
-            {"id": "s-3", "name": "VPN 无法连接", "updated_at": "18 Jun 2026, 10:04"},
-        ],
+        rows,
+        filters=["View: All", "View: Agents", "View: Teams", "View: Workflows"],
     )
 
 

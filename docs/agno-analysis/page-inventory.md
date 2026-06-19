@@ -104,11 +104,19 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 
 ### Sessions
 
-- Header context: database and table labels.
-- Controls: View filter, export, sort by Updated At.
-- Table columns: Session Name, Updated At.
-- Row click likely navigates to session detail/chat.
-- Local parity iteration on 2026-06-19 added a row inspector pattern for table pages: clicking a row selects it, checks the row box, and opens a right-side details panel while preserving the table workspace.
+- Header context: `Database demo-os-db` and `Table agno_sessions`.
+- Controls: `View: All` dropdown and `Updated at` column sort state. No export
+  control is visible on the Agno Sessions reference screen.
+- View menu options: All, Agents, Teams, Workflows. Selecting Teams updates the
+  URL to `type=team` and issues `GET /sessions?page=1&type=team&limit=25&sort_by=updated_at&sort_order=desc&db_id=demo-os-db&table=agno_sessions`.
+- Initial API request: `GET https://demo-os-production-823a.up.railway.app/sessions?page=1&limit=25&sort_by=updated_at&sort_order=desc&db_id=demo-os-db&table=agno_sessions`.
+- Table columns: checkbox, Session Name, Updated At.
+- Pagination footer: previous button, page input, `/ 3`, next button.
+- Row text click did not navigate or open a details panel during CDP testing;
+  row selection is represented by the checkbox column.
+- Local parity iteration on 2026-06-19 replaced the generic DataTable with a
+  dedicated Sessions table: Agno-style View radio menu, URL query sync,
+  25-row pagination, row checkboxes, and filter-specific data subsets.
 
 ### Traces
 

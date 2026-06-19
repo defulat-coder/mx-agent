@@ -234,6 +234,7 @@ const table = (
   tableName: string,
   columns: Array<[string, string]>,
   rows: Record<string, unknown>[],
+  filters = ["View: All"],
 ): TableResponse => ({
   title,
   database: "mx-agent-db",
@@ -244,14 +245,41 @@ const table = (
     mono: ["agent_id", "cron", "endpoint", "status", "trace_id"].includes(key),
   })),
   rows,
-  filters: ["View: All"],
+  filters,
+});
+
+const sessionSeeds = [
+  { name: "新员工入职材料清单", type: "team", updated_at: "19 Jun 2026, 09:30" },
+  { name: "报销申请状态查询", type: "agent", updated_at: "18 Jun 2026, 16:12" },
+  { name: "VPN 无法连接", type: "agent", updated_at: "18 Jun 2026, 10:04" },
+  { name: "法务合同风险摘要", type: "workflow", updated_at: "17 Jun 2026, 18:42" },
+  { name: "本月招聘漏斗分析", type: "team", updated_at: "17 Jun 2026, 11:15" },
+  { name: "预算使用率预警", type: "workflow", updated_at: "16 Jun 2026, 17:58" },
+  { name: "会议室预订冲突处理", type: "agent", updated_at: "16 Jun 2026, 14:20" },
+  { name: "绩效校准会资料", type: "team", updated_at: "15 Jun 2026, 19:05" },
+  { name: "供应商付款审批", type: "workflow", updated_at: "15 Jun 2026, 10:44" },
+  { name: "员工证明开具", type: "agent", updated_at: "14 Jun 2026, 09:18" },
+];
+
+const sessionRows = Array.from({ length: 58 }, (_, index) => {
+  const seed = sessionSeeds[index % sessionSeeds.length];
+  const round = Math.floor(index / sessionSeeds.length);
+
+  return {
+    ...seed,
+    id: `s-${index + 1}`,
+    name: round === 0 ? seed.name : `${seed.name} ${round + 1}`,
+    session_id: `1534cf8b-ec92-40e3-91ed-${String(index + 1).padStart(12, "0")}`,
+    user_id: index % 3 === 0 ? "operator@mx.local" : "employee@mx.local",
+  };
 });
 
 export const fallbackTables = {
-  sessions: table("Sessions", "agno_sessions", [["name", "SESSION NAME"], ["updated_at", "UPDATED AT"]], [
-    { id: "s-1", name: "新员工入职需要哪些步骤？", updated_at: "19 Jun 2026, 09:30" },
-    { id: "s-2", name: "报销申请状态查询", updated_at: "18 Jun 2026, 16:12" },
-    { id: "s-3", name: "VPN 无法连接", updated_at: "18 Jun 2026, 10:04" },
+  sessions: table("Sessions", "agno_sessions", [["name", "SESSION NAME"], ["updated_at", "UPDATED AT"]], sessionRows, [
+    "View: All",
+    "View: Agents",
+    "View: Teams",
+    "View: Workflows",
   ]),
   traces: table(
     "Traces",
