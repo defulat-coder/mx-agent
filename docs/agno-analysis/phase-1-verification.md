@@ -1279,3 +1279,19 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `pnpm build`: passed.
 - `pnpm visual:diff` now reports `22/22 passed`.
 - `settings-billing`: passed, different ratio `0.092232` against max `0.1`.
+
+2026-06-19 Settings organization visual diff matrix expansion:
+
+- Rechecked `https://os.agno.com/settings/organization` with Chrome/CDP at 1512
+  x 828. The current Chrome session redirects to
+  `https://os.agno.com/signin`, so the existing authenticated Organization
+  reference screenshot from the earlier successful Settings pass remains the
+  source of truth.
+- Used the existing Organization reference and current local Organization
+  screenshot to add a stable desktop visual gate for the organization name,
+  Pro invitation panel, members/pending invite tabs, member row, danger zone,
+  and failure toast structure.
+- Added `settings-organization` to the screenshot comparison matrix.
+- `pnpm visual:diff` now reports `23/23 passed`.
+- `settings-organization`: passed, different ratio `0.055464` against max
+  `0.08`.

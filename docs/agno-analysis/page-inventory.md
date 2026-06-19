@@ -439,6 +439,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - Local implementation now mirrors the Organization tab semantics, member
     row, pending-invites empty state, danger-zone block, and connection-failure
     toast.
+  - Organization is now covered by the desktop screenshot diff gate as
+    `settings-organization`.
   - OS & Security is a long form with a disabled ID + copy control, protocol
     select plus endpoint input, collapsible-looking authorization section,
     JWT toggle, security key generation control, additional settings,
