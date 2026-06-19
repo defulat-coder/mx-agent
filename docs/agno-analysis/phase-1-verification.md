@@ -1478,3 +1478,19 @@ repeatable measurement path for subsequent page-by-page iterations.
   `0.14`.
 - `settings-organization-interactions`: passed, different ratio `0.075012`
   against max `0.14`.
+
+2026-06-19 Sessions row-selection visual diff matrix expansion:
+
+- Rechecked
+  `https://os.agno.com/try-demo/sessions?sort_by=updated_at_desc&type=all&page=1&limit=25`
+  with Chrome/CDP. In the current anonymous Chrome session the route renders an
+  empty document body and issues authenticated API calls including
+  `GET https://os-api.agno.com/api/v1/users/me` and
+  `POST https://os-api.agno.com/api/v1/auth/authenticate`; no session checkboxes
+  are present in the live anonymous DOM.
+- Because current anonymous access no longer exposes the public Demo Sessions
+  table, this pass preserves the previously captured Agno row-click reference
+  and adds the matching local row-selected state to the official matrix.
+- Added `sessions-row-click` using the compact 1512 x 772 viewport.
+- `pnpm visual:diff` now reports `44/44 passed`.
+- `sessions-row-click`: passed, different ratio `0.107023` against max `0.14`.

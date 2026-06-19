@@ -1,10 +1,10 @@
 # Visual Diff Report
 
-Generated: 2026-06-19T13:17:55.890Z
+Generated: 2026-06-19T13:21:06.891Z
 
 Config: `docs/agno-analysis/screenshot-comparison.config.json`
 
-Totals: 43/43 passed, 0 failed.
+Totals: 44/44 passed, 0 failed.
 
 | Status | Pair | Viewport | Reference | Local | Different ratio | Max ratio | Diff |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -26,6 +26,7 @@ pass | studio-builder-context | desktop-compact | 1512x772 | 1512x772 | 0.135223
 pass | studio-builder-session | desktop-compact | 1512x772 | 1512x772 | 0.136262 | 0.14 | docs/agno-analysis/visual-diffs/diffs/studio-builder-session.diff.png
 pass | sessions-view-menu | desktop-compact | 1512x772 | 1512x772 | 0.063632 | 0.08 | docs/agno-analysis/visual-diffs/diffs/sessions-view-menu.diff.png
 pass | sessions-team-filter | desktop-compact | 1512x772 | 1512x772 | 0.058782 | 0.08 | docs/agno-analysis/visual-diffs/diffs/sessions-team-filter.diff.png
+pass | sessions-row-click | desktop-compact | 1512x772 | 1512x772 | 0.107023 | 0.14 | docs/agno-analysis/visual-diffs/diffs/sessions-row-click.diff.png
 pass | knowledge-table | desktop | 1512x828 | 1512x828 | 0.075372 | 0.08 | docs/agno-analysis/visual-diffs/diffs/knowledge-table.diff.png
 pass | knowledge-collection-menu | desktop | 1512x828 | 1512x828 | 0.082309 | 0.09 | docs/agno-analysis/visual-diffs/diffs/knowledge-collection-menu.diff.png
 pass | memory-empty-overlay | desktop | 1512x828 | 1512x828 | 0.145103 | 0.15 | docs/agno-analysis/visual-diffs/diffs/memory-empty-overlay.diff.png

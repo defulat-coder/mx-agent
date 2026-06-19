@@ -238,8 +238,9 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Local parity iteration on 2026-06-19 replaced the generic DataTable with a
   dedicated Sessions table: Agno-style View radio menu, URL query sync,
   25-row pagination, row checkboxes, and filter-specific data subsets.
-- Sessions is now covered by the desktop screenshot diff gate for the View menu
-  and Teams filter states using the compact 1512 x 772 reference viewport.
+- Sessions is now covered by desktop screenshot diff gates for the View menu,
+  Teams filter, and row selection states using the compact 1512 x 772 reference
+  viewport.
 
 ### Traces
 

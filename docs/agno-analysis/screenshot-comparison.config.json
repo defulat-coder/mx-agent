@@ -138,6 +138,13 @@
       "viewport": "desktop-compact"
     },
     {
+      "name": "sessions-row-click",
+      "reference": "docs/agno-analysis/next-reference-screenshots/sessions-row-click-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/sessions-row-selected.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.14
+    },
+    {
       "name": "knowledge-table",
       "reference": "docs/agno-analysis/next-reference-screenshots/knowledge-reference.png",
       "local": "docs/agno-analysis/local-screenshots/knowledge-current.png",
