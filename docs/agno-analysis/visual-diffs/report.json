@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T12:45:37.154Z",
+  "generatedAt": "2026-06-19T12:52:43.745Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 30,
-    "passed": 30,
+    "pairs": 32,
+    "passed": 32,
     "failed": 0
   },
   "results": [
@@ -166,6 +166,56 @@
         "differentRatio": 0.109638,
         "meanAbsDelta": 36.922,
         "rmseDelta": 117.826
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "chat-tool-call-collapsed",
+      "status": "pass",
+      "viewport": "desktop-compact",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-tool-call-collapsed-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-tool-call-collapsed-local.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/chat-tool-call-collapsed.diff.png",
+      "dimensions": {
+        "reference": "1512x772",
+        "local": "1512x772",
+        "compared": "1512x772"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.12
+      },
+      "metrics": {
+        "differentPixels": 81355,
+        "totalPixels": 1167264,
+        "differentRatio": 0.069697,
+        "meanAbsDelta": 20.36,
+        "rmseDelta": 79.364
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "chat-tool-call-expanded",
+      "status": "pass",
+      "viewport": "desktop-compact",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-tool-call-expanded-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-tool-call-expanded-local.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/chat-tool-call-expanded.diff.png",
+      "dimensions": {
+        "reference": "1512x772",
+        "local": "1512x772",
+        "compared": "1512x772"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.12
+      },
+      "metrics": {
+        "differentPixels": 84144,
+        "totalPixels": 1167264,
+        "differentRatio": 0.072087,
+        "meanAbsDelta": 20.333,
+        "rmseDelta": 79.694
       },
       "sizeMismatch": false
     },

@@ -57,6 +57,20 @@
       "maxDifferentRatio": 0.12
     },
     {
+      "name": "chat-tool-call-collapsed",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-tool-call-collapsed-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-tool-call-collapsed-local.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.12
+    },
+    {
+      "name": "chat-tool-call-expanded",
+      "reference": "docs/agno-analysis/next-reference-screenshots/chat-tool-call-expanded-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/chat-tool-call-expanded-local.png",
+      "viewport": "desktop-compact",
+      "maxDifferentRatio": 0.12
+    },
+    {
       "name": "studio-list",
       "reference": "docs/agno-analysis/next-reference-screenshots/studio-list-reference.png",
       "local": "docs/agno-analysis/local-screenshots/studio-list.png",

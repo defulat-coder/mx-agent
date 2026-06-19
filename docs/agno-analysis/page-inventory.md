@@ -217,7 +217,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
     prompts: `1 TOOL CALLED` appears in the conversation and opens a `Tool
     Calls` inspector containing `SEARCH_AGNO`.
   - Chat is now covered by desktop screenshot diff gates for the configuration
-    inspector, recent-session inspector, and completed Sage run states.
+    inspector, recent-session inspector, completed Sage run, collapsed tool-call
+    pill, and expanded Tool Calls inspector states.
 
 ### Sessions
 

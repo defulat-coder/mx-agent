@@ -1354,3 +1354,25 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `chat-run-sage`: passed, different ratio `0.109638` against max `0.12`.
 - `studio-list`: passed, different ratio `0.096546` against max `0.12`.
 - `studio-new-agent`: passed, different ratio `0.1185` against max `0.12`.
+
+2026-06-19 Chat tool-call visual diff matrix expansion:
+
+- Rechecked Chrome connectivity before live Agno capture. Chrome is running,
+  the Codex Chrome Extension is installed and enabled, and the native host
+  manifest is valid, but the extension browser endpoint still reports
+  unavailable. The Chrome plugin requires explicit user confirmation before
+  opening a fresh Chrome window, so the live Agno reference screenshots were
+  not overwritten in this pass.
+- Revalidated the local Chat tool-call flow through the in-app browser against
+  `http://localhost:3010/chat?type=agent&id=sage` at the reference viewport
+  size of 1512 x 772.
+- Sent `What is Agno?`, verified the completed run rendered `1 Tool Called`,
+  `Worked for 1 s`, and `SEARCH_AGNO`, then recaptured the collapsed and
+  expanded local screenshots.
+- Added `chat-tool-call-collapsed` and `chat-tool-call-expanded` to the
+  screenshot comparison matrix using the `desktop-compact` viewport.
+- `pnpm visual:diff` now reports `32/32 passed`.
+- `chat-tool-call-collapsed`: passed, different ratio `0.069697` against max
+  `0.12`.
+- `chat-tool-call-expanded`: passed, different ratio `0.072087` against max
+  `0.12`.

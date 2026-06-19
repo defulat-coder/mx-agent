@@ -1,10 +1,10 @@
 # Visual Diff Report
 
-Generated: 2026-06-19T12:45:37.154Z
+Generated: 2026-06-19T12:52:43.745Z
 
 Config: `docs/agno-analysis/screenshot-comparison.config.json`
 
-Totals: 30/30 passed, 0 failed.
+Totals: 32/32 passed, 0 failed.
 
 | Status | Pair | Viewport | Reference | Local | Different ratio | Max ratio | Diff |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -14,6 +14,8 @@ pass | home-agents-collapsed | desktop | 1512x828 | 1512x828 | 0.138229 | 0.14 |
 pass | chat-config-panel | desktop | 1512x828 | 1512x828 | 0.068992 | 0.08 | docs/agno-analysis/visual-diffs/diffs/chat-config-panel.diff.png
 pass | chat-sessions-panel | desktop | 1512x828 | 1512x828 | 0.064963 | 0.08 | docs/agno-analysis/visual-diffs/diffs/chat-sessions-panel.diff.png
 pass | chat-run-sage | desktop | 1512x772 | 1512x772 | 0.109638 | 0.12 | docs/agno-analysis/visual-diffs/diffs/chat-run-sage.diff.png
+pass | chat-tool-call-collapsed | desktop-compact | 1512x772 | 1512x772 | 0.069697 | 0.12 | docs/agno-analysis/visual-diffs/diffs/chat-tool-call-collapsed.diff.png
+pass | chat-tool-call-expanded | desktop-compact | 1512x772 | 1512x772 | 0.072087 | 0.12 | docs/agno-analysis/visual-diffs/diffs/chat-tool-call-expanded.diff.png
 pass | studio-list | desktop | 1512x828 | 1512x828 | 0.096546 | 0.12 | docs/agno-analysis/visual-diffs/diffs/studio-list.diff.png
 pass | studio-new-agent | desktop | 1512x828 | 1512x828 | 0.1185 | 0.12 | docs/agno-analysis/visual-diffs/diffs/studio-new-agent.diff.png
 pass | studio-builder-advanced | desktop | 1512x772 | 1512x772 | 0.079296 | 0.08 | docs/agno-analysis/visual-diffs/diffs/studio-builder-advanced.diff.png
