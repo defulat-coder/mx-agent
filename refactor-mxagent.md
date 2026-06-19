@@ -160,3 +160,32 @@ Autoreview:
 - This is a pure structure split; no query logic or tool call sites changed.
 - `app.services.hr.__init__` remains large, but the package structure now gives
   the next HR slices a stable place to move into without changing callers.
+
+### Step 4 - Split HR manager service queries
+
+Status: completed
+
+Architecture change:
+
+- Moved manager-scoped team queries, scope helpers, and manager approvals into
+  `app.services.hr.manager`.
+- Re-exported manager functions from `app.services.hr` so existing tool modules
+  keep the same `hr_service.*` interface.
+- Kept shared employee and department name-map helpers in the manager slice and
+  re-exported them privately for the remaining admin summary functions.
+
+Verification:
+
+- Import compatibility check for manager exports -> passed.
+- Full backend suite: `uv run pytest` -> 103 passed.
+- Live HTTP check on port 8001:
+  - `GET /health` -> 200.
+  - `POST /v1/chat` without token -> 401 with `code=40101`.
+
+Autoreview:
+
+- This is another structure-only split; query bodies and call sites were not
+  behaviorally changed.
+- `app.services.hr.__init__` is down to 945 lines. The largest remaining HR
+  slice is admin/reporting/talent-development, which can now be split further
+  without changing external imports.
