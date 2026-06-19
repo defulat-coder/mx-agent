@@ -1453,3 +1453,28 @@ repeatable measurement path for subsequent page-by-page iterations.
   max `0.14`.
 - `learning-decision-log-table`: passed, different ratio `0.115843` against
   max `0.14`.
+
+2026-06-19 Settings interaction visual diff matrix expansion:
+
+- Rechecked `https://os.agno.com/settings/os` with Chrome/CDP. In the current
+  anonymous Chrome session the route renders an empty document body and issues
+  authenticated API calls including
+  `GET https://os-api.agno.com/api/v1/users/me` and
+  `POST https://os-api.agno.com/api/v1/auth/authenticate`.
+- Because current anonymous access no longer exposes authenticated Settings
+  forms, this pass preserves the previously captured Agno references and
+  re-captures the local interaction states at the matching desktop viewport
+  1512 x 828.
+- Re-captured `settings-os-interactions-local.png`, verifying copy/key/tag and
+  custom-header state through the security-key input value
+  `sk_live_mx_agent_preview_4f9d2a`, `OPS`, `X-AgentOS-Preview`, and `enabled`.
+- Re-captured `settings-organization-pending-local.png`, verifying the pending
+  invites tab, Pro upgrade empty state, and AgentOS connection failure toast.
+- Added `settings-os-interactions` and
+  `settings-organization-interactions` to the official screenshot comparison
+  matrix.
+- `pnpm visual:diff` now reports `43/43 passed`.
+- `settings-os-interactions`: passed, different ratio `0.075775` against max
+  `0.14`.
+- `settings-organization-interactions`: passed, different ratio `0.075012`
+  against max `0.14`.

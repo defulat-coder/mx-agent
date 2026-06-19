@@ -261,6 +261,13 @@
       "viewport": "desktop"
     },
     {
+      "name": "settings-organization-interactions",
+      "reference": "docs/agno-analysis/next-reference-screenshots/settings-organization-interactions-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/settings-organization-pending-local.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
+    },
+    {
       "name": "settings-billing",
       "reference": "docs/agno-analysis/next-reference-screenshots/settings-billing-reference.png",
       "local": "docs/agno-analysis/local-screenshots/settings-billing.png",
@@ -285,6 +292,13 @@
       "local": "docs/agno-analysis/local-screenshots/settings-os.png",
       "viewport": "desktop",
       "maxDifferentRatio": 0.12
+    },
+    {
+      "name": "settings-os-interactions",
+      "reference": "docs/agno-analysis/next-reference-screenshots/settings-os-interactions-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/settings-os-interactions-local.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
     }
   ]
 }

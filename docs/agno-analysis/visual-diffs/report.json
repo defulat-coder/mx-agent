@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T13:12:39.904Z",
+  "generatedAt": "2026-06-19T13:17:55.890Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 41,
-    "passed": 41,
+    "pairs": 43,
+    "passed": 43,
     "failed": 0
   },
   "results": [
@@ -945,6 +945,31 @@
       "sizeMismatch": false
     },
     {
+      "name": "settings-organization-interactions",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/settings-organization-interactions-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/settings-organization-pending-local.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/settings-organization-interactions.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 93910,
+        "totalPixels": 1251936,
+        "differentRatio": 0.075012,
+        "meanAbsDelta": 23.765,
+        "rmseDelta": 97.689
+      },
+      "sizeMismatch": false
+    },
+    {
       "name": "settings-billing",
       "status": "pass",
       "viewport": "desktop",
@@ -1041,6 +1066,31 @@
         "differentRatio": 0.065668,
         "meanAbsDelta": 15.533,
         "rmseDelta": 65.24
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "settings-os-interactions",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/settings-os-interactions-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/settings-os-interactions-local.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/settings-os-interactions.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 94865,
+        "totalPixels": 1251936,
+        "differentRatio": 0.075775,
+        "meanAbsDelta": 18.746,
+        "rmseDelta": 73.754
       },
       "sizeMismatch": false
     }

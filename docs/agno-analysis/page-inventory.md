@@ -447,8 +447,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
   - Local implementation now mirrors the Organization tab semantics, member
     row, pending-invites empty state, danger-zone block, and connection-failure
     toast.
-  - Organization is now covered by the desktop screenshot diff gate as
-    `settings-organization`.
+  - Organization is now covered by desktop screenshot diff gates for the base
+    page and pending-invites interaction state.
   - OS & Security is a long form with a disabled ID + copy control, protocol
     select plus endpoint input, collapsible-looking authorization section,
     JWT toggle, security key generation control, additional settings,
@@ -462,7 +462,8 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
     copy feedback for AgentOS ID, security-key generation placeholder, tag
     addition, custom header add/remove rows, enabled save state after edits, and
     the separated danger-zone block.
-  - OS & Security is now covered by two desktop screenshot diff gates:
+  - OS & Security is now covered by desktop screenshot diff gates for the base
+    form/shell and the copy/security-key/tag/custom-header interaction state.
     `settings-os-form` for the form body and `settings-os-shell` for the
     settings sub-navigation shell state.
   - Roles shows role tiles with `MANAGE` and `DELETE` actions behind a blurred
