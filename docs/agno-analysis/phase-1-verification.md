@@ -1566,3 +1566,18 @@ repeatable measurement path for subsequent page-by-page iterations.
   `0.14`.
 - `studio-builder-tools`: passed, different ratio `0.071896` against max
   `0.14`.
+
+2026-06-19 Desktop-only visual diff matrix expansion:
+
+- Mobile breakpoints remain out of scope for this pass.
+- Rechecked protected Agno routes with Chrome/CDP:
+  `/sessions`, `/knowledge`, `/learning`, `/studio/agents`, `/approvals`, and
+  the requested Chat deep link currently redirect to
+  `https://os.agno.com/signin` in the active Chrome profile.
+- Preserved the already captured Agno desktop references and avoided adding
+  candidates where the reference was a loading skeleton but the local screenshot
+  was a populated table/list.
+- Added `approvals-table-gated-overlay`, covering the admin-access overlay over
+  the Approvals table at 1512 x 828.
+- Added `learning-user-memory-desktop-loading`, covering the Learning/User
+  Memories desktop loading shell at 1512 x 828.

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T13:42:20.890Z",
+  "generatedAt": "2026-06-19T14:15:45.021Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -19,8 +19,8 @@
     }
   ],
   "totals": {
-    "pairs": 50,
-    "passed": 50,
+    "pairs": 52,
+    "passed": 52,
     "failed": 0
   },
   "results": [
@@ -825,6 +825,31 @@
       "sizeMismatch": false
     },
     {
+      "name": "approvals-table-gated-overlay",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/approvals-table-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/approvals-gated-list.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/approvals-table-gated-overlay.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 61750,
+        "totalPixels": 1251936,
+        "differentRatio": 0.049324,
+        "meanAbsDelta": 15.098,
+        "rmseDelta": 71.688
+      },
+      "sizeMismatch": false
+    },
+    {
       "name": "scheduler-gated-overlay",
       "status": "pass",
       "viewport": "desktop",
@@ -971,6 +996,31 @@
         "differentRatio": 0.025909,
         "meanAbsDelta": 6.654,
         "rmseDelta": 41.365
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "learning-user-memory-desktop-loading",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/learning-user-memory-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/learning-user-memory.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/learning-user-memory-desktop-loading.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.14
+      },
+      "metrics": {
+        "differentPixels": 27432,
+        "totalPixels": 1251936,
+        "differentRatio": 0.021912,
+        "meanAbsDelta": 5.55,
+        "rmseDelta": 38.28
       },
       "sizeMismatch": false
     },

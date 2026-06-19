@@ -236,6 +236,13 @@
       "viewport": "desktop"
     },
     {
+      "name": "approvals-table-gated-overlay",
+      "reference": "docs/agno-analysis/next-reference-screenshots/approvals-table-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/approvals-gated-list.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
+    },
+    {
       "name": "scheduler-gated-overlay",
       "reference": "docs/agno-analysis/reference-screenshots/scheduler.png",
       "local": "docs/agno-analysis/local-screenshots/scheduler-current.png",
@@ -273,6 +280,13 @@
       "reference": "docs/agno-analysis/next-reference-screenshots/learning-demo-user-memory-reference.png",
       "local": "docs/agno-analysis/local-screenshots/learning-demo-current.png",
       "viewport": "desktop-compact"
+    },
+    {
+      "name": "learning-user-memory-desktop-loading",
+      "reference": "docs/agno-analysis/next-reference-screenshots/learning-user-memory-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/learning-user-memory.png",
+      "viewport": "desktop",
+      "maxDifferentRatio": 0.14
     },
     {
       "name": "learning-user-profile-table",
