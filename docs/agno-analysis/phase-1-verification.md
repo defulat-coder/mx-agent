@@ -1057,3 +1057,20 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `knowledge-table`: passed, different ratio `0.075372` against max `0.08`.
 - `knowledge-collection-menu`: passed, different ratio `0.082309` against max
   `0.09`.
+
+2026-06-19 Memory visual diff matrix expansion:
+
+- Aligned the local Memory page with the observed Agno public Demo OS empty
+  state: compact `Database / Table` context, blurred memory table background,
+  centered `No memories found` help state, `Learn More`, and `Create Memory`.
+- Recaptured current standalone Memory states with Chrome/CDP:
+  `docs/agno-analysis/local-screenshots/memory-current.png` and
+  `docs/agno-analysis/local-screenshots/memory-create-current.png`.
+- Added `memory-empty-overlay` and `memory-create-dialog` to the screenshot
+  comparison matrix. These states verify the desktop empty overlay and
+  create-memory modal geometry.
+- `pnpm visual:diff` now reports `9/9 passed`.
+- `memory-empty-overlay`: passed, different ratio `0.145103` against max
+  `0.15`.
+- `memory-create-dialog`: passed, different ratio `0.092857` against max
+  `0.10`.

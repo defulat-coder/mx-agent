@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T08:59:47.705Z",
+  "generatedAt": "2026-06-19T09:11:19.062Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 7,
-    "passed": 7,
+    "pairs": 9,
+    "passed": 9,
     "failed": 0
   },
   "results": [
@@ -166,6 +166,56 @@
         "differentRatio": 0.082309,
         "meanAbsDelta": 20.179,
         "rmseDelta": 79.743
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "memory-empty-overlay",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/memory-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/memory-current.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/memory-empty-overlay.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.15
+      },
+      "metrics": {
+        "differentPixels": 181660,
+        "totalPixels": 1251936,
+        "differentRatio": 0.145103,
+        "meanAbsDelta": 28.315,
+        "rmseDelta": 97.044
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "memory-create-dialog",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/next-reference-screenshots/memory-create-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/memory-create-current.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/memory-create-dialog.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.1
+      },
+      "metrics": {
+        "differentPixels": 116251,
+        "totalPixels": 1251936,
+        "differentRatio": 0.092857,
+        "meanAbsDelta": 16.315,
+        "rmseDelta": 56.274
       },
       "sizeMismatch": false
     },

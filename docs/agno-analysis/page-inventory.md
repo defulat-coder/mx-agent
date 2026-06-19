@@ -266,8 +266,10 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
     `Content`, `Topics optional`, disabled add-tag control until input, and
     `Cancel`/`Create` actions.
   - Local implementation now follows the dedicated memory table geometry, topic
-    chip truncation, search/empty state, pagination footer, and create-memory
+    chip truncation, empty overlay, pagination footer, and create-memory
     dialog.
+  - Memory is covered by the desktop screenshot diff gate for both the empty
+    overlay and create-memory dialog states.
 
 ### Knowledge
 
