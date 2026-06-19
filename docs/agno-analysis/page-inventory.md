@@ -236,11 +236,24 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 
 ### Approvals
 
-- Header: Approvals with View filter.
-- Content: approval cards/list items with tool/action name, requester agent/team/workflow, date, parameters, Deny and Approve actions.
-- Demo state overlays admin access required messaging for management.
-- Public demo renders approvals as a vertical list rather than a database table: action name on the left, agent/team target and date on the right, params below, and Deny/Approve controls on pending items.
-- Local implementation follows that vertical approval list and keeps an `Admin access required` overlay on top, matching the demo's gated management state.
+- Header: `Approvals` with a `View: All` status filter.
+- Status menu: grouped popover with header `Status` and radio options All,
+  Pending, Approved, Rejected.
+- Content: vertical approval rows rather than a database table. Each row shows
+  tool/action name on the left, target agent/team/workflow and date on the
+  right, parameters below, and Deny/Approve controls only for pending items.
+- Observed sample rows include `web_search`, `execute_sql`, `send_email`,
+  `deploy_service`, `process_payment`, `publish_article`, `scale_cluster`,
+  `create_user_account`, `revoke_access`, and `send_campaign`.
+- Non-destructive filter interaction: selecting Pending updates the URL to
+  `/try-demo/approvals?status=pending&page=1&limit=25`; no approvals-specific
+  business API request was observed during public Demo OS filtering.
+- Demo state overlays `Admin access required` messaging over a blurred approval
+  list: `Approval can only be viewed and managed by admins. Demo OS users don't
+  have access.`
+- Local implementation follows the vertical approval list, status radio menu,
+  URL query sync, pending-only Deny/Approve controls, local-safe decision state,
+  and the blurred admin-access overlay.
 
 ### Scheduler
 

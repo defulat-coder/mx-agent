@@ -170,8 +170,11 @@ Chrome/CDP interaction analysis added a data-page verification pass:
 - Agno reference row text click did not navigate or open a detail panel; local
   parity now keeps selection in the checkbox column instead of showing a generic
   row inspector.
-- Dedicated vertical approvals list on `/approvals`.
-- `Admin access required` overlay matching the public Demo OS gated approvals state.
+- Dedicated vertical approvals list on `/approvals`: status radio menu,
+  target/date columns, parameter text, pending-only Deny/Approve controls,
+  local-safe decision state, and URL query sync.
+- `Admin access required` blur overlay matching the public Demo OS gated
+  approvals state.
 
 Sessions CDP API findings:
 
@@ -180,13 +183,26 @@ Sessions CDP API findings:
 - Teams filter request:
   `GET https://demo-os-production-823a.up.railway.app/sessions?page=1&type=team&limit=25&sort_by=updated_at&sort_order=desc&db_id=demo-os-db&table=agno_sessions`
 
+Approvals CDP findings:
+
+- Public demo loads the route and shared auth/config/health requests, but the
+  visible approvals list is bundled/static in the gated public state.
+- View menu options: Status, All, Pending, Approved, Rejected.
+- Selecting Pending updates the route to
+  `https://os.agno.com/try-demo/approvals?status=pending&page=1&limit=25`.
+- Approve/Deny controls were not clicked on `os.agno.com` because they can
+  mutate external Demo OS approval state.
+
 Local screenshots:
 
 - `docs/agno-analysis/local-screenshots/sessions-list.png`
 - `docs/agno-analysis/local-screenshots/sessions-filter-menu.png`
 - `docs/agno-analysis/local-screenshots/sessions-filter-teams.png`
 - `docs/agno-analysis/local-screenshots/sessions-row-selected.png`
-- `docs/agno-analysis/local-screenshots/approvals-gated-list.png`
+- `docs/agno-analysis/local-screenshots/approvals-list.png`
+- `docs/agno-analysis/local-screenshots/approvals-filter-menu.png`
+- `docs/agno-analysis/local-screenshots/approvals-pending.png`
+- `docs/agno-analysis/local-screenshots/approvals-local-decision.png`
 
 Target reference screenshots:
 
@@ -196,9 +212,18 @@ Target reference screenshots:
 - `docs/agno-analysis/next-reference-screenshots/sessions-row-click-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/sessions-sort-reference.png`
 - `docs/agno-analysis/next-reference-screenshots/knowledge-table-reference.png`
-- `docs/agno-analysis/next-reference-screenshots/approvals-table-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/approvals-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/approvals-filter-reference.png`
+- `docs/agno-analysis/next-reference-screenshots/approvals-pending-reference.png`
 
 2026-06-19 Sessions follow-up verification:
+
+- `pnpm lint`: passed.
+- `pnpm build`: passed.
+- `uv run pytest tests/test_os_facade.py -q`: 4 passed.
+- Production preview used `pnpm exec next start -p 3003`.
+
+2026-06-19 Approvals follow-up verification:
 
 - `pnpm lint`: passed.
 - `pnpm build`: passed.
