@@ -61,8 +61,12 @@ export function getSettings(): Promise<SettingsResponse> {
 
 export async function sendChatMessage(message: string, sessionId?: string): Promise<ChatResponse> {
   if (!apiBase) {
+    const previewReply = /agno/i.test(message)
+      ? "Agno is a lightweight Python framework for building AI agents with models, tools, knowledge, workflows, memory, and deployment/monitoring via AgentOS."
+      : "MX AgentOS is running in local preview mode. Connect NEXT_PUBLIC_AGENTOS_API_BASE_URL and NEXT_PUBLIC_AGENTOS_API_TOKEN to chat with the backend.";
+
     return {
-      reply: "MX AgentOS is running in local preview mode. Connect NEXT_PUBLIC_AGENTOS_API_BASE_URL and NEXT_PUBLIC_AGENTOS_API_TOKEN to chat with the backend.",
+      reply: previewReply,
       action: null,
       session_id: sessionId ?? "preview-session",
     };

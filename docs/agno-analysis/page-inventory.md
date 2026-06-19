@@ -123,6 +123,24 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
     later entity/session changes back into the URL, restores the captured Router
     Team conversation, and renders the inactive-AgentOS overlay for the captured
     session.
+  - Sending a runnable Demo OS agent prompt from
+    `/try-demo/chat?type=agent&id=sage` first checks
+    `GET https://demo-os-production-823a.up.railway.app/health`, then posts
+    `multipart/form-data` to
+    `POST https://demo-os-production-823a.up.railway.app/agents/sage/runs`.
+    Observed form fields: `message`, `stream=true`, `session_id`, and `user_id`.
+    The run response is `text/event-stream`.
+  - After the streamed run completes, the route mutates to
+    `/try-demo/chat?type=agent&id=sage&session={uuid}` and fetches
+    `/sessions/{session}?type=agent&user_id={user}&db_id=demo-os-db` plus
+    `/sessions/{session}/runs?session_id={session}&type=agent&db_id=demo-os-db&table=agno_sessions`.
+  - Completed chat UI adds the first user prompt as a breadcrumb segment,
+    renders the user message with a compact `NN` avatar, renders an assistant
+    run row such as `Worked for 2 s`, keeps the composer placeholder as `Ask
+    anything...`, and shows copy/metrics actions below the assistant answer.
+  - Local implementation now mirrors this completed-run structure for preview
+    and backend chat responses: textarea composer, Enter-to-send, URL session
+    sync, first-prompt breadcrumb, run duration row, and copy/metrics actions.
 
 ### Sessions
 

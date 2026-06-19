@@ -158,6 +158,57 @@ Target reference screenshots:
 - `pnpm build`: passed.
 - Production preview used `pnpm exec next start -p 3003`.
 
+## Chat Run Streaming Iteration
+
+Chrome/CDP analysis added the runnable Chat send flow for:
+
+`https://os.agno.com/try-demo/chat?type=agent&id=sage`
+
+Observed Agno behavior:
+
+- Prompt submission calls `GET /health` on the configured Demo OS endpoint.
+- The run request is `POST /agents/sage/runs` with `multipart/form-data`.
+- Observed form fields are `message`, `stream=true`, `session_id`, and
+  `user_id`; the response MIME type is `text/event-stream`.
+- The page then writes `session={uuid}` into the URL and fetches
+  `/sessions/{session}` and `/sessions/{session}/runs` for persisted run state.
+- The completed run UI shows the first prompt in the Chat breadcrumb, the user
+  message with an `NN` avatar, an assistant run header like `Worked for 2 s`,
+  copy/metrics actions, and a composer that still says `Ask anything...`.
+
+Local implementation now mirrors the completed-run structure for preview and
+backend responses:
+
+- textarea composer with Enter-to-send.
+- session query sync after the first response.
+- first-prompt breadcrumb segment.
+- assistant `Worked for N s` run row.
+- copy and metrics actions under the response.
+- Agno-specific local preview answer for `Agno` prompts so screenshot
+  comparison can exercise the same run layout without external credentials.
+
+Local Chrome assertions passed for:
+
+- `/chat?type=agent&id=hr-agent` sends `Summarize Agno in one concise sentence.`
+  and updates the URL to include `session=preview-session`.
+- The rendered page includes the prompt breadcrumb, `NN` user row, `Worked for
+  1 s`, Agno-style answer text, copy action, metrics action, and `Ask
+  anything...` placeholder.
+
+Local screenshots:
+
+- `docs/agno-analysis/local-screenshots/chat-run-local.png`
+
+Target reference screenshots:
+
+- `docs/agno-analysis/next-reference-screenshots/chat-run-sage-reference.png`
+
+2026-06-19 Chat run follow-up verification:
+
+- `pnpm lint`: passed.
+- `pnpm build`: passed.
+- Production preview used `HOSTNAME=0.0.0.0 PORT=3003 node .next/standalone/server.js`.
+
 ## Production Deployment Iteration
 
 The standalone deployment gap was closed with production container artifacts:

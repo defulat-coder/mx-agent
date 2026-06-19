@@ -89,4 +89,5 @@ export type ChatMessage = {
   role: "user" | "assistant";
   content: string;
   stepLabel?: string;
+  durationLabel?: string;
 };

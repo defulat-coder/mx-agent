@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  BarChart3,
   Bot,
   ChevronDown,
   ChevronRight,
+  Copy,
   Database,
   History,
   Info,
@@ -106,6 +108,14 @@ const agnoRestoredMessages: ChatMessage[] = [
   },
 ];
 
+function sessionTitle(messages: ChatMessage[]) {
+  const firstUserMessage = messages.find((message) => message.role === "user")?.content;
+  if (!firstUserMessage) {
+    return null;
+  }
+  return firstUserMessage.length > 30 ? `${firstUserMessage.slice(0, 27)}...` : firstUserMessage;
+}
+
 function getInitialEntity(group: EntityGroup, entityId?: string) {
   return fallbackEntities[group].find((entity) => entity.id === entityId) ?? fallbackEntities[group][0];
 }
@@ -149,10 +159,8 @@ export function ChatSurface({
 
   const availableEntities = fallbackEntities[entityGroup];
   const hasMessages = messages.length > 0;
-  const placeholder = useMemo(
-    () => (showInactiveOverlay || !hasMessages ? "Ask anything..." : "Ask a follow-up..."),
-    [hasMessages, showInactiveOverlay],
-  );
+  const activeSessionTitle = useMemo(() => sessionTitle(messages), [messages]);
+  const placeholder = "Ask anything...";
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -170,26 +178,31 @@ export function ChatSurface({
     setMessages((current) => [...current, userMessage]);
     setInput("");
     setIsSending(true);
+    const startedAt = Date.now();
 
     try {
       const response = await sendChatMessage(message, sessionId);
       setSessionId(response.session_id ?? sessionId);
       updateChatUrl(entityGroup, selectedEntity, response.session_id ?? sessionId);
+      const durationSeconds = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
       setMessages((current) => [
         ...current,
         {
           id: `assistant-${Date.now()}`,
           role: "assistant",
           content: response.reply,
+          durationLabel: `Worked for ${durationSeconds} s`,
         },
       ]);
     } catch {
+      const durationSeconds = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
       setMessages((current) => [
         ...current,
         {
           id: `assistant-${Date.now()}`,
           role: "assistant",
           content: "The chat backend is not reachable from this browser session.",
+          durationLabel: `Stopped after ${durationSeconds} s`,
         },
       ]);
     } finally {
@@ -250,6 +263,12 @@ export function ChatSurface({
               {selectedEntity.name}
               <ChevronDown className="size-3.5" />
             </button>
+            {activeSessionTitle ? (
+              <>
+                <span className="text-neutral-400">/</span>
+                <span className="max-w-56 truncate text-neutral-700">{activeSessionTitle}</span>
+              </>
+            ) : null}
             {menu === "group" ? (
               <Popover className="left-0 top-9 w-44">
                 {(Object.keys(groupLabels) as EntityGroup[]).map((group) => (
@@ -361,34 +380,64 @@ export function ChatSurface({
               </div>
             </div>
           ) : (
-            <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-3 overflow-auto px-2 pb-36 pt-8">
+            <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-7 overflow-auto px-2 pb-36 pt-8">
               {messages.map((message) =>
                 message.role === "assistant" ? (
-                  <div className="mr-auto max-w-[78%] space-y-2" key={message.id}>
+                  <div className="grid grid-cols-[28px_1fr] gap-3" key={message.id}>
+                    <span className="grid size-6 place-items-center rounded-md bg-[#ff3b25] text-white">
+                      <Bot className="size-3.5" />
+                    </span>
+                    <div className="min-w-0 space-y-3">
                     {message.stepLabel ? (
-                      <details className="group rounded-lg border border-neutral-200 bg-white text-sm" open>
-                        <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2 font-medium text-neutral-700">
+                      <details className="group text-sm" open>
+                        <summary className="flex cursor-pointer list-none items-center gap-2 text-neutral-600">
                           <ChevronRight className="size-4 transition-transform group-open:rotate-90" />
                           {message.stepLabel}
                         </summary>
-                        <div className="border-t border-neutral-100 px-3 py-2 font-mono text-[11px] uppercase text-neutral-500">
+                        <div className="ml-6 mt-2 font-mono text-[11px] uppercase text-neutral-400">
                           Run started from restored session
                         </div>
                       </details>
                     ) : null}
-                    <div className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm leading-6 text-neutral-700">
+                    {message.durationLabel ? (
+                      <div className="flex items-center gap-2 text-sm text-neutral-500">
+                        <ChevronDown className="size-4" />
+                        {message.durationLabel}
+                      </div>
+                    ) : null}
+                    <div className="text-sm leading-6 text-neutral-700">
                       {message.content}
+                    </div>
+                    <div className="flex items-center gap-3 text-neutral-500">
+                      <button className="rounded p-1 hover:bg-neutral-100" type="button" aria-label="Copy response">
+                        <Copy className="size-4" />
+                      </button>
+                      <button className="rounded p-1 hover:bg-neutral-100" type="button" aria-label="View run metrics">
+                        <BarChart3 className="size-4" />
+                      </button>
+                    </div>
                     </div>
                   </div>
                 ) : (
-                  <div
-                    className="ml-auto max-w-[78%] rounded-lg bg-neutral-950 px-3 py-2 text-sm leading-6 text-white"
-                    key={message.id}
-                  >
-                    {message.content}
+                  <div className="grid grid-cols-[28px_1fr] gap-3" key={message.id}>
+                    <span className="grid size-6 place-items-center rounded-md bg-neutral-100 font-mono text-[11px] text-neutral-700">
+                      NN
+                    </span>
+                    <div className="text-sm leading-6 text-neutral-700">{message.content}</div>
                   </div>
                 ),
               )}
+              {isSending ? (
+                <div className="grid grid-cols-[28px_1fr] gap-3">
+                  <span className="grid size-6 place-items-center rounded-md bg-[#ff3b25] text-white">
+                    <Bot className="size-3.5" />
+                  </span>
+                  <div className="flex items-center gap-2 text-sm text-neutral-500">
+                    <ChevronRight className="size-4" />
+                    Working...
+                  </div>
+                </div>
+              ) : null}
             </div>
           )}
 
@@ -403,10 +452,17 @@ export function ChatSurface({
             className="absolute inset-x-0 bottom-2 mx-auto w-full max-w-3xl rounded-2xl border border-neutral-200 bg-white p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)]"
             onSubmit={onSubmit}
           >
-            <input
-              className="h-11 w-full rounded-xl bg-neutral-100 px-3 text-sm outline-none placeholder:text-neutral-400"
+            <textarea
+              className="h-11 max-h-32 min-h-11 w-full resize-none rounded-xl bg-neutral-100 px-3 py-3 text-sm outline-none placeholder:text-neutral-400"
               onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  event.currentTarget.form?.requestSubmit();
+                }
+              }}
               placeholder={placeholder}
+              rows={1}
               value={input}
             />
             <div className="mt-2 flex items-center justify-between">
