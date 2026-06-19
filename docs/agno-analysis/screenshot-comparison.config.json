@@ -119,6 +119,12 @@
       "viewport": "desktop-compact"
     },
     {
+      "name": "learning-user-memory-loading",
+      "reference": "docs/agno-analysis/next-reference-screenshots/learning-demo-user-memory-reference.png",
+      "local": "docs/agno-analysis/local-screenshots/learning-demo-current.png",
+      "viewport": "desktop-compact"
+    },
+    {
       "name": "settings-os-shell",
       "reference": "docs/agno-analysis/next-reference-screenshots/settings-os-nav-reference.png",
       "local": "docs/agno-analysis/local-screenshots/settings-os.png",

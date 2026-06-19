@@ -118,8 +118,9 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Learning expands the sidebar with second-level navigation: User Memories, User
   Profiles, Entity Memories, Session Context, and Decision Logs.
 - The main header breadcrumb shows the active section.
-- `User Memories` can render an empty/loading workspace with a centered
-  three-dot indicator while the memory page is loading.
+- Current public Demo OS `User Memories` renders the Demo OS shell with Learning
+  highlighted, no expanded Learning subnav, no child breadcrumb, and a centered
+  three-dot loading indicator in an otherwise empty workspace.
 - `User Profiles`, `Entity Memories`, `Session Context`, and `Decision Logs`
   reuse a MemoryPage-style entity table under the authenticated shell. Observed
   columns are checkbox, `ENTITY NAME`, `ENTITY TYPE`, and `UPDATED AT`.
@@ -136,6 +137,10 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
 - Local implementation now adds `/learning/[section]`, sidebar subnav, shell
   active-state support for every Learning child route, User Memories loading
   state, and inactive entity-table states for the other four sections.
+- 2026-06-19 follow-up: local Demo OS shell now suppresses the Learning subnav
+  and child breadcrumb for the public User Memories state.
+- Learning is covered by the desktop screenshot diff gate for the public Demo OS
+  User Memories loading state.
 
 ### Chat
 

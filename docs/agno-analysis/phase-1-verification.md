@@ -1190,3 +1190,30 @@ repeatable measurement path for subsequent page-by-page iterations.
 - `pnpm visual:diff` now reports `17/17 passed`.
 - `traces-sessions-table`: passed, different ratio `0.058645` against max
   `0.08`.
+
+2026-06-19 Learning visual diff matrix expansion:
+
+- Rechecked Learning with Chrome/CDP at 1512 x 772. The authenticated
+  `/learning/user_memory` route did not render a usable shell in the current
+  Chrome session, so the public Demo OS route was used as the authoritative
+  current reference for this pass:
+  `https://os.agno.com/try-demo/learning/user_memory`.
+- The public Demo OS route mutates to
+  `/try-demo/learning/user_memory?sort_by=updated_at_desc&page=1&limit=25` and
+  renders the Demo OS shell with Learning highlighted, no expanded Learning
+  child navigation, no child breadcrumb, and a centered three-dot loading
+  indicator.
+- Observed startup traffic includes `POST /api/v1/auth/authenticate`,
+  `POST /api/v1/auth/demo-sdk-token`, `GET /api/v1/users/me`,
+  `GET /api/v1/operating-systems/`, Demo OS `GET /health`, and Demo OS
+  `GET /config`.
+- Aligned the local Demo OS shell for Learning by suppressing the Learning child
+  breadcrumb and expanded Learning subnav in the public loading state.
+- Captured current reference
+  `docs/agno-analysis/next-reference-screenshots/learning-demo-user-memory-reference.png`
+  and recaptured `docs/agno-analysis/local-screenshots/learning-demo-current.png`
+  from the standalone build.
+- Added `learning-user-memory-loading` to the screenshot comparison matrix.
+- `pnpm visual:diff` now reports `18/18 passed`.
+- `learning-user-memory-loading`: passed, different ratio `0.025909` against
+  max `0.08`.

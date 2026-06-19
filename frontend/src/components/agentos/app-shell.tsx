@@ -99,6 +99,8 @@ export function AppShell({
   const learningLabel = learningSubNav.find(([, href]) => pathname === href)?.[0];
   const pageLabel = !settingsLabel && pathname !== "/" ? navigation.find((item) => isActive(item.href, item.label))?.label : null;
   const shellWorkspaceName = isDemoSurface ? "Demo OS" : workspaceName;
+  const showLearningSubNav = pathname.startsWith("/learning") && !isDemoSurface;
+  const visiblePageLabel = pageLabel === "Learning" && isDemoSurface ? null : pageLabel;
 
   return (
     <div className="min-h-svh bg-[#f4f4f5] text-neutral-950">
@@ -196,7 +198,7 @@ export function AppShell({
                       ))}
                     </div>
                   ) : null}
-                  {item.label === "Learning" && pathname.startsWith("/learning") ? (
+                  {item.label === "Learning" && showLearningSubNav ? (
                     <div className="ml-6 mt-1 space-y-0.5 border-l border-neutral-200 pl-3">
                       {learningSubNav.map(([label, href]) => (
                         <Link
@@ -243,15 +245,15 @@ export function AppShell({
                 </span>
                 <span className="text-sm font-medium">{shellWorkspaceName}</span>
                 <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.16)]" />
-                {pageLabel ? (
+                {visiblePageLabel ? (
                   <>
                     <span className="text-neutral-300">/</span>
                     <span className="text-sm">
-                      {pageLabel === "Studio" && studioLabel
+                      {visiblePageLabel === "Studio" && studioLabel
                         ? studioLabel
-                        : pageLabel === "Learning" && learningLabel
+                        : visiblePageLabel === "Learning" && learningLabel && showLearningSubNav
                           ? learningLabel
-                          : pageLabel}
+                          : visiblePageLabel}
                     </span>
                   </>
                 ) : null}
