@@ -93,6 +93,12 @@
       "viewport": "desktop"
     },
     {
+      "name": "scheduler-gated-overlay",
+      "reference": "docs/agno-analysis/reference-screenshots/scheduler.png",
+      "local": "docs/agno-analysis/local-screenshots/scheduler-current.png",
+      "viewport": "desktop"
+    },
+    {
       "name": "settings-os-shell",
       "reference": "docs/agno-analysis/next-reference-screenshots/settings-os-nav-reference.png",
       "local": "docs/agno-analysis/local-screenshots/settings-os.png",

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T09:26:56.747Z",
+  "generatedAt": "2026-06-19T09:34:56.732Z",
   "config": "docs/agno-analysis/screenshot-comparison.config.json",
   "viewportMatrix": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "totals": {
-    "pairs": 13,
-    "passed": 13,
+    "pairs": 14,
+    "passed": 14,
     "failed": 0
   },
   "results": [
@@ -316,6 +316,31 @@
         "differentRatio": 0.054344,
         "meanAbsDelta": 15.167,
         "rmseDelta": 71.568
+      },
+      "sizeMismatch": false
+    },
+    {
+      "name": "scheduler-gated-overlay",
+      "status": "pass",
+      "viewport": "desktop",
+      "reference": "docs/agno-analysis/reference-screenshots/scheduler.png",
+      "local": "docs/agno-analysis/local-screenshots/scheduler-current.png",
+      "diff": "docs/agno-analysis/visual-diffs/diffs/scheduler-gated-overlay.diff.png",
+      "dimensions": {
+        "reference": "1512x828",
+        "local": "1512x828",
+        "compared": "1512x828"
+      },
+      "thresholds": {
+        "channelThreshold": 12,
+        "maxDifferentRatio": 0.08
+      },
+      "metrics": {
+        "differentPixels": 72310,
+        "totalPixels": 1251936,
+        "differentRatio": 0.057759,
+        "meanAbsDelta": 16.475,
+        "rmseDelta": 74.424
       },
       "sizeMismatch": false
     },

@@ -1,10 +1,10 @@
 # Visual Diff Report
 
-Generated: 2026-06-19T09:26:56.747Z
+Generated: 2026-06-19T09:34:56.732Z
 
 Config: `docs/agno-analysis/screenshot-comparison.config.json`
 
-Totals: 13/13 passed, 0 failed.
+Totals: 14/14 passed, 0 failed.
 
 | Status | Pair | Viewport | Reference | Local | Different ratio | Max ratio | Diff |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -20,4 +20,5 @@ pass | metrics-gated-overlay | desktop | 1512x828 | 1512x828 | 0.059342 | 0.08 |
 pass | approvals-gated-overlay | desktop | 1512x828 | 1512x828 | 0.053984 | 0.08 | docs/agno-analysis/visual-diffs/diffs/approvals-gated-overlay.diff.png
 pass | approvals-status-menu | desktop | 1512x828 | 1512x828 | 0.059634 | 0.08 | docs/agno-analysis/visual-diffs/diffs/approvals-status-menu.diff.png
 pass | approvals-pending-filter | desktop | 1512x828 | 1512x828 | 0.054344 | 0.08 | docs/agno-analysis/visual-diffs/diffs/approvals-pending-filter.diff.png
+pass | scheduler-gated-overlay | desktop | 1512x828 | 1512x828 | 0.057759 | 0.08 | docs/agno-analysis/visual-diffs/diffs/scheduler-gated-overlay.diff.png
 pass | settings-os-shell | desktop | 1512x828 | 1512x828 | 0.065668 | 0.12 | docs/agno-analysis/visual-diffs/diffs/settings-os-shell.diff.png

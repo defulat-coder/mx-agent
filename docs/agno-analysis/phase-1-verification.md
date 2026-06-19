@@ -1117,3 +1117,24 @@ repeatable measurement path for subsequent page-by-page iterations.
   `0.08`.
 - `approvals-pending-filter`: passed, different ratio `0.054344` against max
   `0.08`.
+
+2026-06-19 Scheduler visual diff matrix expansion:
+
+- Rechecked the Agno public Demo OS Scheduler route with Chrome/CDP at 1512 x
+  828. The page renders a scheduler table with enabled switches, names, cron
+  strings, endpoints, next-run timestamps, and `-` updated-at values, then
+  overlays `Not available for Demo OS`.
+- Observed startup traffic includes `POST /api/v1/auth/authenticate`, auth
+  refresh when required, `POST /api/v1/auth/demo-sdk-token`,
+  `GET /api/v1/users/me`, `GET /api/v1/operating-systems/`, Demo OS
+  `GET /health`, and Demo OS `GET /config`.
+- Aligned the local Scheduler page with the observed gated state: removed
+  public-demo-invisible export/filter/run controls, matched the switch-first
+  table shape, added Demo OS schedule rows, and added the centered unavailable
+  overlay.
+- Recaptured `docs/agno-analysis/local-screenshots/scheduler-current.png` from
+  the standalone build.
+- Added `scheduler-gated-overlay` to the screenshot comparison matrix.
+- `pnpm visual:diff` now reports `14/14 passed`.
+- `scheduler-gated-overlay`: passed, different ratio `0.057759` against max
+  `0.08`.

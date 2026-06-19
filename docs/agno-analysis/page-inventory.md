@@ -381,9 +381,10 @@ All screenshots were captured from the public Demo OS surface at a 1512 x 828 vi
     AgentOS scheduler data is unavailable.
   - Underlying table rows include switch controls, schedule name, cron string,
     endpoint path, next run timestamp, and updated-at timestamp.
-  - Local implementation keeps the schedule table usable, adds View filters for
-    all/enabled/disabled, preserves the switch-first row layout, supports Run
-    actions, and opens a right-side schedule details inspector.
+  - Local implementation mirrors the public Demo OS gated state with a blurred
+    scheduler table, switch-first rows, and the centered unavailable overlay.
+  - Scheduler is covered by the desktop screenshot diff gate for the gated
+    overlay state.
 
 ### Settings
 
