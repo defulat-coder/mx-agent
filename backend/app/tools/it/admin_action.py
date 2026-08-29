@@ -4,6 +4,7 @@ from agno.run import RunContext
 from loguru import logger
 
 from app.core.database import async_session_factory
+from app.core.exceptions import AppException
 from app.services import it as it_service
 from app.tools.it.utils import get_it_admin_id
 
@@ -31,8 +32,11 @@ async def it_admin_handle_ticket(
             record = await it_service.handle_ticket(session, ticket_id, admin_id, action, resolution)
             await session.commit()
             return record.model_dump_json()
-        except Exception as e:
-            return str(e)
+        except AppException as e:
+            return e.message
+        except Exception:
+            logger.exception("处理 IT 工单失败 | ticket_id={tid}", tid=ticket_id)
+            return "服务内部错误，请稍后重试"
 
 
 async def it_admin_assign_asset(
@@ -56,8 +60,11 @@ async def it_admin_assign_asset(
             record = await it_service.assign_asset(session, asset_id, employee_id, admin_id)
             await session.commit()
             return record.model_dump_json()
-        except Exception as e:
-            return str(e)
+        except AppException as e:
+            return e.message
+        except Exception:
+            logger.exception("分配 IT 设备失败 | asset_id={aid}", aid=asset_id)
+            return "服务内部错误，请稍后重试"
 
 
 async def it_admin_reclaim_asset(
@@ -79,5 +86,8 @@ async def it_admin_reclaim_asset(
             record = await it_service.reclaim_asset(session, asset_id, admin_id)
             await session.commit()
             return record.model_dump_json()
-        except Exception as e:
-            return str(e)
+        except AppException as e:
+            return e.message
+        except Exception:
+            logger.exception("回收 IT 设备失败 | asset_id={aid}", aid=asset_id)
+            return "服务内部错误，请稍后重试"

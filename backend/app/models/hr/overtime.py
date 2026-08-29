@@ -3,7 +3,7 @@
 from datetime import date, time
 from decimal import Decimal
 
-from sqlalchemy import Date, ForeignKey, Numeric, String, Time
+from sqlalchemy import CheckConstraint, Date, ForeignKey, Numeric, String, Time
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -23,6 +23,9 @@ class OvertimeRecord(Base):
     """
 
     __tablename__ = "overtime_records"
+    __table_args__ = (
+        CheckConstraint("hours > 0", name="ck_overtime_hours_positive"),
+    )
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True, comment="员工ID")
     date: Mapped[date] = mapped_column(Date, index=True, comment="加班日期")

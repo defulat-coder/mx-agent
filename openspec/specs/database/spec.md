@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: 异步数据库连接
-系统 SHALL 使用 SQLAlchemy 2.0 async + asyncpg 建立异步数据库连接池。
+系统 SHALL 使用 SQLAlchemy 2.0 async 按 `DATABASE_URL` 建立异步数据库连接；默认运行时使用 aiosqlite。
 
 #### Scenario: 数据库连接池初始化
 - **WHEN** 应用启动
@@ -19,11 +19,22 @@
 - **THEN** 继承 Base Model 即自动获得 id (PK)、created_at、updated_at 字段
 
 ### Requirement: Session 依赖注入
-系统 SHALL 通过 FastAPI Depends 提供异步 DB session，确保请求结束后自动关闭。
+系统 SHALL 通过 session factory 提供异步 DB session，确保操作结束后自动关闭。
 
 #### Scenario: 请求级 session
 - **WHEN** endpoint 或 service 需要数据库操作
-- **THEN** 通过 `Depends(get_db)` 获取 async session，请求结束后自动 commit/rollback 并关闭
+- **THEN** 查询操作使用请求/Tool 级 session，写操作由 API/Tool 事务边界统一 commit/rollback 并关闭
+
+### Requirement: SQLite 数据完整性
+系统 SHALL 为每个 SQLite 连接启用外键约束，并通过数据库约束保护关键业务不变量。
+
+#### Scenario: 外键约束
+- **WHEN** SQLite 连接建立
+- **THEN** `PRAGMA foreign_keys` 为 `ON`
+
+#### Scenario: 关键自然键与数值范围
+- **WHEN** 写入重复的员工月薪、考勤、年度预算、假期余额或报销预算记录，或写入负库存/负金额/越界进度
+- **THEN** 数据库拒绝该写入
 
 ### Requirement: 数据库配置
 数据库连接信息 SHALL 通过环境变量配置，支持 .env 文件。

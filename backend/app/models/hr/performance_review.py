@@ -1,6 +1,6 @@
 """绩效考评模型"""
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import CheckConstraint, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -20,6 +20,10 @@ class PerformanceReview(Base):
     """
 
     __tablename__ = "performance_reviews"
+    __table_args__ = (
+        UniqueConstraint("employee_id", "year", "half", name="uq_performance_employee_year_half"),
+        CheckConstraint("score BETWEEN 0 AND 100", name="ck_performance_score_range"),
+    )
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True, comment="员工ID")
     year: Mapped[int] = mapped_column(comment="考评年度")

@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import CheckConstraint, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -23,6 +23,9 @@ class DevelopmentPlan(Base):
     """
 
     __tablename__ = "development_plans"
+    __table_args__ = (
+        CheckConstraint("progress BETWEEN 0 AND 100", name="ck_development_plan_progress_range"),
+    )
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True, comment="员工ID")
     plan_year: Mapped[int] = mapped_column(comment="计划年度")

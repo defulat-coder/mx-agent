@@ -58,6 +58,30 @@ async def _get_active_employees(
     return list((await session.execute(stmt)).scalars().all())
 
 
+async def _get_employee_info_map(
+    session: AsyncSession, employees: list[Employee],
+) -> dict[int, EmployeeInfoResponse]:
+    """批量构建员工基本信息，避免候选人循环内重复查询员工和部门。"""
+    department_ids = {e.department_id for e in employees if e.department_id}
+    departments = (
+        await session.execute(select(Department).where(Department.id.in_(department_ids)))
+    ).scalars().all() if department_ids else []
+    department_names = {d.id: d.name for d in departments}
+    return {
+        e.id: EmployeeInfoResponse(
+            employee_id=e.id,
+            name=e.name,
+            employee_no=e.employee_no,
+            department=department_names.get(e.department_id),
+            position=e.position,
+            level=e.level,
+            hire_date=e.hire_date,
+            status=e.status,
+        )
+        for e in employees
+    }
+
+
 async def discover_hidden_talent(
     session: AsyncSession, department_id: int | None = None,
 ) -> HiddenTalentResult:
@@ -68,6 +92,7 @@ async def discover_hidden_talent(
         return HiddenTalentResult(candidates=[], total=0)
 
     emp_ids = [e.id for e in employees]
+    info_by_emp = await _get_employee_info_map(session, employees)
 
     # 批量加载数据
     perfs = (await session.execute(
@@ -139,7 +164,6 @@ async def discover_hidden_talent(
         if current_tag not in low_tags and current_pos not in low_positions:
             continue
 
-        info = await get_employee_info(session, emp.id)
         signals = []
         signals.append(f"绩效连续优秀: {', '.join(recent_ratings[-2:])}")
         signals.append(f"自主完成培训 {len(self_initiated)} 门")
@@ -148,7 +172,7 @@ async def discover_hidden_talent(
             signals.append(f"当前标签「{current_tag}」可能被低估")
 
         candidates.append(HiddenTalentCandidate(
-            info=info,
+            info=info_by_emp[emp.id],
             performance_trend=recent_ratings,
             self_initiated_training_count=len(self_initiated),
             idp_completion_rate=round(idp_rate, 2),
@@ -170,6 +194,7 @@ async def assess_flight_risk(
         return FlightRiskResult(candidates=[], total=0)
 
     emp_ids = [e.id for e in employees]
+    info_by_emp = await _get_employee_info_map(session, employees)
 
     perfs = (await session.execute(
         select(PerformanceReview).where(PerformanceReview.employee_id.in_(emp_ids))
@@ -242,9 +267,8 @@ async def assess_flight_risk(
             risk_signals.append(f"近 3 月加班 {recent_ot_hours:.0f} 小时，可能疲劳")
 
         recent_ratings = [p.rating for p in emp_perfs[-3:]]
-        info = await get_employee_info(session, emp.id)
         candidates.append(FlightRiskCandidate(
-            info=info,
+            info=info_by_emp[emp.id],
             performance_ratings=recent_ratings,
             level_tenure_years=round(level_tenure, 1),
             idp_status=idp_status,
@@ -260,7 +284,7 @@ async def evaluate_promotion_readiness(
     employee_id: int | None = None,
     department_id: int | None = None,
 ) -> PromotionReadinessResult:
-    """晋升准备度评估：综合评分 1-100。"""
+    """晋升准备度评估：综合评分 0-100。"""
     logger.info("人才发现-晋升评估 | employee_id={eid} department_id={did}", eid=employee_id, did=department_id)
     if employee_id:
         emp = (await session.execute(
@@ -274,6 +298,7 @@ async def evaluate_promotion_readiness(
         return PromotionReadinessResult(items=[])
 
     emp_ids = [e.id for e in employees]
+    info_by_emp = await _get_employee_info_map(session, employees)
     today = date.today()
 
     perfs = (await session.execute(
@@ -323,8 +348,8 @@ async def evaluate_promotion_readiness(
         # 最近绩效评分 (30%)
         emp_perfs = perf_by_emp.get(emp.id, [])
         emp_perfs.sort(key=lambda p: (p.year, p.half))
-        latest_rating = emp_perfs[-1].rating if emp_perfs else "B"
-        perf_score = rating_scores.get(latest_rating, 60)
+        latest_rating = emp_perfs[-1].rating if emp_perfs else "未知"
+        perf_score = rating_scores.get(latest_rating, 0)
 
         # 管理培训评分 (20%)
         mgmt_trains = train_by_emp.get(emp.id, [])
@@ -336,11 +361,10 @@ async def evaluate_promotion_readiness(
         idp_score = avg_progress
 
         readiness = int(tenure_score * 0.25 + perf_score * 0.30 + mgmt_score * 0.20 + idp_score * 0.25)
-        readiness = max(1, min(100, readiness))
+        readiness = max(0, min(100, readiness))
 
-        info = await get_employee_info(session, emp.id)
         items.append(PromotionReadinessItem(
-            info=info,
+            info=info_by_emp[emp.id],
             level_tenure_years=round(tenure, 1),
             latest_rating=latest_rating,
             management_training_count=len(mgmt_trains),
@@ -357,15 +381,20 @@ async def find_candidates(
 ) -> CandidateMatchResult:
     """岗位适配推荐：基于技能 + 项目 + 培训关键词匹配。"""
     logger.info("人才发现-岗位适配 | requirements={req}", req=requirements)
-    keywords = [kw.strip() for kw in requirements.replace("，", ",").replace("、", ",").split(",") if kw.strip()]
+    keywords = list(dict.fromkeys(
+        kw.strip().casefold()
+        for kw in requirements.replace("，", ",").replace("、", ",").split(",")
+        if kw.strip()
+    ))
     if not keywords:
-        keywords = requirements.split()
+        keywords = list(dict.fromkeys(kw.casefold() for kw in requirements.split()))
 
     employees = await _get_active_employees(session)
     if not employees:
         return CandidateMatchResult(candidates=[], total=0, notice="无在职员工")
 
     emp_ids = [e.id for e in employees]
+    info_by_emp = await _get_employee_info_map(session, employees)
 
     skills = (await session.execute(
         select(Skill).where(Skill.employee_id.in_(emp_ids))
@@ -402,34 +431,38 @@ async def find_candidates(
         matched_skills: list[str] = []
         relevant_projects: list[str] = []
 
-        # 技能匹配
         emp_skills = skill_by_emp.get(emp.id, [])
-        for s in emp_skills:
-            for kw in keywords:
-                if kw.lower() in s.name.lower():
-                    level_bonus = {"专家": 4, "高级": 3, "中级": 2, "初级": 1}.get(s.level, 1)
-                    score += 10 * level_bonus
-                    matched_skills.append(f"{s.name}({s.level})")
-
-        # 项目匹配
         emp_projs = proj_by_emp.get(emp.id, [])
-        for p in emp_projs:
-            text = f"{p.project_name} {p.description} {p.achievement}"
-            for kw in keywords:
-                if kw.lower() in text.lower():
-                    role_bonus = {"负责人": 3, "核心成员": 2, "参与者": 1}.get(p.role, 1)
-                    score += 5 * role_bonus
-                    if p.project_name not in relevant_projects:
-                        relevant_projects.append(p.project_name)
-                    break
-
-        # 培训匹配
         emp_trains = train_by_emp.get(emp.id, [])
-        for t in emp_trains:
-            for kw in keywords:
-                if kw.lower() in t.course_name.lower():
-                    score += 2
-                    break
+
+        # 每个关键词在各证据类型中只取一次最高分，避免重复标签/记录把分数无限叠加。
+        for kw in keywords:
+            matching_skills = [s for s in emp_skills if kw in s.name.casefold()]
+            if matching_skills:
+                best_skill = max(
+                    matching_skills,
+                    key=lambda s: {"专家": 4, "高级": 3, "中级": 2, "初级": 1}.get(s.level, 1),
+                )
+                score += 10 * {"专家": 4, "高级": 3, "中级": 2, "初级": 1}.get(best_skill.level, 1)
+                skill_label = f"{best_skill.name}({best_skill.level})"
+                if skill_label not in matched_skills:
+                    matched_skills.append(skill_label)
+
+            matching_projects = [
+                p for p in emp_projs
+                if kw in f"{p.project_name} {p.description} {p.achievement}".casefold()
+            ]
+            if matching_projects:
+                best_project = max(
+                    matching_projects,
+                    key=lambda p: {"负责人": 3, "核心成员": 2, "参与者": 1}.get(p.role, 1),
+                )
+                score += 5 * {"负责人": 3, "核心成员": 2, "参与者": 1}.get(best_project.role, 1)
+                if best_project.project_name not in relevant_projects:
+                    relevant_projects.append(best_project.project_name)
+
+            if any(kw in t.course_name.casefold() for t in emp_trains):
+                score += 2
 
         if score == 0:
             continue
@@ -437,7 +470,7 @@ async def find_candidates(
         # 绩效基线
         emp_perfs = perf_by_emp.get(emp.id, [])
         emp_perfs.sort(key=lambda p: (p.year, p.half))
-        latest_rating = emp_perfs[-1].rating if emp_perfs else "B"
+        latest_rating = emp_perfs[-1].rating if emp_perfs else "未知"
         if latest_rating in ("C", "D"):
             continue
 
@@ -447,18 +480,19 @@ async def find_candidates(
     top = scored[:20]
 
     candidates = []
+    max_score = max(len(keywords) * 57, 1)
     for emp, score, matched_skills, relevant_projects, latest_rating in top:
-        info = await get_employee_info(session, emp.id)
         summary_parts = []
         if matched_skills:
             summary_parts.append(f"技能匹配: {', '.join(matched_skills)}")
         if relevant_projects:
             summary_parts.append(f"相关项目: {', '.join(relevant_projects[:3])}")
         candidates.append(CandidateMatchItem(
-            info=info,
+            info=info_by_emp[emp.id],
             matched_skills=matched_skills,
             relevant_projects=relevant_projects,
             latest_rating=latest_rating,
+            match_score=round(score / max_score * 100),
             match_summary="; ".join(summary_parts) if summary_parts else "基于培训记录匹配",
         ))
 

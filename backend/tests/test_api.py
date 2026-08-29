@@ -37,12 +37,11 @@ async def test_chat_missing_body(client: AsyncClient, auth_headers: dict):
 
 
 async def test_chat_empty_message(client: AsyncClient, auth_headers: dict):
-    """空 message 字段也可请求（不做非空校验）"""
+    """空 message 字段应在调用 Agent 前被拒绝。"""
     resp = await client.post("/v1/chat", json={"message": ""}, headers=auth_headers)
-    # 只要鉴权通过，应返回 200（Agent 会给出回复）
-    assert resp.status_code == 200
+    assert resp.status_code == 422
     data = resp.json()
-    assert "reply" in data
+    assert data["code"] == 42201
 
 
 async def test_request_id_in_response_header(client: AsyncClient):

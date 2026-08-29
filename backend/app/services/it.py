@@ -1,9 +1,10 @@
 """IT 运维 Service — 工单管理、设备资产管理、统计分析"""
 
 from datetime import datetime, timezone
+from uuid import uuid4
 
 from loguru import logger
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import BusinessException, NotFoundException
@@ -156,16 +157,26 @@ async def create_ticket(
         priority: 优先级
     """
     logger.info("创建工单 | submitter_id={sid} type={t} priority={p}", sid=submitter_id, t=type, p=priority)
-    # 生成工单编号
-    max_id_stmt = select(func.max(ITTicket.id))
-    max_id = (await session.execute(max_id_stmt)).scalar() or 0
-    ticket_no = f"IT-T-{max_id + 1:04d}"
+    if type not in {"repair", "password_reset", "software_install", "permission", "other"}:
+        raise BusinessException(message=f"不支持的工单类型: {type}")
+    if priority not in {"low", "medium", "high", "urgent"}:
+        raise BusinessException(message=f"不支持的优先级: {priority}")
+    title = title.strip()
+    if not title:
+        raise BusinessException(message="工单标题不能为空")
+    submitter = await session.get(Employee, submitter_id)
+    if not submitter:
+        raise NotFoundException(message="提交人不存在")
+    if submitter.status not in ("在职", "试用期"):
+        raise BusinessException(message="仅在职员工可创建工单")
+    # 随机编号不依赖“先查最大 ID”，并发创建时不会生成相同编号。
+    ticket_no = f"IT-T-{uuid4().hex[:12].upper()}"
 
     ticket = ITTicket(
         ticket_no=ticket_no,
         type=type,
         title=title,
-        description=description,
+        description=description.strip(),
         status="open",
         priority=priority,
         submitter_id=submitter_id,
@@ -246,28 +257,41 @@ async def handle_ticket(
         resolution: 处理结果说明（resolve 时填写）
     """
     logger.info("处理工单 | ticket_id={tid} action={act}", tid=ticket_id, act=action)
+    if action not in {"accept", "resolve", "close"}:
+        raise BusinessException(message=f"不支持的操作: {action}")
+    resolution = resolution.strip()
+    if action == "resolve" and not resolution:
+        raise BusinessException(message="解决工单时必须填写处理结果说明")
+
     ticket = (await session.execute(select(ITTicket).where(ITTicket.id == ticket_id))).scalar_one_or_none()
     if not ticket:
         raise NotFoundException(message="工单不存在")
 
     if action == "accept":
-        if ticket.status != "open":
-            raise BusinessException(message="仅待处理工单可受理")
-        ticket.status = "in_progress"
-        ticket.handler_id = handler_id
+        expected_status = "open"
+        values = {"status": "in_progress", "handler_id": handler_id}
     elif action == "resolve":
-        if ticket.status not in ("open", "in_progress"):
-            raise BusinessException(message="仅待处理或处理中的工单可解决")
-        ticket.status = "resolved"
-        ticket.handler_id = handler_id
-        ticket.resolution = resolution
-        ticket.resolved_at = datetime.now(timezone.utc)
-    elif action == "close":
-        ticket.status = "closed"
+        expected_status = "in_progress"
+        values = {
+            "status": "resolved",
+            "handler_id": handler_id,
+            "resolution": resolution,
+            "resolved_at": datetime.now(timezone.utc),
+        }
     else:
-        raise BusinessException(message=f"不支持的操作: {action}")
+        expected_status = "resolved"
+        values = {"status": "closed"}
+
+    changed = await session.execute(
+        update(ITTicket)
+        .where(ITTicket.id == ticket_id, ITTicket.status == expected_status)
+        .values(**values),
+    )
+    if changed.rowcount != 1:
+        raise BusinessException(message=f"当前状态 [{ticket.status}] 不允许执行 [{action}]")
 
     await session.flush()
+    await session.refresh(ticket)
     return ITTicketResponse(
         ticket_id=ticket.id,
         ticket_no=ticket.ticket_no,
@@ -329,14 +353,25 @@ async def assign_asset(
 ) -> ITAssetResponse:
     """分配设备给员工。"""
     logger.info("分配设备 | asset_id={aid} → employee_id={eid}", aid=asset_id, eid=employee_id)
+    employee = (await session.execute(select(Employee).where(Employee.id == employee_id))).scalar_one_or_none()
+    if not employee:
+        raise NotFoundException(message="接收员工不存在")
+    if employee.status not in ("在职", "试用期"):
+        raise BusinessException(message="设备只能分配给在职员工")
+
     asset = (await session.execute(select(ITAsset).where(ITAsset.id == asset_id))).scalar_one_or_none()
     if not asset:
         raise NotFoundException(message="设备不存在")
     if asset.status != "idle":
         raise BusinessException(message="设备当前不可分配（状态非空闲）")
 
-    asset.status = "in_use"
-    asset.employee_id = employee_id
+    assigned = await session.execute(
+        update(ITAsset)
+        .where(ITAsset.id == asset_id, ITAsset.status == "idle")
+        .values(status="in_use", employee_id=employee_id),
+    )
+    if assigned.rowcount != 1:
+        raise BusinessException(message="设备状态已变化，请刷新后重试")
 
     history = ITAssetHistory(
         asset_id=asset_id,
@@ -348,8 +383,8 @@ async def assign_asset(
     )
     session.add(history)
     await session.flush()
+    await session.refresh(asset)
 
-    emp_name = (await session.execute(select(Employee.name).where(Employee.id == employee_id))).scalar_one_or_none()
     return ITAssetResponse(
         asset_id=asset.id,
         asset_no=asset.asset_no,
@@ -358,7 +393,7 @@ async def assign_asset(
         model_name=asset.model_name,
         status=asset.status,
         employee_id=asset.employee_id,
-        employee_name=emp_name,
+        employee_name=employee.name,
         purchase_date=asset.purchase_date,
         warranty_expire=asset.warranty_expire,
     )
@@ -376,8 +411,13 @@ async def reclaim_asset(
         raise BusinessException(message="设备当前未被使用，无需回收")
 
     old_employee_id = asset.employee_id
-    asset.status = "idle"
-    asset.employee_id = None
+    reclaimed = await session.execute(
+        update(ITAsset)
+        .where(ITAsset.id == asset_id, ITAsset.status == "in_use")
+        .values(status="idle", employee_id=None),
+    )
+    if reclaimed.rowcount != 1:
+        raise BusinessException(message="设备状态已变化，请刷新后重试")
 
     history = ITAssetHistory(
         asset_id=asset_id,
@@ -389,6 +429,7 @@ async def reclaim_asset(
     )
     session.add(history)
     await session.flush()
+    await session.refresh(asset)
 
     return ITAssetResponse(
         asset_id=asset.id,

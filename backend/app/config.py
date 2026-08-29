@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     AGENTOS_ID: str | None = None
     AGENTOS_NAME: str | None = None
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
 
     # Database
     DATABASE_URL: str = "sqlite+aiosqlite:///data/mx_agent.db"
@@ -58,7 +62,7 @@ class Settings(BaseSettings):
         return self.EMBEDDING_BASE_URL or self.LLM_BASE_URL
 
     # Auth
-    AUTH_SECRET: str = "dev-secret-change-me"
+    AUTH_SECRET: str = "dev-secret-change-me-at-least-32-bytes"
     ALLOW_MOCK_IDENTITY: bool = False
 
     # Logging

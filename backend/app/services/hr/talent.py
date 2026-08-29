@@ -1,6 +1,6 @@
 """Talent-development HR queries and analytics."""
 
-from datetime import date, datetime
+from datetime import date, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -166,17 +166,27 @@ async def get_training_summary(
     session: AsyncSession, year: int | None = None,
 ) -> list[TrainingSummaryResponse]:
     """各部门培训统计。"""
-    employees = (await session.execute(select(Employee))).scalars().all()
+    employees = (await session.execute(
+        select(Employee).where(Employee.status.in_(["在职", "试用期"]))
+    )).scalars().all()
     depts = (await session.execute(select(Department))).scalars().all()
     dept_name = {d.id: d.name for d in depts}
 
     stmt = select(Training)
     if year:
-        y_start = date(year, 1, 1).isoformat()
-        y_end = date(year, 12, 31).isoformat()
+        y_start = date(year, 1, 1)
+        y_end = date(year, 12, 31)
         stmt = stmt.where(
-            ((Training.completed_date >= y_start) & (Training.completed_date <= y_end))
-            | ((Training.deadline >= y_start) & (Training.deadline <= y_end))
+            (
+                (Training.status == "已完成")
+                & (Training.completed_date >= y_start)
+                & (Training.completed_date <= y_end)
+            )
+            | (
+                (Training.status != "已完成")
+                & (Training.deadline >= y_start)
+                & (Training.deadline <= y_end)
+            )
         )
     trainings = (await session.execute(stmt)).scalars().all()
 
@@ -188,9 +198,12 @@ async def get_training_summary(
 
     dept_stats: dict[int, dict] = {}
     for t in trainings:
-        did = emp_dept.get(t.employee_id, 0)
+        did = emp_dept.get(t.employee_id)
+        if not did:
+            continue
         if did not in dept_stats:
-            dept_stats[did] = {"completed": 0, "total_hours": 0, "mandatory_total": 0, "mandatory_done": 0}
+            dept_stats[did] = {"total": 0, "completed": 0, "total_hours": 0, "mandatory_total": 0, "mandatory_done": 0}
+        dept_stats[did]["total"] += 1
         if t.status == "已完成":
             dept_stats[did]["completed"] += 1
             dept_stats[did]["total_hours"] += float(t.hours)
@@ -201,14 +214,14 @@ async def get_training_summary(
 
     results = []
     for did in sorted(dept_emp_count.keys()):
-        stats = dept_stats.get(did, {"completed": 0, "total_hours": 0, "mandatory_total": 0, "mandatory_done": 0})
+        stats = dept_stats.get(did, {"total": 0, "completed": 0, "total_hours": 0, "mandatory_total": 0, "mandatory_done": 0})
         emp_count = dept_emp_count[did]
         results.append(TrainingSummaryResponse(
             department_id=did,
             department_name=dept_name.get(did, "未知"),
             total_employees=emp_count,
             completed_count=stats["completed"],
-            completion_rate=round(stats["completed"] / max(emp_count, 1), 2),
+            completion_rate=round(stats["completed"] / max(stats["total"], 1), 2),
             total_hours=round(stats["total_hours"], 1),
             avg_hours=round(stats["total_hours"] / max(emp_count, 1), 1),
             mandatory_completion_rate=round(
@@ -295,39 +308,61 @@ async def get_performance_distribution(
 
 
 async def get_turnover_analysis(session: AsyncSession) -> list[TurnoverAnalysisResponse]:
-    """各部门人员流动分析。"""
+    """各部门近 12 个月人员流动分析。"""
     employees = (await session.execute(select(Employee))).scalars().all()
     depts = (await session.execute(select(Department))).scalars().all()
     dept_name = {d.id: d.name for d in depts}
-
-    # 统计转正记录
-    hist_rows = (await session.execute(
-        select(EmploymentHistory).where(EmploymentHistory.change_type == "转正")
-    )).scalars().all()
-    converted_eids = {h.employee_id for h in hist_rows}
+    dept_id_by_name = {d.name: d.id for d in depts}
+    hist_rows = (await session.execute(select(EmploymentHistory))).scalars().all()
+    hist_by_emp: dict[int, list[EmploymentHistory]] = {}
+    for h in hist_rows:
+        hist_by_emp.setdefault(h.employee_id, []).append(h)
 
     dept_stats: dict[int, dict] = {}
     today = date.today()
+    period_start = today - timedelta(days=365)
+
+    def stats_for(department_id: int) -> dict:
+        return dept_stats.setdefault(
+            department_id,
+            {"total": 0, "active": 0, "resigned": 0, "probation": 0, "converted": 0, "tenure_sum": 0},
+        )
+
     for e in employees:
-        did = e.department_id or 0
-        if did not in dept_stats:
-            dept_stats[did] = {"total": 0, "active": 0, "resigned": 0, "probation": 0, "converted": 0, "tenure_sum": 0}
-        dept_stats[did]["total"] += 1
-        if e.status == "在职":
-            dept_stats[did]["active"] += 1
+        histories = sorted(hist_by_emp.get(e.id, []), key=lambda h: h.start_date)
+        latest_history = histories[-1] if histories else None
+
+        if e.status in ("在职", "试用期"):
+            did = e.department_id or 0
+            stats = stats_for(did)
+            stats["total"] += 1
+            stats["active"] += 1
+            if e.status == "试用期" and e.hire_date and e.hire_date >= period_start:
+                stats["probation"] += 1
+            if e.hire_date:
+                stats["tenure_sum"] += max((today - e.hire_date).days, 0) / 365.25
         elif e.status == "离职":
-            dept_stats[did]["resigned"] += 1
-        elif e.status == "试用期":
-            dept_stats[did]["probation"] += 1
-        if e.id in converted_eids:
-            dept_stats[did]["converted"] += 1
-        if e.hire_date:
-            dept_stats[did]["tenure_sum"] += (today - e.hire_date).days / 365.25
+            exit_date = latest_history.end_date if latest_history else None
+            if exit_date and period_start <= exit_date <= today:
+                did = dept_id_by_name.get(latest_history.department, e.department_id or 0)
+                stats = stats_for(did)
+                stats["total"] += 1
+                stats["resigned"] += 1
+                if e.hire_date:
+                    stats["tenure_sum"] += max((exit_date - e.hire_date).days, 0) / 365.25
+
+    recent_conversions = {
+        (h.employee_id, dept_id_by_name.get(h.department, 0))
+        for h in hist_rows
+        if h.change_type == "转正" and period_start <= h.start_date <= today
+    }
+    for _, did in recent_conversions:
+        stats_for(did)["converted"] += 1
 
     results = []
     for did in sorted(dept_stats.keys()):
         s = dept_stats[did]
-        total_for_rate = s["active"] + s["resigned"]
+        total_for_rate = s["total"]
         probation_total = s["probation"] + s["converted"]
         results.append(TurnoverAnalysisResponse(
             department_id=did,
@@ -350,14 +385,9 @@ async def get_promotion_stats(
     yr_start = date(yr, 1, 1)
     yr_end = date(yr, 12, 31)
 
-    hist_rows = (await session.execute(
-        select(EmploymentHistory)
-        .where(EmploymentHistory.start_date >= yr_start)
-        .where(EmploymentHistory.start_date <= yr_end)
-    )).scalars().all()
+    hist_rows = (await session.execute(select(EmploymentHistory))).scalars().all()
 
     employees = (await session.execute(select(Employee))).scalars().all()
-    emp_dept = {e.id: e.department_id for e in employees}
     active_by_dept: dict[int, int] = {}
     for e in employees:
         if e.status in ("在职", "试用期") and e.department_id:
@@ -365,17 +395,34 @@ async def get_promotion_stats(
 
     depts = (await session.execute(select(Department))).scalars().all()
     dept_name = {d.id: d.name for d in depts}
+    dept_id_by_name = {d.name: d.id for d in depts}
 
     dept_stats: dict[int, dict] = {}
+    histories_by_emp: dict[int, list[EmploymentHistory]] = {}
     for h in hist_rows:
-        did = emp_dept.get(h.employee_id, 0)
-        if did not in dept_stats:
-            dept_stats[did] = {"promotion": 0, "transfer_in": 0, "transfer_out": 0}
-        if h.change_type == "晋升":
-            dept_stats[did]["promotion"] += 1
-        elif h.change_type == "调岗":
-            # 当前部门算调入
-            dept_stats[did]["transfer_in"] += 1
+        histories_by_emp.setdefault(h.employee_id, []).append(h)
+
+    def stats_for(department_id: int) -> dict:
+        return dept_stats.setdefault(
+            department_id, {"promotion": 0, "transfer_in": 0, "transfer_out": 0},
+        )
+
+    for histories in histories_by_emp.values():
+        histories.sort(key=lambda h: h.start_date)
+        for index, h in enumerate(histories):
+            if not yr_start <= h.start_date <= yr_end:
+                continue
+            did = dept_id_by_name.get(h.department, 0)
+            if h.change_type == "晋升":
+                stats_for(did)["promotion"] += 1
+            elif h.change_type == "调岗":
+                previous_did = (
+                    dept_id_by_name.get(histories[index - 1].department, 0)
+                    if index else 0
+                )
+                if did and previous_did and did != previous_did:
+                    stats_for(did)["transfer_in"] += 1
+                    stats_for(previous_did)["transfer_out"] += 1
 
     results = []
     for did in sorted(set(list(active_by_dept.keys()) + list(dept_stats.keys()))):

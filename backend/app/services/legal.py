@@ -1,13 +1,15 @@
 """法务管理 Service — 合同模板、合同管理、审查、条款分析"""
 
+import asyncio
 import json
 from datetime import date, timedelta
 
 from loguru import logger
-from sqlalchemy import func, select
+from pydantic import ValidationError
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import BusinessException, NotFoundException
+from app.core.exceptions import BusinessException, ExternalServiceException, NotFoundException
 from app.core.llm import get_model
 from app.models.legal import Contract, ContractReview, ContractTemplate
 from app.models.hr import Department, Employee
@@ -139,11 +141,19 @@ async def review_contract(
         raise BusinessException(message=f"该合同当前状态 [{c.status}] 不可审查，仅 pending 状态可审查")
 
     if action == "approved":
-        c.status = "approved"
+        new_status = "approved"
     elif action == "returned":
-        c.status = "returned"
+        new_status = "returned"
     else:
         raise BusinessException(message=f"不支持的操作: {action}，仅支持 approved/returned")
+
+    changed = await session.execute(
+        update(Contract)
+        .where(Contract.id == contract_id, Contract.status == "pending")
+        .values(status=new_status),
+    )
+    if changed.rowcount != 1:
+        raise BusinessException(message="合同状态已变更，请刷新后重试")
 
     review = ContractReview(
         contract_id=contract_id,
@@ -219,7 +229,7 @@ async def analyze_contract(
 {{"summary": "条款摘要", "risks": ["风险点1", "风险点2"], "suggestions": ["建议1", "建议2"]}}"""
 
     model = get_model()
-    response = model.invoke(prompt)
+    response = await asyncio.to_thread(model.invoke, prompt)
 
     # 解析 LLM 返回的 JSON
     try:
@@ -232,20 +242,18 @@ async def analyze_contract(
             content = content[:-3]
         content = content.strip()
         data = json.loads(content)
-    except (json.JSONDecodeError, AttributeError):
-        data = {
-            "summary": str(response.content if hasattr(response, "content") else response),
-            "risks": [],
-            "suggestions": [],
-        }
-
-    return ContractAnalysisResult(
-        contract_id=c.id,
-        contract_no=c.contract_no,
-        summary=data.get("summary", ""),
-        risks=data.get("risks", []),
-        suggestions=data.get("suggestions", []),
-    )
+        if not isinstance(data, dict):
+            raise TypeError("分析结果不是 JSON 对象")
+        return ContractAnalysisResult.model_validate({
+            "contract_id": c.id,
+            "contract_no": c.contract_no,
+            "summary": data.get("summary"),
+            "risks": data.get("risks"),
+            "suggestions": data.get("suggestions"),
+        })
+    except (json.JSONDecodeError, AttributeError, TypeError, ValidationError) as exc:
+        logger.warning("合同分析返回格式无效 | contract_id={cid} error={error}", cid=contract_id, error=exc)
+        raise ExternalServiceException(message="合同分析服务返回格式异常，请稍后重试") from exc
 
 
 # ── 法务人员：统计报表 ───────────────────────────────────

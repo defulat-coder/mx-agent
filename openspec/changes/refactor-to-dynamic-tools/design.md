@@ -17,7 +17,7 @@
 **Goals:**
 - 各 Agent 的 tools 改为工厂函数，根据 roles 动态返回可用 tools
 - 简化 Agent instructions，移除权限说明段落
-- 移除 Tool 层冗余的权限校验（角色检查），保留身份提取逻辑
+- 普通查询依靠动态 tools 缩小暴露面，敏感 HR 工具保留运行时角色校验作为纵深防御
 
 **Non-Goals:**
 - 不改变现有的 roles 定义和权限划分逻辑
@@ -57,9 +57,9 @@ def get_hr_tools(run_context: RunContext) -> list[Callable]:
 | 函数 | 当前行为 | 重构后 |
 |------|----------|--------|
 | `get_employee_id` | 提取 employee_id | 保留，无变化 |
-| `get_manager_info` | 校验 manager + 提取 dept_id | 移除角色校验，仅提取 dept_id |
-| `get_admin_id` | 校验 admin | 移除（动态 tools 已隔离） |
-| `get_talent_dev_id` | 校验 talent_dev | 移除（动态 tools 已隔离） |
+| `get_manager_info` | 校验 manager + 提取 dept_id | 保留角色与 department_id 校验 |
+| `get_admin_id` | 校验 admin | 保留敏感 HR 管理权限校验 |
+| `get_talent_dev_id` | 校验 talent_dev | 保留人才数据权限校验 |
 
 ### 4. Instructions 简化
 
@@ -71,6 +71,6 @@ def get_hr_tools(run_context: RunContext) -> list[Callable]:
 
 | 风险 | 缓解措施 |
 |------|----------|
-| 移除 Tool 层校验后，若工厂函数有 bug 可能导致越权 | 保留 tools/utils.py 的身份提取逻辑，关键 tools 可添加断言校验 |
+| 工厂函数或缓存异常可能导致越权 | 敏感 HR tools 运行时再次校验角色，并以安全回归测试覆盖 |
 | 缓存导致 roles 变更不生效 | 当前 roles 在 JWT 中，session 内不变，问题不大；如需实时刷新可设置 `cache_callables=False` |
 | instructions 简化后 LLM 行为可能变化 | 分 Agent 灰度验证，保留核心行为准则 |

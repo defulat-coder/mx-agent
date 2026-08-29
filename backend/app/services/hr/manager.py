@@ -3,7 +3,7 @@
 from datetime import date, datetime
 
 from loguru import logger
-from sqlalchemy import select, text
+from sqlalchemy import select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ForbiddenException, NotFoundException
@@ -29,6 +29,111 @@ from app.schemas.hr import (
     TeamOvertimeRecordResponse,
 )
 from app.services.hr.employee import get_employee_info
+
+
+_APPROVAL_STATUS = {"通过": "已通过", "拒绝": "已拒绝"}
+
+
+def _approval_message(subject: str, action: str, comment: str) -> str:
+    message = f"{subject}已{action}"
+    if comment:
+        message += "；当前系统暂不保存审批备注"
+    return message
+
+
+async def _transition_leave_request(
+    session: AsyncSession,
+    leave_req: LeaveRequest,
+    action: str,
+    comment: str,
+) -> ApprovalResponse:
+    """原子认领待审批申请，并在通过时同步扣减假期余额。"""
+    new_status = _APPROVAL_STATUS[action]
+    claimed = await session.execute(
+        update(LeaveRequest)
+        .where(LeaveRequest.id == leave_req.id, LeaveRequest.status == "待审批")
+        .values(status=new_status)
+        .execution_options(synchronize_session=False)
+    )
+    if claimed.rowcount != 1:
+        current_status = await session.scalar(
+            select(LeaveRequest.status).where(LeaveRequest.id == leave_req.id)
+        )
+        return ApprovalResponse(
+            success=False,
+            message=f"该申请当前状态为「{current_status}」，无法审批",
+        )
+
+    if action == "通过":
+        balance_updated = await session.execute(
+            update(LeaveBalance)
+            .where(
+                LeaveBalance.employee_id == leave_req.employee_id,
+                LeaveBalance.year == leave_req.start_date.year,
+                LeaveBalance.leave_type == leave_req.leave_type,
+                LeaveBalance.remaining_days >= leave_req.days,
+            )
+            .values(
+                used_days=LeaveBalance.used_days + leave_req.days,
+                remaining_days=LeaveBalance.remaining_days - leave_req.days,
+            )
+            .execution_options(synchronize_session=False)
+        )
+        if balance_updated.rowcount != 1:
+            await session.execute(
+                update(LeaveRequest)
+                .where(LeaveRequest.id == leave_req.id, LeaveRequest.status == new_status)
+                .values(status="待审批")
+                .execution_options(synchronize_session=False)
+            )
+            balance = await session.scalar(
+                select(LeaveBalance).where(
+                    LeaveBalance.employee_id == leave_req.employee_id,
+                    LeaveBalance.year == leave_req.start_date.year,
+                    LeaveBalance.leave_type == leave_req.leave_type,
+                )
+            )
+            message = "未配置对应年度和类型的假期余额" if balance is None else "假期余额不足"
+            return ApprovalResponse(success=False, message=message)
+
+    await session.flush()
+    return ApprovalResponse(
+        success=True,
+        request_id=leave_req.id,
+        action=action,
+        message=_approval_message("请假申请", action, comment),
+    )
+
+
+async def _transition_overtime_request(
+    session: AsyncSession,
+    ot_record: OvertimeRecord,
+    action: str,
+    comment: str,
+) -> ApprovalResponse:
+    """以条件更新保证一条加班申请只能审批一次。"""
+    claimed = await session.execute(
+        update(OvertimeRecord)
+        .where(OvertimeRecord.id == ot_record.id, OvertimeRecord.status == "待审批")
+        .values(status=_APPROVAL_STATUS[action])
+        .execution_options(synchronize_session=False)
+    )
+    if claimed.rowcount != 1:
+        current_status = await session.scalar(
+            select(OvertimeRecord.status).where(OvertimeRecord.id == ot_record.id)
+        )
+        return ApprovalResponse(
+            success=False,
+            message=f"该记录当前状态为「{current_status}」，无法审批",
+        )
+
+    await session.flush()
+    return ApprovalResponse(
+        success=True,
+        request_id=ot_record.id,
+        action=action,
+        message=_approval_message("加班申请", action, comment),
+    )
 
 
 async def get_managed_department_ids(session: AsyncSession, department_id: int) -> list[int]:
@@ -340,35 +445,27 @@ async def approve_leave_request(
 ) -> ApprovalResponse:
     """审批请假申请。"""
     logger.info("审批请假 | approver={mid} request_id={rid} action={act}", mid=manager_employee_id, rid=request_id, act=action)
+    if action not in _APPROVAL_STATUS:
+        return ApprovalResponse(success=False, message="审批动作仅支持「通过」或「拒绝」")
+
     leave_req = (await session.execute(
         select(LeaveRequest).where(LeaveRequest.id == request_id)
     )).scalar_one_or_none()
     if not leave_req:
         raise NotFoundException(message="请假申请不存在")
 
-    if leave_req.status != "待审批":
-        return ApprovalResponse(
-            success=False,
-            message=f"该申请当前状态为「{leave_req.status}」，无法审批",
-        )
-
     managed_ids = await get_managed_employee_ids(session, manager_employee_id, department_id)
+    if leave_req.employee_id == manager_employee_id:
+        return ApprovalResponse(success=False, message="不能审批自己的请假申请")
     if leave_req.employee_id not in managed_ids:
         return ApprovalResponse(
             success=False,
             message="该员工不在您的管辖范围内，无权审批",
         )
+    if leave_req.days <= 0:
+        return ApprovalResponse(success=False, message="请假天数必须大于 0")
 
-    new_status = "已通过" if action == "通过" else "已拒绝"
-    leave_req.status = new_status
-    await session.commit()
-
-    return ApprovalResponse(
-        success=True,
-        request_id=request_id,
-        action=action,
-        message=f"请假申请已{action}",
-    )
+    return await _transition_leave_request(session, leave_req, action, comment)
 
 
 async def approve_overtime_request(
@@ -381,32 +478,22 @@ async def approve_overtime_request(
 ) -> ApprovalResponse:
     """审批加班申请。"""
     logger.info("审批加班 | approver={mid} record_id={rid} action={act}", mid=manager_employee_id, rid=record_id, act=action)
+    if action not in _APPROVAL_STATUS:
+        return ApprovalResponse(success=False, message="审批动作仅支持「通过」或「拒绝」")
+
     ot_record = (await session.execute(
         select(OvertimeRecord).where(OvertimeRecord.id == record_id)
     )).scalar_one_or_none()
     if not ot_record:
         raise NotFoundException(message="加班记录不存在")
 
-    if ot_record.status != "待审批":
-        return ApprovalResponse(
-            success=False,
-            message=f"该记录当前状态为「{ot_record.status}」，无法审批",
-        )
-
     managed_ids = await get_managed_employee_ids(session, manager_employee_id, department_id)
+    if ot_record.employee_id == manager_employee_id:
+        return ApprovalResponse(success=False, message="不能审批自己的加班申请")
     if ot_record.employee_id not in managed_ids:
         return ApprovalResponse(
             success=False,
             message="该员工不在您的管辖范围内，无权审批",
         )
 
-    new_status = "已通过" if action == "通过" else "已拒绝"
-    ot_record.status = new_status
-    await session.commit()
-
-    return ApprovalResponse(
-        success=True,
-        request_id=record_id,
-        action=action,
-        message=f"加班申请已{action}",
-    )
+    return await _transition_overtime_request(session, ot_record, action, comment)

@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 
-from sqlalchemy import ForeignKey, Numeric, String
+from sqlalchemy import CheckConstraint, ForeignKey, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -25,6 +25,14 @@ class SalaryRecord(Base):
     """
 
     __tablename__ = "salary_records"
+    __table_args__ = (
+        UniqueConstraint("employee_id", "year_month", name="uq_salary_employee_month"),
+        CheckConstraint(
+            "base_salary >= 0 AND bonus >= 0 AND allowance >= 0 AND deduction >= 0 "
+            "AND social_insurance >= 0 AND housing_fund >= 0 AND tax >= 0 AND net_salary >= 0",
+            name="ck_salary_amounts_non_negative",
+        ),
+    )
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True, comment="员工ID")
     year_month: Mapped[str] = mapped_column(String(7), index=True, comment="薪资月份，格式YYYY-MM")

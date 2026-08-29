@@ -3,7 +3,7 @@
 from datetime import date
 from decimal import Decimal
 
-from sqlalchemy import Date, ForeignKey, Numeric, String
+from sqlalchemy import CheckConstraint, Date, ForeignKey, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -22,6 +22,14 @@ class LeaveBalance(Base):
     """
 
     __tablename__ = "leave_balances"
+    __table_args__ = (
+        UniqueConstraint("employee_id", "year", "leave_type", name="uq_leave_balance_employee_year_type"),
+        CheckConstraint(
+            "total_days >= 0 AND used_days >= 0 AND remaining_days >= 0 "
+            "AND used_days <= total_days AND remaining_days <= total_days",
+            name="ck_leave_balance_days_valid",
+        ),
+    )
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True, comment="员工ID")
     year: Mapped[int] = mapped_column(comment="年度")
@@ -45,6 +53,10 @@ class LeaveRequest(Base):
     """
 
     __tablename__ = "leave_requests"
+    __table_args__ = (
+        CheckConstraint("days > 0", name="ck_leave_request_days_positive"),
+        CheckConstraint("end_date >= start_date", name="ck_leave_request_date_order"),
+    )
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True, comment="员工ID")
     leave_type: Mapped[str] = mapped_column(String(16), comment="假期类型")

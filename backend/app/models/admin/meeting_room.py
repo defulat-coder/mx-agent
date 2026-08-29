@@ -1,6 +1,6 @@
 """会议室模型"""
 
-from sqlalchemy import Integer, String
+from sqlalchemy import CheckConstraint, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -18,6 +18,9 @@ class MeetingRoom(Base):
     """
 
     __tablename__ = "meeting_rooms"
+    __table_args__ = (
+        CheckConstraint("capacity > 0", name="ck_meeting_room_capacity_positive"),
+    )
 
     name: Mapped[str] = mapped_column(String(64), comment="会议室名称")
     floor: Mapped[str] = mapped_column(String(16), comment="楼层")

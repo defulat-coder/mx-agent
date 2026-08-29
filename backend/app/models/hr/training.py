@@ -3,7 +3,7 @@
 from datetime import date
 from decimal import Decimal
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import CheckConstraint, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -26,6 +26,10 @@ class Training(Base):
     """
 
     __tablename__ = "trainings"
+    __table_args__ = (
+        CheckConstraint("hours > 0", name="ck_training_hours_positive"),
+        CheckConstraint("score IS NULL OR score BETWEEN 0 AND 100", name="ck_training_score_range"),
+    )
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True, comment="员工ID")
     course_name: Mapped[str] = mapped_column(String(128), comment="课程名称")

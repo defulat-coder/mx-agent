@@ -4,7 +4,11 @@ import asyncio
 
 from app.core.database import engine
 from app.models.base import Base
+from app.models.admin import *  # noqa: F401, F403  # 确保所有模型注册到 Base.metadata
+from app.models.finance import *  # noqa: F401, F403
 from app.models.hr import *  # noqa: F401, F403  # 确保所有模型注册到 Base.metadata
+from app.models.it import *  # noqa: F401, F403
+from app.models.legal import *  # noqa: F401, F403
 
 
 async def main() -> None:

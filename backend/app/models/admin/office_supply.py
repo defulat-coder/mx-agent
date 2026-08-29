@@ -1,6 +1,6 @@
 """办公用品模型"""
 
-from sqlalchemy import Integer, String
+from sqlalchemy import CheckConstraint, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -17,6 +17,10 @@ class OfficeSupply(Base):
     """
 
     __tablename__ = "office_supplies"
+    __table_args__ = (
+        UniqueConstraint("name", name="uq_office_supply_name"),
+        CheckConstraint("stock >= 0", name="ck_office_supply_stock_non_negative"),
+    )
 
     name: Mapped[str] = mapped_column(String(64), comment="用品名称")
     category: Mapped[str] = mapped_column(String(32), comment="分类")

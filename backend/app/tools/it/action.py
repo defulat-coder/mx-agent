@@ -4,6 +4,7 @@ from agno.run import RunContext
 from loguru import logger
 
 from app.core.database import async_session_factory
+from app.core.exceptions import AppException
 from app.services import it as it_service
 from app.tools.hr.utils import get_employee_id
 
@@ -24,8 +25,17 @@ async def it_create_ticket(
         priority: 优先级（low/medium/high/urgent），默认 medium
     """
     logger.info("tool=it_create_ticket | type={type} priority={priority}", type=type, priority=priority)
-    employee_id = get_employee_id(run_context)
+    try:
+        employee_id = get_employee_id(run_context)
+    except ValueError as e:
+        return str(e)
     async with async_session_factory() as session:
-        record = await it_service.create_ticket(session, employee_id, type, title, description, priority)
-        await session.commit()
-        return record.model_dump_json()
+        try:
+            record = await it_service.create_ticket(session, employee_id, type, title, description, priority)
+            await session.commit()
+            return record.model_dump_json()
+        except AppException as e:
+            return e.message
+        except Exception:
+            logger.exception("创建 IT 工单失败")
+            return "服务内部错误，请稍后重试"

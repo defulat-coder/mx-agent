@@ -1,14 +1,21 @@
 """行政员工操作 Tools — 预订会议室、申领用品、预约访客、差旅申请"""
 
 import json
-from datetime import datetime
+from datetime import date, datetime
+from urllib.parse import urlencode
 
 from agno.run import RunContext
 from loguru import logger
 
 from app.core.database import async_session_factory
+from app.core.error_codes import ErrorCode
+from app.core.exceptions import AppException
 from app.services import admin as admin_service
 from app.tools.hr.utils import get_employee_id
+
+
+def _error_result(code: int, message: str) -> str:
+    return json.dumps({"status": "error", "code": code, "message": message}, ensure_ascii=False)
 
 
 async def adm_book_room(
@@ -27,16 +34,20 @@ async def adm_book_room(
         end_time: 结束时间（ISO 格式，如 2026-02-14T10:00:00）
     """
     logger.info("tool=adm_book_room | room_id={r} title={t}", r=room_id, t=title)
-    employee_id = get_employee_id(run_context)
-    st = datetime.fromisoformat(start_time)
-    et = datetime.fromisoformat(end_time)
-    async with async_session_factory() as session:
-        try:
+    try:
+        employee_id = get_employee_id(run_context)
+        st = datetime.fromisoformat(start_time)
+        et = datetime.fromisoformat(end_time)
+        async with async_session_factory() as session, session.begin():
             record = await admin_service.book_room(session, employee_id, room_id, title, st, et)
-            await session.commit()
-            return record.model_dump_json()
-        except Exception as e:
-            return str(e)
+        return record.model_dump_json()
+    except AppException as exc:
+        return _error_result(exc.code, exc.message)
+    except ValueError:
+        return _error_result(ErrorCode.BAD_REQUEST, "时间格式无效，请使用 ISO 8601 格式")
+    except Exception:
+        logger.exception("预订会议室失败")
+        return _error_result(ErrorCode.INTERNAL_ERROR, "服务内部错误")
 
 
 async def adm_cancel_booking(run_context: RunContext, booking_id: int) -> str:
@@ -46,14 +57,18 @@ async def adm_cancel_booking(run_context: RunContext, booking_id: int) -> str:
         booking_id: 预订 ID
     """
     logger.info("tool=adm_cancel_booking | booking_id={bid}", bid=booking_id)
-    employee_id = get_employee_id(run_context)
-    async with async_session_factory() as session:
-        try:
+    try:
+        employee_id = get_employee_id(run_context)
+        async with async_session_factory() as session, session.begin():
             record = await admin_service.cancel_booking(session, booking_id, employee_id)
-            await session.commit()
-            return record.model_dump_json()
-        except Exception as e:
-            return str(e)
+        return record.model_dump_json()
+    except AppException as exc:
+        return _error_result(exc.code, exc.message)
+    except ValueError as exc:
+        return _error_result(ErrorCode.BAD_REQUEST, str(exc))
+    except Exception:
+        logger.exception("取消会议室预订失败")
+        return _error_result(ErrorCode.INTERNAL_ERROR, "服务内部错误")
 
 
 async def adm_request_supply(run_context: RunContext, items: str) -> str:
@@ -63,11 +78,18 @@ async def adm_request_supply(run_context: RunContext, items: str) -> str:
         items: 申领物品列表，JSON 格式，如 [{"name":"A4纸","quantity":2},{"name":"签字笔","quantity":5}]
     """
     logger.info("tool=adm_request_supply")
-    employee_id = get_employee_id(run_context)
-    async with async_session_factory() as session:
-        record = await admin_service.request_supply(session, employee_id, items)
-        await session.commit()
+    try:
+        employee_id = get_employee_id(run_context)
+        async with async_session_factory() as session, session.begin():
+            record = await admin_service.request_supply(session, employee_id, items)
         return record.model_dump_json()
+    except AppException as exc:
+        return _error_result(exc.code, exc.message)
+    except ValueError as exc:
+        return _error_result(ErrorCode.BAD_REQUEST, str(exc))
+    except Exception:
+        logger.exception("申领办公用品失败")
+        return _error_result(ErrorCode.INTERNAL_ERROR, "服务内部错误")
 
 
 async def adm_book_visitor(
@@ -90,13 +112,20 @@ async def adm_book_visitor(
         purpose: 来访目的
     """
     logger.info("tool=adm_book_visitor | visitor={vn}", vn=visitor_name)
-    employee_id = get_employee_id(run_context)
-    async with async_session_factory() as session:
-        record = await admin_service.book_visitor(
-            session, employee_id, visitor_name, company, phone, visit_date, visit_time, purpose,
-        )
-        await session.commit()
+    try:
+        employee_id = get_employee_id(run_context)
+        async with async_session_factory() as session, session.begin():
+            record = await admin_service.book_visitor(
+                session, employee_id, visitor_name, company, phone, visit_date, visit_time, purpose,
+            )
         return record.model_dump_json()
+    except AppException as exc:
+        return _error_result(exc.code, exc.message)
+    except ValueError as exc:
+        return _error_result(ErrorCode.BAD_REQUEST, str(exc))
+    except Exception:
+        logger.exception("预约访客失败")
+        return _error_result(ErrorCode.INTERNAL_ERROR, "服务内部错误")
 
 
 async def adm_apply_travel(
@@ -115,9 +144,28 @@ async def adm_apply_travel(
         reason: 出差事由
     """
     logger.info("tool=adm_apply_travel | dest={d}", d=destination)
-    employee_id = get_employee_id(run_context)
-    result = {
-        "approval_url": f"https://oa.maxi.com/travel/apply?employee_id={employee_id}&dest={destination}&start={start_date}&end={end_date}",
-        "message": "差旅申请已提交，请前往 OA 系统完成审批流程",
-    }
-    return json.dumps(result, ensure_ascii=False)
+    try:
+        employee_id = get_employee_id(run_context)
+        start = date.fromisoformat(start_date)
+        end = date.fromisoformat(end_date)
+        if end < start:
+            return _error_result(ErrorCode.BAD_REQUEST, "返回日期不能早于出发日期")
+        query = urlencode({
+            "employee_id": employee_id,
+            "dest": destination,
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+            "reason": reason,
+        })
+        return json.dumps({
+            "status": "prepared",
+            "requires_user_action": True,
+            "approval_url": f"https://oa.maxi.com/travel/apply?{query}",
+            "message": "差旅申请信息已准备，请前往 OA 系统确认并提交",
+        }, ensure_ascii=False)
+    except ValueError as exc:
+        message = str(exc) if "登录态" in str(exc) else "日期格式无效，请使用 YYYY-MM-DD"
+        return _error_result(ErrorCode.BAD_REQUEST, message)
+    except Exception:
+        logger.exception("准备差旅申请失败")
+        return _error_result(ErrorCode.INTERNAL_ERROR, "服务内部错误")

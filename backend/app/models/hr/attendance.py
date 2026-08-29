@@ -2,7 +2,7 @@
 
 from datetime import date, time
 
-from sqlalchemy import Date, ForeignKey, String, Time
+from sqlalchemy import Date, ForeignKey, String, Time, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -21,6 +21,9 @@ class AttendanceRecord(Base):
     """
 
     __tablename__ = "attendance_records"
+    __table_args__ = (
+        UniqueConstraint("employee_id", "date", name="uq_attendance_employee_date"),
+    )
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True, comment="员工ID")
     date: Mapped[date] = mapped_column(Date, index=True, comment="考勤日期")

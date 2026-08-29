@@ -4,6 +4,7 @@ from agno.run import RunContext
 from loguru import logger
 
 from app.core.database import async_session_factory
+from app.core.exceptions import AppException
 from app.services import legal as legal_service
 from app.tools.legal.utils import get_legal_id
 
@@ -31,8 +32,11 @@ async def leg_admin_review_contract(
             record = await legal_service.review_contract(session, contract_id, reviewer_id, action, opinion)
             await session.commit()
             return record.model_dump_json()
-        except Exception as e:
-            return str(e)
+        except AppException as e:
+            return e.message
+        except Exception:
+            logger.exception("合同审查失败 | contract_id={cid}", cid=contract_id)
+            return "服务内部错误，请稍后重试"
 
 
 async def leg_admin_analyze_contract(
@@ -53,5 +57,8 @@ async def leg_admin_analyze_contract(
         try:
             result = await legal_service.analyze_contract(session, contract_id)
             return result.model_dump_json()
-        except Exception as e:
-            return str(e)
+        except AppException as e:
+            return e.message
+        except Exception:
+            logger.exception("合同分析失败 | contract_id={cid}", cid=contract_id)
+            return "服务内部错误，请稍后重试"

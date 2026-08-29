@@ -131,13 +131,14 @@ sql("")
 # ── 4. 预算使用记录（15 条） ──────────────────────────────────
 
 sql("-- 预算使用记录")
+available_reimbursement_ids = list(range(1, 21))
 for i in range(1, 16):
     budget_id = random.randint(1, min(10, len(DEPT_IDS)))
     amount = round(random.uniform(500, 10000), 2)
     cat = random.choice(CATEGORIES)
     desc = f"费用支出-{cat}"
     used_date = today - timedelta(days=random.randint(0, 60))
-    reimb_id = random.randint(1, 20) if random.random() > 0.3 else "NULL"
+    reimb_id = available_reimbursement_ids.pop(random.randrange(len(available_reimbursement_ids))) if random.random() > 0.3 else "NULL"
     sql(
         f"INSERT INTO budget_usages (id, budget_id, reimbursement_id, amount, category, description, used_date, created_at, updated_at) "
         f"VALUES ({i}, {budget_id}, {reimb_id}, {amount}, {q(cat)}, {q(desc)}, {q(str(used_date))}, {q(str(now))}, {q(str(now))});"

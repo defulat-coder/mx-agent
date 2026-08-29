@@ -25,6 +25,17 @@
 - **WHEN** 应用启动
 - **THEN** 所有 v1 接口注册在 `/v1/` 路径下
 
+### Requirement: 评测管理接口
+系统 SHALL 将评测启动与状态查询限制为管理员，并限制其只能调用本机 Router Team 评测入口。
+
+#### Scenario: 非管理员启动评测
+- **WHEN** 已认证但不含 `admin` 角色的用户调用 `POST /v1/evals/runs`
+- **THEN** 系统返回 403 Forbidden
+
+#### Scenario: 非法评测目标
+- **WHEN** base_url 指向非本机地址或 endpoint 不在允许列表
+- **THEN** 请求参数校验失败，不发起后台请求
+
 ### Requirement: 全局异常处理
 系统 SHALL 捕获未处理的异常并返回统一格式的错误响应。
 

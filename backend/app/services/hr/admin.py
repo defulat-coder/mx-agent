@@ -39,7 +39,13 @@ from app.services.hr.employee import (
     get_salary_records,
     get_social_insurance,
 )
-from app.services.hr.manager import _get_dept_name_map, _get_employee_name_map
+from app.services.hr.manager import (
+    _APPROVAL_STATUS,
+    _get_dept_name_map,
+    _get_employee_name_map,
+    _transition_leave_request,
+    _transition_overtime_request,
+)
 
 
 # ── 管理者 Service ───────────────────────────────────────────
@@ -376,42 +382,48 @@ async def get_leave_summary(session: AsyncSession) -> list[LeaveSummaryResponse]
 
 
 async def admin_approve_leave_request(
-    session: AsyncSession, request_id: int, action: str, comment: str = "",
+    session: AsyncSession,
+    admin_employee_id: int,
+    request_id: int,
+    action: str,
+    comment: str = "",
 ) -> ApprovalResponse:
     """管理者审批请假申请（全公司范围，无部门限制）。"""
     logger.info("管理者审批请假 | request_id={rid} action={act}", rid=request_id, act=action)
+    if action not in _APPROVAL_STATUS:
+        return ApprovalResponse(success=False, message="审批动作仅支持「通过」或「拒绝」")
+
     leave_req = (await session.execute(
         select(LeaveRequest).where(LeaveRequest.id == request_id)
     )).scalar_one_or_none()
     if not leave_req:
         raise NotFoundException(message="请假申请不存在")
-    if leave_req.status != "待审批":
-        return ApprovalResponse(
-            success=False,
-            message=f"该申请当前状态为「{leave_req.status}」，无法审批",
-        )
-    new_status = "已通过" if action == "通过" else "已拒绝"
-    leave_req.status = new_status
-    await session.commit()
-    return ApprovalResponse(success=True, request_id=request_id, action=action, message=f"请假申请已{action}")
+    if leave_req.employee_id == admin_employee_id:
+        return ApprovalResponse(success=False, message="不能审批自己的请假申请")
+    if leave_req.days <= 0:
+        return ApprovalResponse(success=False, message="请假天数必须大于 0")
+
+    return await _transition_leave_request(session, leave_req, action, comment)
 
 
 async def admin_approve_overtime_request(
-    session: AsyncSession, record_id: int, action: str, comment: str = "",
+    session: AsyncSession,
+    admin_employee_id: int,
+    record_id: int,
+    action: str,
+    comment: str = "",
 ) -> ApprovalResponse:
     """管理者审批加班申请（全公司范围，无部门限制）。"""
     logger.info("管理者审批加班 | record_id={rid} action={act}", rid=record_id, act=action)
+    if action not in _APPROVAL_STATUS:
+        return ApprovalResponse(success=False, message="审批动作仅支持「通过」或「拒绝」")
+
     ot_record = (await session.execute(
         select(OvertimeRecord).where(OvertimeRecord.id == record_id)
     )).scalar_one_or_none()
     if not ot_record:
         raise NotFoundException(message="加班记录不存在")
-    if ot_record.status != "待审批":
-        return ApprovalResponse(
-            success=False,
-            message=f"该记录当前状态为「{ot_record.status}」，无法审批",
-        )
-    new_status = "已通过" if action == "通过" else "已拒绝"
-    ot_record.status = new_status
-    await session.commit()
-    return ApprovalResponse(success=True, request_id=record_id, action=action, message=f"加班申请已{action}")
+    if ot_record.employee_id == admin_employee_id:
+        return ApprovalResponse(success=False, message="不能审批自己的加班申请")
+
+    return await _transition_overtime_request(session, ot_record, action, comment)

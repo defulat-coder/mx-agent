@@ -1,10 +1,11 @@
 """行政管理 Service — 会议室、办公用品、快递、访客、差旅"""
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
 from loguru import logger
-from sqlalchemy import Date, and_, func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import BusinessException, NotFoundException
@@ -20,6 +21,53 @@ from app.schemas.admin import (
     SupplyStatsResponse,
     VisitorResponse,
 )
+
+
+LOCAL_TIMEZONE = ZoneInfo("Asia/Shanghai")
+MAX_BOOKING_DURATION = timedelta(hours=4)
+
+
+def _local_naive(value: datetime) -> datetime:
+    """将输入统一为上海本地无时区时间，匹配 SQLite DateTime 存储语义。"""
+    if value.tzinfo is not None:
+        value = value.astimezone(LOCAL_TIMEZONE).replace(tzinfo=None)
+    return value
+
+
+def _local_now() -> datetime:
+    return datetime.now(LOCAL_TIMEZONE).replace(tzinfo=None)
+
+
+async def _begin_immediate_on_sqlite(session: AsyncSession) -> None:
+    """SQLite 不支持行锁，在关键检查前获取写锁以串行化状态变更。"""
+    transaction = session.sync_session.get_transaction()
+    already_started = transaction is not None and transaction.origin.name == "AUTOBEGIN"
+    if session.get_bind().dialect.name == "sqlite" and not already_started:
+        await session.execute(text("BEGIN IMMEDIATE"))
+
+
+def _parse_supply_items(items: str) -> list[dict[str, str | int]]:
+    """解析、校验并合并同名用品。"""
+    try:
+        raw_items = json.loads(items)
+    except (json.JSONDecodeError, TypeError):
+        raise BusinessException(message="申领物品必须是有效的 JSON 数组") from None
+    if not isinstance(raw_items, list) or not raw_items:
+        raise BusinessException(message="申领物品必须是非空 JSON 数组")
+
+    quantities: dict[str, int] = {}
+    for item in raw_items:
+        if not isinstance(item, dict):
+            raise BusinessException(message="每项用品必须包含 name 和 quantity")
+        name = item.get("name")
+        quantity = item.get("quantity")
+        if not isinstance(name, str) or not name.strip():
+            raise BusinessException(message="用品名称不能为空")
+        if isinstance(quantity, bool) or not isinstance(quantity, int) or quantity <= 0:
+            raise BusinessException(message=f"'{name.strip()}' 的数量必须为正整数")
+        normalized_name = name.strip()
+        quantities[normalized_name] = quantities.get(normalized_name, 0) + quantity
+    return [{"name": name, "quantity": quantity} for name, quantity in quantities.items()]
 
 
 # ── 会议室查询 ─────────────────────────────────────────────
@@ -40,7 +88,13 @@ async def get_available_rooms(
     """查询可用会议室，指定时间段则排除有冲突的。"""
     logger.info("查询可用会议室 | start={s} end={e}", s=start_time, e=end_time)
     stmt = select(MeetingRoom).where(MeetingRoom.status == "available")
-    if start_time and end_time:
+    if (start_time is None) != (end_time is None):
+        raise BusinessException(message="开始时间和结束时间必须同时提供")
+    if start_time is not None and end_time is not None:
+        start_time = _local_naive(start_time)
+        end_time = _local_naive(end_time)
+        if end_time <= start_time:
+            raise BusinessException(message="结束时间必须晚于开始时间")
         # 排除有冲突预订的会议室
         conflict = (
             select(RoomBooking.room_id)
@@ -82,13 +136,22 @@ async def book_room(
         end_time: 结束时间
     """
     logger.info("预订会议室 | room_id={rid} employee_id={eid}", rid=room_id, eid=employee_id)
+    await _begin_immediate_on_sqlite(session)
+    start_time = _local_naive(start_time)
+    end_time = _local_naive(end_time)
+    now = _local_now()
+    if start_time <= now:
+        raise BusinessException(message="不能预订过去的时间")
     _validate_slot(start_time)
     _validate_slot(end_time)
     if end_time <= start_time:
         raise BusinessException(message="结束时间必须晚于开始时间")
-    now = datetime.now(timezone.utc)
+    if end_time - start_time > MAX_BOOKING_DURATION:
+        raise BusinessException(message="单次预订最长 4 小时")
     if start_time > now + timedelta(days=7):
         raise BusinessException(message="最多提前 7 天预订")
+    if not title.strip():
+        raise BusinessException(message="会议主题不能为空")
 
     room = (await session.execute(select(MeetingRoom).where(MeetingRoom.id == room_id))).scalar_one_or_none()
     if not room:
@@ -108,7 +171,7 @@ async def book_room(
         raise BusinessException(message="该时间段已有其他会议预订，请选择其他时间")
 
     booking = RoomBooking(
-        room_id=room_id, employee_id=employee_id, title=title,
+        room_id=room_id, employee_id=employee_id, title=title.strip(),
         start_time=start_time, end_time=end_time, status="active",
     )
     session.add(booking)
@@ -118,7 +181,7 @@ async def book_room(
     return RoomBookingResponse(
         booking_id=booking.id, room_id=room_id, room_name=room.name,
         employee_id=employee_id, employee_name=emp_name,
-        title=title, start_time=start_time, end_time=end_time,
+        title=title.strip(), start_time=start_time, end_time=end_time,
         status="active", created_at=booking.created_at,
     )
 
@@ -158,7 +221,7 @@ async def cancel_booking(session: AsyncSession, booking_id: int, employee_id: in
         raise BusinessException(message="只能取消自己的预订")
     if booking.status != "active":
         raise BusinessException(message="预订已取消或已完成")
-    now = datetime.now(timezone.utc)
+    now = _local_now()
     if booking.start_time <= now + timedelta(minutes=30):
         raise BusinessException(message="开始前 30 分钟内不可取消")
 
@@ -187,14 +250,24 @@ async def request_supply(
         items: JSON 格式 [{name, quantity}]
     """
     logger.info("申领办公用品 | employee_id={eid}", eid=employee_id)
-    req = SupplyRequest(employee_id=employee_id, items=items, status="pending")
+    item_list = _parse_supply_items(items)
+    names = [item["name"] for item in item_list]
+    existing_names = set((await session.execute(
+        select(OfficeSupply.name).where(OfficeSupply.name.in_(names)),
+    )).scalars().all())
+    missing_names = [name for name in names if name not in existing_names]
+    if missing_names:
+        raise BusinessException(message=f"用品不存在: {', '.join(missing_names)}")
+
+    normalized_items = json.dumps(item_list, ensure_ascii=False, separators=(",", ":"))
+    req = SupplyRequest(employee_id=employee_id, items=normalized_items, status="pending")
     session.add(req)
     await session.flush()
 
     emp_name = (await session.execute(select(Employee.name).where(Employee.id == employee_id))).scalar_one_or_none() or ""
     return SupplyRequestResponse(
         request_id=req.id, employee_id=employee_id, employee_name=emp_name,
-        items=items, status="pending", created_at=req.created_at,
+        items=normalized_items, status="pending", created_at=req.created_at,
     )
 
 
@@ -251,33 +324,40 @@ async def approve_supply(
         remark: 备注
     """
     logger.info("审批申领单 | request_id={rid} action={act}", rid=request_id, act=action)
-    req = (await session.execute(select(SupplyRequest).where(SupplyRequest.id == request_id))).scalar_one_or_none()
+    if action not in ("approve", "reject"):
+        raise BusinessException(message=f"不支持的操作: {action}")
+
+    await _begin_immediate_on_sqlite(session)
+    req = (await session.execute(
+        select(SupplyRequest).where(SupplyRequest.id == request_id).with_for_update(),
+    )).scalar_one_or_none()
     if not req:
         raise NotFoundException(message="申领单不存在")
     if req.status != "pending":
         raise BusinessException(message="申领单已处理")
 
     if action == "approve":
-        # 扣减库存
-        try:
-            item_list = json.loads(req.items) if req.items else []
-        except json.JSONDecodeError:
-            item_list = []
+        item_list = _parse_supply_items(req.items)
+        names = [item["name"] for item in item_list]
+        supplies = (await session.execute(
+            select(OfficeSupply).where(OfficeSupply.name.in_(names)).with_for_update(),
+        )).scalars().all()
+        supplies_by_name = {supply.name: supply for supply in supplies}
+        missing_names = [name for name in names if name not in supplies_by_name]
+        if missing_names:
+            raise BusinessException(message=f"用品不存在: {', '.join(missing_names)}")
         for item in item_list:
-            name = item.get("name", "")
-            qty = item.get("quantity", 0)
-            supply = (await session.execute(
-                select(OfficeSupply).where(OfficeSupply.name == name),
-            )).scalar_one_or_none()
-            if supply and supply.stock < qty:
-                raise BusinessException(message=f"'{name}' 库存不足（剩余 {supply.stock}，申请 {qty}）")
-            if supply:
-                supply.stock -= qty
+            supply = supplies_by_name[item["name"]]
+            quantity = item["quantity"]
+            if supply.stock < quantity:
+                raise BusinessException(
+                    message=f"'{supply.name}' 库存不足（剩余 {supply.stock}，申请 {quantity}）",
+                )
+        for item in item_list:
+            supplies_by_name[item["name"]].stock -= item["quantity"]
         req.status = "approved"
-    elif action == "reject":
-        req.status = "rejected"
     else:
-        raise BusinessException(message=f"不支持的操作: {action}")
+        req.status = "rejected"
 
     req.approved_by = admin_id
     req.remark = remark
@@ -394,10 +474,25 @@ async def book_visitor(
 ) -> VisitorResponse:
     """预约访客。"""
     logger.info("预约访客 | host_id={hid} visitor={vn}", hid=host_id, vn=visitor_name)
-    from datetime import date as date_type
-    vd = date_type.fromisoformat(visit_date)
+    if not visitor_name.strip():
+        raise BusinessException(message="访客姓名不能为空")
+    try:
+        vd = date.fromisoformat(visit_date)
+    except ValueError:
+        raise BusinessException(message="来访日期格式必须为 YYYY-MM-DD") from None
+    if vd < datetime.now(LOCAL_TIMEZONE).date():
+        raise BusinessException(message="来访日期不能早于今天")
+    if visit_time:
+        try:
+            start_value, end_value = visit_time.split("-", 1)
+            start_visit = time.fromisoformat(start_value)
+            end_visit = time.fromisoformat(end_value)
+        except ValueError:
+            raise BusinessException(message="来访时间格式必须为 HH:MM-HH:MM") from None
+        if start_visit >= end_visit:
+            raise BusinessException(message="来访结束时间必须晚于开始时间")
     visitor = Visitor(
-        visitor_name=visitor_name, company=company, phone=phone,
+        visitor_name=visitor_name.strip(), company=company, phone=phone,
         host_id=host_id, visit_date=vd, visit_time=visit_time,
         purpose=purpose, status="pending",
     )
@@ -406,7 +501,7 @@ async def book_visitor(
 
     host_name = (await session.execute(select(Employee.name).where(Employee.id == host_id))).scalar_one_or_none() or ""
     return VisitorResponse(
-        visitor_id=visitor.id, visitor_name=visitor_name, company=company,
+        visitor_id=visitor.id, visitor_name=visitor_name.strip(), company=company,
         phone=phone, host_id=host_id, host_name=host_name,
         visit_date=vd, visit_time=visit_time, purpose=purpose,
         status="pending", created_at=visitor.created_at,

@@ -1,6 +1,8 @@
 """部门预算模型"""
 
-from sqlalchemy import Float, ForeignKey, Integer, String
+from decimal import Decimal
+
+from sqlalchemy import CheckConstraint, ForeignKey, Integer, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -18,9 +20,16 @@ class Budget(Base):
     """
 
     __tablename__ = "budgets"
+    __table_args__ = (
+        UniqueConstraint("department_id", "year", name="uq_budget_department_year"),
+        CheckConstraint(
+            "total_amount >= 0 AND used_amount >= 0 AND used_amount <= total_amount",
+            name="ck_budget_amounts_valid",
+        ),
+    )
 
     department_id: Mapped[int] = mapped_column(ForeignKey("departments.id"), comment="部门ID")
     year: Mapped[int] = mapped_column(Integer, comment="年度")
-    total_amount: Mapped[float] = mapped_column(Float, comment="预算总额")
-    used_amount: Mapped[float] = mapped_column(Float, default=0, comment="已使用金额")
+    total_amount: Mapped[Decimal] = mapped_column(Numeric(14, 2), comment="预算总额")
+    used_amount: Mapped[Decimal] = mapped_column(Numeric(14, 2), default=0, comment="已使用金额")
     status: Mapped[str] = mapped_column(String(16), default="active", comment="状态")

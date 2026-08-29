@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -21,6 +21,9 @@ class RoomBooking(Base):
     """
 
     __tablename__ = "room_bookings"
+    __table_args__ = (
+        CheckConstraint("end_time > start_time", name="ck_room_booking_time_order"),
+    )
 
     room_id: Mapped[int] = mapped_column(ForeignKey("meeting_rooms.id"), comment="会议室ID")
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), comment="预订人ID")

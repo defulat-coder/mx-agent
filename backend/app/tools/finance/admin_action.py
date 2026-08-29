@@ -1,11 +1,13 @@
 """财务人员操作 Tools — 报销审核、开票处理"""
 
 import json
+from urllib.parse import urlencode
 
 from agno.run import RunContext
 from loguru import logger
 
 from app.core.database import async_session_factory
+from app.core.exceptions import AppException
 from app.services import finance as fin_service
 from app.tools.finance.utils import get_finance_id
 
@@ -33,8 +35,11 @@ async def fin_admin_review_reimbursement(
             record = await fin_service.review_reimbursement(session, reimbursement_id, admin_id, action, remark)
             await session.commit()
             return record.model_dump_json()
-        except Exception as e:
-            return str(e)
+        except AppException as e:
+            return e.message
+        except Exception:
+            logger.exception("报销审核失败 | reimbursement_id={rid}", rid=reimbursement_id)
+            return "服务内部错误，请稍后重试"
 
 
 async def fin_admin_process_invoice_request(
@@ -43,7 +48,7 @@ async def fin_admin_process_invoice_request(
     amount: float,
     description: str = "",
 ) -> str:
-    """处理开票申请。返回开票结果（模拟）。
+    """准备开票申请链接，需用户在 OA 页面确认后提交。
 
     Args:
         customer: 客户名称
@@ -55,9 +60,13 @@ async def fin_admin_process_invoice_request(
         get_finance_id(run_context)
     except ValueError as e:
         return str(e)
+    if not customer.strip() or amount <= 0:
+        return "客户名称不能为空，且开票金额必须大于 0"
+    query = urlencode({"customer": customer.strip(), "amount": f"{amount:.2f}", "description": description})
     result = {
-        "status": "success",
-        "message": f"已为 {customer} 开具金额 {amount:.2f} 元的发票",
-        "invoice_url": f"https://oa.maxi.com/invoice/preview?customer={customer}&amount={amount}",
+        "status": "prepared",
+        "requires_user_action": True,
+        "message": "开票信息已准备，请在 OA 页面核对并提交",
+        "invoice_url": f"https://oa.maxi.com/invoice/preview?{query}",
     }
     return json.dumps(result, ensure_ascii=False)

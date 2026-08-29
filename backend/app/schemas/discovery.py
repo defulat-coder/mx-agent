@@ -63,7 +63,7 @@ class PromotionReadinessItem(BaseModel):
     latest_rating: str = Field(description="最近绩效评级")
     management_training_count: int = Field(description="管理类培训完成数")
     idp_progress: int = Field(description="IDP 平均进度")
-    readiness_score: int = Field(description="综合就绪度评分 1-100")
+    readiness_score: int = Field(description="综合就绪度评分 0-100")
 
 
 class PromotionReadinessResult(BaseModel):
@@ -79,6 +79,7 @@ class CandidateMatchItem(BaseModel):
     matched_skills: list[str] = Field(description="匹配的技能")
     relevant_projects: list[str] = Field(description="相关项目名称")
     latest_rating: str = Field(description="最近绩效评级")
+    match_score: int = Field(description="归一化匹配分 0-100")
     match_summary: str = Field(description="匹配度说明")
 
 

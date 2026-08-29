@@ -20,6 +20,7 @@ def q(v: str) -> str:
 sql("-- HR 测试数据 —— 自动生成，覆盖 14 张表")
 sql("-- 使用前请确保表已通过 SQLAlchemy metadata.create_all 或 alembic 创建")
 sql("BEGIN;\n")
+sql("UPDATE departments SET manager_id = NULL;")
 
 # ── 清空旧数据 ──────────────────────────────────────────────
 for t in [
@@ -221,7 +222,7 @@ for eid, name, _, _, _, lv, hd, st, _, _ in employees_raw:
 
     for lt, total, used in [
         ("年假", annual, annual_used),
-        ("调休", round(random.uniform(1, 5), 1), round(random.uniform(0, 2), 1)),
+        ("调休", (comp_days := round(random.uniform(1, 5), 1)), round(random.uniform(0, min(2, comp_days)), 1)),
         ("病假", 10, round(random.uniform(0, 2), 1)),
         ("事假", 5, round(random.uniform(0, 1), 1)),
     ]:

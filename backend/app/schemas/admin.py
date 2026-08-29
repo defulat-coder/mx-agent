@@ -25,8 +25,8 @@ class RoomBookingResponse(BaseModel):
     employee_id: int = Field(description="预订人 ID")
     employee_name: str = Field(default="", description="预订人姓名")
     title: str = Field(description="会议主题")
-    start_time: dt.datetime = Field(description="开始时间")
-    end_time: dt.datetime = Field(description="结束时间")
+    start_time: dt.datetime = Field(description="开始时间（Asia/Shanghai 本地时间）")
+    end_time: dt.datetime = Field(description="结束时间（Asia/Shanghai 本地时间）")
     status: str = Field(description="状态")
     created_at: dt.datetime | None = Field(default=None, description="创建时间")
 

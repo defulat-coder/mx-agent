@@ -2,10 +2,14 @@
 
 import sys
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import jwt
 
-SECRET = "change-me-in-production"
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from app.config import settings
+
+SECRET = settings.AUTH_SECRET
 ALGORITHM = "HS256"
 
 # 预设测试用户

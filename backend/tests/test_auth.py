@@ -8,7 +8,7 @@ import pytest
 from httpx import AsyncClient
 
 from app.config import settings
-from app.tools.hr.utils import get_employee_id
+from app.tools.hr.utils import get_admin_id, get_employee_id, get_manager_info, get_talent_dev_id
 from tests.conftest import make_token
 
 
@@ -86,3 +86,29 @@ def test_mock_identity_enabled_can_inject():
     finally:
         settings.DEBUG = old_debug
         settings.ALLOW_MOCK_IDENTITY = old_allow_mock
+
+
+@pytest.mark.parametrize(
+    ("helper", "roles", "department_id", "message"),
+    [
+        (get_manager_info, [], 7, "部门主管"),
+        (get_admin_id, [], 7, "HR 管理者"),
+        (get_talent_dev_id, [], 7, "人才发展"),
+    ],
+)
+def test_sensitive_hr_identity_helpers_enforce_roles(helper, roles, department_id, message):
+    run_context = SimpleNamespace(
+        session_id="s-role",
+        session_state={"employee_id": 1, "roles": roles, "department_id": department_id},
+    )
+    with pytest.raises(ValueError, match=message):
+        helper(run_context)
+
+
+def test_manager_identity_requires_department_id():
+    run_context = SimpleNamespace(
+        session_id="s-manager",
+        session_state={"employee_id": 1, "roles": ["manager"], "department_id": None},
+    )
+    with pytest.raises(ValueError, match="department_id"):
+        get_manager_info(run_context)

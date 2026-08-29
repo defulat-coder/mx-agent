@@ -1,6 +1,6 @@
 """人才盘点（九宫格）模型"""
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -21,6 +21,9 @@ class TalentReview(Base):
     """
 
     __tablename__ = "talent_reviews"
+    __table_args__ = (
+        UniqueConstraint("employee_id", "review_year", name="uq_talent_review_employee_year"),
+    )
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True, comment="员工ID")
     review_year: Mapped[int] = mapped_column(comment="盘点年度")

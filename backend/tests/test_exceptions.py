@@ -17,6 +17,7 @@ def test_app_exception_defaults():
     assert exc.status_code == 400
     assert exc.code == ErrorCode.BAD_REQUEST
     assert exc.message == "请求错误"
+    assert str(exc) == "请求错误"
 
 
 def test_unauthorized_exception():

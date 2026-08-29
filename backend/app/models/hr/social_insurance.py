@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 
-from sqlalchemy import ForeignKey, Numeric, String
+from sqlalchemy import CheckConstraint, ForeignKey, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -23,6 +23,15 @@ class SocialInsuranceRecord(Base):
     """
 
     __tablename__ = "social_insurance_records"
+    __table_args__ = (
+        UniqueConstraint("employee_id", "year_month", name="uq_social_insurance_employee_month"),
+        CheckConstraint(
+            "pension >= 0 AND medical >= 0 AND unemployment >= 0 AND housing_fund >= 0 "
+            "AND pension_company >= 0 AND medical_company >= 0 AND unemployment_company >= 0 "
+            "AND injury_company >= 0 AND maternity_company >= 0 AND housing_fund_company >= 0",
+            name="ck_social_insurance_amounts_non_negative",
+        ),
+    )
 
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), index=True, comment="员工ID")
     year_month: Mapped[str] = mapped_column(String(7), index=True, comment="缴纳月份，格式YYYY-MM")

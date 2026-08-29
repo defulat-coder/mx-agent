@@ -10,9 +10,10 @@ setup_tracing()
 from agno.db.sqlite import SqliteDb
 from agno.os import AgentOS
 from agno.os.middleware import JWTMiddleware
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.cors import CORSMiddleware
 
 from app.agents.router_agent import router_team
 from app.config import settings
@@ -79,61 +80,23 @@ app.add_middleware(
     session_state_claims=list(SESSION_STATE_CLAIMS),
     validate=True,
     excluded_route_paths=[
-        "/",
         "/docs",
+        "/docs/oauth2-redirect",
         "/redoc",
         "/openapi.json",
         "/health",
-        "/info",
-        "/agents",
-        "/agents/*",
-        "/teams",
-        "/teams/*",
-        "/workflows",
-        "/workflows/*",
-        "/sessions",
-        "/sessions/*",
-        "/memories",
-        "/memories/*",
-        "/memory_topics",
-        "/knowledge/*",
-        "/traces",
-        "/traces/*",
-        "/metrics",
-        "/metrics/*",
-        "/config",
         "/v1/chat",
-        "/components",
-        "/components/*",
-        "/models",
-        "/databases/*",
-        "/eval-runs",
-        "/eval-runs/*",
-        "/optimize-memories",
-        "/user_memory_stats",
-        "/trace_session_stats",
     ],
 )
 
-
-@app.middleware("http")
-async def cors_middleware(request: Request, call_next):
-    origin = request.headers.get("origin", "")
-
-    if request.method == "OPTIONS":
-        response = Response(status_code=200)
-    else:
-        response = await call_next(request)
-
-    if origin:
-        response.headers["access-control-allow-origin"] = origin
-        response.headers["access-control-allow-credentials"] = "true"
-        response.headers["access-control-allow-methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
-        response.headers["access-control-allow-headers"] = "content-type, authorization, x-requested-with, accept, origin"
-        response.headers["access-control-allow-private-network"] = "true"
-        response.headers["access-control-max-age"] = "600"
-
-    return response
+app.state.cors_allowed_origins = settings.CORS_ORIGINS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
+    allow_headers=["Authorization", "Content-Type", "X-Requested-With"],
+)
 
 
 # TraceIDMiddleware：最外层，创建请求级 OTel span 并注入 X-Trace-Id 响应头

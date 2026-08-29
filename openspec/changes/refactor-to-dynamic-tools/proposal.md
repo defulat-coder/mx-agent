@@ -10,7 +10,7 @@ Agno 原生支持动态 tools（`tools` 参数传入工厂函数），可在运�
 ## What Changes
 
 - 各 Agent 的 `tools` 从静态列表改为**工厂函数**，根据用户 roles 动态返回可用 tools
-- **移除 Tool 层权限校验逻辑**（`get_manager_info`、`get_admin_id`、`get_talent_dev_id` 等校验函数仅保留身份提取功能）
+- **保留敏感 Tool 层权限校验逻辑**（动态 tools 用于缩小暴露面，主管、HR 管理者和人才发展工具继续做运行时兜底）
 - **简化 Agent instructions**，移除权限说明部分（LLM 只能看到它有权限的 tools，无需再提示"主管可以..."）
 - 涉及 5 个 Agent：HR、IT、Admin、Finance、Legal
 

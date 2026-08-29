@@ -2,6 +2,7 @@
 -- 使用前请确保表已通过 SQLAlchemy metadata.create_all 或 alembic 创建
 BEGIN;
 
+UPDATE departments SET manager_id = NULL;
 DELETE FROM certificates;
 DELETE FROM project_experiences;
 DELETE FROM educations;
@@ -1381,7 +1382,7 @@ INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (2, 2026, '病假', 10, 0.4, 9.6);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (2, 2026, '事假', 5, 0.3, 4.7);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (3, 2026, '年假', 10, 2.7, 7.3);
-INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (3, 2026, '调休', 1.1, 1.2, -0.1);
+INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (3, 2026, '调休', 1.1, 0.7, 0.4);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (3, 2026, '病假', 10, 0.5, 9.5);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (3, 2026, '事假', 5, 0.3, 4.7);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (4, 2026, '年假', 15, 1.2, 13.8);
@@ -1401,7 +1402,7 @@ INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (7, 2026, '病假', 10, 0.8, 9.2);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (7, 2026, '事假', 5, 0.2, 4.8);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (8, 2026, '年假', 10, 1.0, 9.0);
-INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (8, 2026, '调休', 1.9, 1.8, 0.1);
+INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (8, 2026, '调休', 1.9, 1.7, 0.2);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (8, 2026, '病假', 10, 1.6, 8.4);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (8, 2026, '事假', 5, 0.1, 4.9);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (9, 2026, '年假', 15, 3.0, 12.0);
@@ -1433,15 +1434,15 @@ INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (15, 2026, '病假', 10, 1.0, 9.0);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (15, 2026, '事假', 5, 0.1, 4.9);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (16, 2026, '年假', 10, 0.7, 9.3);
-INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (16, 2026, '调休', 1.9, 1.1, 0.8);
+INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (16, 2026, '调休', 1.9, 1.0, 0.9);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (16, 2026, '病假', 10, 0.0, 10.0);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (16, 2026, '事假', 5, 0.9, 4.1);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (17, 2026, '年假', 10, 0.6, 9.4);
-INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (17, 2026, '调休', 1.5, 1.4, 0.1);
+INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (17, 2026, '调休', 1.5, 1.1, 0.4);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (17, 2026, '病假', 10, 1.8, 8.2);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (17, 2026, '事假', 5, 0.8, 4.2);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (18, 2026, '年假', 15, 1.0, 14.0);
-INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (18, 2026, '调休', 1.1, 1.2, -0.1);
+INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (18, 2026, '调休', 1.1, 0.6, 0.5);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (18, 2026, '病假', 10, 1.8, 8.2);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (18, 2026, '事假', 5, 0.8, 4.2);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (19, 2026, '年假', 5, 2.5, 2.5);
@@ -1449,7 +1450,7 @@ INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (19, 2026, '病假', 10, 0.7, 9.3);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (19, 2026, '事假', 5, 0.9, 4.1);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (20, 2026, '年假', 15, 1.2, 13.8);
-INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (20, 2026, '调休', 1.4, 0.6, 0.8);
+INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (20, 2026, '调休', 1.4, 0.4, 1.0);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (20, 2026, '病假', 10, 0.3, 9.7);
 INSERT INTO leave_balances (employee_id, year, leave_type, total_days, used_days, remaining_days) VALUES (20, 2026, '事假', 5, 0.2, 4.8);
 

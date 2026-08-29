@@ -54,35 +54,41 @@ def get_employee_id(run_context: RunContext) -> int:
 
 
 def get_manager_info(run_context: RunContext) -> tuple[int, int]:
-    """从 session_state 提取主管信息。
-
-    注：权限校验已通过动态 tools 在 Agent 层实现，此函数仅负责提取身份信息。
+    """从 session_state 提取并校验主管信息。
 
     Returns:
         (employee_id, department_id)
     """
     employee_id = get_employee_id(run_context)
     state = run_context.session_state
+    if "manager" not in state.get("roles", []):  # type: ignore[union-attr]
+        raise ValueError("该功能仅限部门主管使用")
+    if state.get("department_id") is None:  # type: ignore[union-attr]
+        raise ValueError("主管登录态缺少 department_id")
     return employee_id, state["department_id"]  # type: ignore[index]
 
 
 def get_admin_id(run_context: RunContext) -> int:
-    """从 session_state 提取管理者身份。
-
-    注：权限校验已通过动态 tools 在 Agent 层实现，此函数仅负责提取身份信息。
+    """从 session_state 提取并校验 HR 管理者身份。
 
     Returns:
         员工 ID
     """
-    return get_employee_id(run_context)
+    employee_id = get_employee_id(run_context)
+    state = run_context.session_state
+    if "admin" not in state.get("roles", []):  # type: ignore[union-attr]
+        raise ValueError("该功能仅限 HR 管理者使用")
+    return employee_id
 
 
 def get_talent_dev_id(run_context: RunContext) -> int:
-    """从 session_state 提取人才发展角色身份。
-
-    注：权限校验已通过动态 tools 在 Agent 层实现，此函数仅负责提取身份信息。
+    """从 session_state 提取并校验人才发展角色身份。
 
     Returns:
         员工 ID
     """
-    return get_employee_id(run_context)
+    employee_id = get_employee_id(run_context)
+    state = run_context.session_state
+    if "talent_dev" not in state.get("roles", []):  # type: ignore[union-attr]
+        raise ValueError("该功能仅限人才发展角色使用")
+    return employee_id

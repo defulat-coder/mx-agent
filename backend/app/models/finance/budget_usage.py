@@ -1,8 +1,9 @@
 """预算使用记录模型"""
 
 from datetime import date
+from decimal import Decimal
 
-from sqlalchemy import Date, Float, ForeignKey, String
+from sqlalchemy import CheckConstraint, Date, ForeignKey, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -21,10 +22,14 @@ class BudgetUsage(Base):
     """
 
     __tablename__ = "budget_usages"
+    __table_args__ = (
+        UniqueConstraint("reimbursement_id", name="uq_budget_usage_reimbursement"),
+        CheckConstraint("amount > 0", name="ck_budget_usage_amount_positive"),
+    )
 
     budget_id: Mapped[int] = mapped_column(ForeignKey("budgets.id"), comment="预算ID")
     reimbursement_id: Mapped[int | None] = mapped_column(ForeignKey("reimbursements.id"), default=None, comment="关联报销单ID")
-    amount: Mapped[float] = mapped_column(Float, comment="使用金额")
+    amount: Mapped[Decimal] = mapped_column(Numeric(14, 2), comment="使用金额")
     category: Mapped[str] = mapped_column(String(32), comment="费用科目")
     description: Mapped[str] = mapped_column(String(256), default="", comment="说明")
     used_date: Mapped[date] = mapped_column(Date, comment="使用日期")

@@ -3,7 +3,7 @@
 from datetime import date, datetime, timezone
 
 from loguru import logger
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import BusinessException, NotFoundException
@@ -367,38 +367,73 @@ async def review_reimbursement(
         remark: 审核备注
     """
     logger.info("审核报销单 | id={rid} action={act}", rid=reimbursement_id, act=action)
+    allowed_transitions = {
+        "pending": {"approve", "reject", "return"},
+        "returned": {"approve", "reject"},
+    }
+    if action not in {"approve", "reject", "return"}:
+        raise BusinessException(message=f"不支持的操作: {action}")
+
     r = (await session.execute(select(Reimbursement).where(Reimbursement.id == reimbursement_id))).scalar_one_or_none()
     if not r:
         raise NotFoundException(message="报销单不存在")
-    if r.status not in ("pending", "returned"):
-        raise BusinessException(message=f"当前状态 [{r.status}] 不允许审核")
+    if action not in allowed_transitions.get(r.status, set()):
+        raise BusinessException(message=f"当前状态 [{r.status}] 不允许执行 [{action}]")
+    if r.amount <= 0:
+        raise BusinessException(message="报销金额必须大于 0")
+
+    next_status = {"approve": "approved", "reject": "rejected", "return": "returned"}[action]
+    reviewed_at = datetime.now(timezone.utc)
+    claimed = await session.execute(
+        update(Reimbursement)
+        .where(Reimbursement.id == reimbursement_id, Reimbursement.status == r.status)
+        .values(
+            status=next_status,
+            reviewer_id=reviewer_id,
+            review_remark=remark,
+            reviewed_at=reviewed_at,
+        ),
+    )
+    if claimed.rowcount != 1:
+        raise BusinessException(message="报销单状态已变更，请刷新后重试")
 
     if action == "approve":
-        r.status = "approved"
-        # 关联预算扣减
         current_year = date.today().year
         budget = (await session.execute(
             select(Budget).where(Budget.department_id == r.department_id, Budget.year == current_year),
         )).scalar_one_or_none()
-        if budget:
-            budget.used_amount += r.amount
-            usage = BudgetUsage(
-                budget_id=budget.id, reimbursement_id=r.id, amount=r.amount,
-                category=r.type, description=f"报销单 {r.reimbursement_no}",
-                used_date=date.today(),
-            )
-            session.add(usage)
-    elif action == "reject":
-        r.status = "rejected"
-    elif action == "return":
-        r.status = "returned"
-    else:
-        raise BusinessException(message=f"不支持的操作: {action}")
+        if not budget:
+            raise BusinessException(message=f"部门缺少 {current_year} 年度预算")
+        if budget.status != "active":
+            raise BusinessException(message="部门预算当前不可用")
+        if budget.used_amount + r.amount > budget.total_amount:
+            raise BusinessException(message="部门预算余额不足")
 
-    r.reviewer_id = reviewer_id
-    r.review_remark = remark
-    r.reviewed_at = datetime.now(timezone.utc)
+        existing_usage = (await session.execute(
+            select(BudgetUsage.id).where(BudgetUsage.reimbursement_id == r.id),
+        )).scalar_one_or_none()
+        if existing_usage is not None:
+            raise BusinessException(message="该报销单已记入预算，不可重复审核")
+
+        budget_updated = await session.execute(
+            update(Budget)
+            .where(
+                Budget.id == budget.id,
+                Budget.status == "active",
+                Budget.used_amount + r.amount <= Budget.total_amount,
+            )
+            .values(used_amount=Budget.used_amount + r.amount),
+        )
+        if budget_updated.rowcount != 1:
+            raise BusinessException(message="预算状态或余额已变化，请刷新后重试")
+        session.add(BudgetUsage(
+            budget_id=budget.id, reimbursement_id=r.id, amount=r.amount,
+            category=r.type, description=f"报销单 {r.reimbursement_no}",
+            used_date=date.today(),
+        ))
+
     await session.flush()
+    await session.refresh(r)
 
     emp_name = (await session.execute(select(Employee.name).where(Employee.id == r.employee_id))).scalar_one_or_none() or ""
     dept_name = (await session.execute(select(Department.name).where(Department.id == r.department_id))).scalar_one_or_none() or ""

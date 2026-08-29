@@ -1,8 +1,9 @@
 """报销单模型"""
 
 from datetime import datetime
+from decimal import Decimal
 
-from sqlalchemy import DateTime, Float, ForeignKey, String
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -24,11 +25,14 @@ class Reimbursement(Base):
     """
 
     __tablename__ = "reimbursements"
+    __table_args__ = (
+        CheckConstraint("amount > 0", name="ck_reimbursement_amount_positive"),
+    )
 
     reimbursement_no: Mapped[str] = mapped_column(String(32), unique=True, index=True, comment="报销单号")
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), comment="申请人ID")
     type: Mapped[str] = mapped_column(String(32), comment="报销类型")
-    amount: Mapped[float] = mapped_column(Float, comment="报销金额")
+    amount: Mapped[Decimal] = mapped_column(Numeric(14, 2), comment="报销金额")
     status: Mapped[str] = mapped_column(String(16), default="pending", comment="状态")
     reviewer_id: Mapped[int | None] = mapped_column(ForeignKey("employees.id"), default=None, comment="审核人ID")
     review_remark: Mapped[str] = mapped_column(String(256), default="", comment="审核备注")

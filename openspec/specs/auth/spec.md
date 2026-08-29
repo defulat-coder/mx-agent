@@ -15,12 +15,27 @@
 - **WHEN** 请求未携带 Authorization header
 - **THEN** 系统返回 401 Unauthorized
 
+#### Scenario: AgentOS 运维路由
+- **WHEN** 未认证用户访问 Agent、Team、Session、Trace、Config、Metrics 等 AgentOS 运维路由
+- **THEN** 系统返回 401 Unauthorized；仅健康检查和 API 文档允许匿名访问
+
+### Requirement: CORS 来源限制
+系统 SHALL 仅允许配置白名单中的前端来源发起跨域凭证请求。
+
+#### Scenario: 非白名单来源
+- **WHEN** 请求的 Origin 不在 `CORS_ORIGINS` 中
+- **THEN** 响应不得返回允许该 Origin 的 CORS 凭证头
+
 ### Requirement: Agent Tool 鉴权
 所有 Agent Tool 在执行数据查询时 SHALL 强制使用当前认证用户的 employee_id 进行数据过滤。
 
 #### Scenario: Tool 数据隔离
 - **WHEN** Agent 调用任何数据查询 Tool
 - **THEN** Tool 内部 SQL 查询强制附加 `WHERE employee_id = :current_employee_id`，不可被 prompt 绕过
+
+#### Scenario: 敏感角色工具
+- **WHEN** 主管、HR 管理者或人才发展工具被直接调用
+- **THEN** Tool 除动态暴露过滤外还须在运行时校验 `manager`、`admin` 或 `talent_dev` 角色
 
 ### Requirement: 身份上下文传递
 系统 SHALL 通过 agno 的 run_context 机制将 employee_id 传递给 Agent 及其 Tools。

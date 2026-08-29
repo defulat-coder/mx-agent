@@ -14,7 +14,7 @@ async def approve_leave_request(
     action: str,
     comment: str = "",
 ) -> str:
-    """审批请假申请。action 为"通过"或"拒绝"，comment 为审批备注。
+    """审批请假申请。comment 当前不会持久化，返回结果会明确提示。
 
     Args:
         request_id: 请假申请 ID
@@ -31,9 +31,10 @@ async def approve_leave_request(
     except ValueError as e:
         return str(e)
     async with async_session_factory() as session:
-        result = await hr_service.approve_leave_request(
-            session, emp_id, dept_id, request_id, action, comment,
-        )
+        async with session.begin():
+            result = await hr_service.approve_leave_request(
+                session, emp_id, dept_id, request_id, action, comment,
+            )
         return result.model_dump_json()
 
 
@@ -43,7 +44,7 @@ async def approve_overtime_request(
     action: str,
     comment: str = "",
 ) -> str:
-    """审批加班申请。action 为"通过"或"拒绝"，comment 为审批备注。
+    """审批加班申请。comment 当前不会持久化，返回结果会明确提示。
 
     Args:
         record_id: 加班记录 ID
@@ -60,7 +61,8 @@ async def approve_overtime_request(
     except ValueError as e:
         return str(e)
     async with async_session_factory() as session:
-        result = await hr_service.approve_overtime_request(
-            session, emp_id, dept_id, record_id, action, comment,
-        )
+        async with session.begin():
+            result = await hr_service.approve_overtime_request(
+                session, emp_id, dept_id, record_id, action, comment,
+            )
         return result.model_dump_json()

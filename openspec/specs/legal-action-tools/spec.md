@@ -36,6 +36,10 @@
 - **WHEN** 法务人员调用 leg_admin_analyze_contract 传有效 contract_id
 - **THEN** 调用 LLM 分析合同内容，返回 ContractAnalysisResult（summary, risks, suggestions）+ disclaimer
 
+#### Scenario: 非法分析结构
+- **WHEN** LLM 返回非 JSON 或字段类型不符合 ContractAnalysisResult
+- **THEN** 系统返回外部服务格式错误，不将非结构化内容伪装成成功结果
+
 #### Scenario: 合同无内容
 - **WHEN** Contract.content 为空
 - **THEN** 返回错误提示"该合同暂无内容可分析"
