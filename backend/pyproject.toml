@@ -3,35 +3,36 @@ name = "mx-agent"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
-    "agno>=2.6.18",
-    "aiosqlite>=0.21.0",
-    "fastapi>=0.128.7",
-    "greenlet>=3.3.1",
-    "lancedb>=0.29.2",
-    "langfuse>=4.0.0",
+    "agno>=3.0.1",
+    "aiosqlite>=0.22.1",
+    "fastapi>=0.141.1",
+    "greenlet>=3.5.5",
+    "lancedb>=0.37.1",
+    "langfuse>=4.15.1",
     "loguru>=0.7.3",
-    "openai>=2.20.0",
-    "openinference-instrumentation-agno>=0.1.27",
-    "opentelemetry-api>=1.39.1",
-    "opentelemetry-sdk>=1.39.1",
-    "opentelemetry-exporter-otlp>=1.39.1",
-    "pandas>=3.0.0",
-    "pydantic>=2.12.0",
-    "pydantic-settings>=2.12.0",
-    "pyjwt>=2.11.0",
-    "python-dotenv>=1.2.1",
-    "sqlalchemy==2.0.46",
-    "uvicorn[standard]>=0.40.0",
+    "openai>=3.6.0",
+    "openinference-instrumentation-agno>=1.0.6",
+    "opentelemetry-api>=1.44.0",
+    "opentelemetry-sdk>=1.44.0",
+    "opentelemetry-exporter-otlp>=1.44.0",
+    "pandas>=3.0.5",
+    "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
+    "pyjwt>=2.13.0",
+    "python-dotenv>=1.2.3",
+    "python-multipart>=0.0.32",
+    "sqlalchemy>=2.0.52",
+    "uvicorn[standard]>=0.52.4",
 ]
 
 [dependency-groups]
 dev = [
     "httpx>=0.28.1",
-    "pytest>=9.0.2",
-    "pytest-asyncio>=0.24",
-    "pyyaml>=6.0.2",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pyyaml>=6.0.3",
 ]
 
 [tool.pytest.ini_options]

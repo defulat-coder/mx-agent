@@ -56,7 +56,7 @@ uv run python scripts/run_evals.py
 
 ## Guidance
 
-- Use Python `>=3.13` and `uv`; keep `uv.lock` in sync when dependency changes
+- Use Python `>=3.14` and `uv`; keep `uv.lock` in sync when dependency changes
   are intentional.
 - Run backend commands from `backend/` so `.env`, SQLite paths, logs, and
   knowledge directories resolve correctly.
